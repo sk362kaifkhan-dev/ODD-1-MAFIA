@@ -1,0 +1,2481 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>ODD ONE MAFIA — Online Party Game</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #070b14;
+      color: #f8fafc;
+      overflow-x: hidden;
+    }
+    .font-display {
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.35);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(139, 92, 246, 0.45);
+      border-radius: 9999px;
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.96); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .animate-pop-in {
+      animation: popIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-950/70 via-slate-950 to-slate-950 flex flex-col">
+
+  <!-- Toast Banner Container (Never uses alert() or confirm()) -->
+  <div id="toast-container" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 w-[92%] max-w-md pointer-events-none"></div>
+
+  <!-- Sticky Top Navigation Bar -->
+  <header class="w-full border-b border-slate-800/80 bg-slate-950/85 backdrop-blur-md sticky top-0 z-30">
+    <div class="max-w-2xl mx-auto px-3.5 py-2.5 flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2.5">
+        <div id="header-logo-badge" class="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-600 flex items-center justify-center shadow-lg shadow-violet-500/25 font-display font-extrabold text-white text-lg shrink-0">
+          ?
+        </div>
+        <div>
+          <h1 id="header-title" class="font-display font-extrabold text-base sm:text-lg tracking-tight text-white leading-none">
+            ODD ONE MAFIA
+          </h1>
+          <span id="header-subtitle" class="text-[11px] text-slate-400 font-medium">Odd One Out & Mafia Online</span>
+        </div>
+      </div>
+
+      <div id="header-room-controls" class="hidden flex items-center gap-1.5">
+        <button type="button" onclick="window.copyRoomCode()" class="px-2.5 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700 text-xs font-extrabold text-violet-300 flex items-center gap-1.5 transition active:scale-95">
+          <span id="header-room-code">-----</span>
+          <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+        </button>
+        <button type="button" onclick="window.leaveRoom()" class="px-2.5 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-xs font-bold text-rose-300 transition active:scale-95">
+          Leave
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="flex-1 w-full max-w-2xl mx-auto px-3.5 py-4 flex flex-col">
+
+    <!-- ===================================================================== -->
+    <!-- VIEW 1: LANDING / HOME SCREEN                                         -->
+    <!-- ===================================================================== -->
+    <section id="view-landing" class="flex-1 flex flex-col justify-center space-y-4 animate-pop-in">
+      <!-- Hero Banner -->
+      <div class="rounded-3xl bg-gradient-to-br from-slate-900/95 via-indigo-950/50 to-slate-900/95 border border-slate-800 p-4 sm:p-5 text-center shadow-2xl space-y-2">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-500/15 border border-violet-500/30 text-[11px] font-bold text-violet-300 uppercase tracking-wider">
+          <span>⚔️ Anime & Cartoons</span> • <span>🦸 MCU</span> • <span>🔫 Mafia</span>
+        </div>
+        <h2 class="font-display text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          ODD ONE MAFIA
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
+          Play <span class="text-violet-300 font-bold">Odd One Out</span> (3–6 players) or <span class="text-rose-400 font-bold">Mafia</span> (4–6 players) online with friends! Create a room, chat freely, and vote out the culprit.
+        </p>
+        <div id="connection-status-pill" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-950/80 border border-slate-800 text-[10px] font-semibold text-amber-300">
+          <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+          Connecting to Firebase...
+        </div>
+      </div>
+
+      <!-- Setup Card -->
+      <div class="rounded-3xl bg-slate-900/90 border border-slate-800 p-4 sm:p-5 shadow-xl space-y-4">
+        <!-- Step 1: Select Game Mode -->
+        <div>
+          <span class="block text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-2">
+            1. Select Game Mode
+          </span>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <button id="landing-game-odd" type="button" onclick="window.selectLandingGameType('ODD_ONE_OUT')"
+              class="p-3.5 rounded-2xl border-2 border-violet-500 bg-violet-500/15 text-left transition active:scale-[0.98] shadow-lg shadow-violet-950/30">
+              <div class="flex items-center justify-between">
+                <span class="font-display font-extrabold text-sm sm:text-base text-white">❓ Odd One Out</span>
+                <span class="px-2 py-0.5 rounded-full bg-violet-500/30 text-[10px] font-extrabold text-violet-200">3–6 Players</span>
+              </div>
+              <p class="text-[11px] text-slate-300 mt-1 leading-snug">
+                Innocents share the same Anime/Cartoon/MCU character while 1 Imposter gets a different one. Chat & vote!
+              </p>
+            </button>
+
+            <button id="landing-game-mafia" type="button" onclick="window.selectLandingGameType('MAFIA')"
+              class="p-3.5 rounded-2xl border-2 border-slate-800 bg-slate-950/70 text-left transition active:scale-[0.98]">
+              <div class="flex items-center justify-between">
+                <span class="font-display font-extrabold text-sm sm:text-base text-white">🔫 Mafia</span>
+                <span class="px-2 py-0.5 rounded-full bg-rose-500/20 text-[10px] font-extrabold text-rose-300">4–6 Players</span>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-1 leading-snug">
+                1 Mafia kills at night, 1 Doctor saves a player, and Innocent Villagers debate & vote out the Mafia!
+              </p>
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 2: Nickname -->
+        <div>
+          <label for="player-name-input" class="block text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+            2. Your Player Nickname
+          </label>
+          <input id="player-name-input" type="text" maxlength="16" placeholder="e.g. Naruto, Gojo, Tony..."
+            class="w-full px-4 py-3 rounded-2xl bg-slate-950 border border-slate-700/80 focus:border-violet-500 outline-none text-sm font-semibold text-white placeholder:text-slate-500" />
+        </div>
+
+        <!-- Step 3: Player Count -->
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-extrabold uppercase tracking-wider text-slate-400">3. Number of Players</span>
+            <span id="landing-size-range-hint" class="text-[11px] font-semibold text-violet-300">Min 3 • Max 6</span>
+          </div>
+          <div id="landing-size-buttons" class="grid grid-cols-4 gap-2"></div>
+        </div>
+
+        <!-- Create Room CTA -->
+        <button id="btn-create-room" type="button" onclick="window.createRoom()"
+          class="w-full py-3.5 px-5 rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-extrabold text-sm sm:text-base shadow-lg shadow-violet-600/25 transition active:scale-[0.98]">
+          ✨ Create Odd One Out Room
+        </button>
+
+        <div class="relative flex py-0.5 items-center">
+          <div class="flex-grow border-t border-slate-800"></div>
+          <span class="flex-shrink mx-3 text-[11px] font-bold uppercase tracking-wider text-slate-500">Or Join Friend's Room</span>
+          <div class="flex-grow border-t border-slate-800"></div>
+        </div>
+
+        <!-- Join Room Code Input -->
+        <div class="flex gap-2">
+          <input id="join-code-input" type="text" maxlength="5" placeholder="5-LETTER CODE"
+            class="flex-1 min-w-0 px-4 py-3 rounded-2xl bg-slate-950 border border-slate-700/80 focus:border-cyan-400 outline-none text-sm font-display font-extrabold tracking-widest uppercase text-center text-white placeholder:text-slate-600 placeholder:font-sans placeholder:tracking-normal" />
+          <button id="btn-join-room" type="button" onclick="window.joinRoom()"
+            class="px-5 py-3 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-extrabold text-sm transition active:scale-95 shrink-0">
+            Join Room
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- VIEW 2: MULTIPLAYER LOBBY                                             -->
+    <!-- ===================================================================== -->
+    <section id="view-lobby" class="hidden flex-1 flex flex-col space-y-3.5 animate-pop-in">
+      <!-- Room Code & Share Card -->
+      <div class="rounded-3xl bg-gradient-to-br from-slate-900 to-indigo-950/60 border border-slate-800 p-4 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="text-center sm:text-left">
+          <div class="flex items-center justify-center sm:justify-start gap-2">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Room Code</span>
+            <span id="lobby-game-badge" class="px-2 py-0.5 rounded-full bg-violet-500/20 border border-violet-500/30 text-[10px] font-extrabold text-violet-300">
+              ❓ ODD ONE OUT
+            </span>
+          </div>
+          <div id="lobby-room-code" class="font-display text-3xl font-extrabold tracking-widest text-white leading-tight">
+            -----
+          </div>
+          <span id="lobby-mode-indicator" class="text-[11px] text-emerald-400 font-semibold">● Online Sync Active</span>
+        </div>
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <button type="button" onclick="window.copyRoomCode()"
+            class="flex-1 sm:flex-initial px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-bold text-white transition active:scale-95">
+            Copy Code
+          </button>
+          <button type="button" onclick="window.copyInviteLink()"
+            class="flex-1 sm:flex-initial px-3.5 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-xs font-bold text-white shadow transition active:scale-95">
+            🔗 Share Link
+          </button>
+        </div>
+      </div>
+
+      <!-- Player Roster Card -->
+      <div class="rounded-3xl bg-slate-900/90 border border-slate-800 p-4 shadow-xl space-y-3">
+        <div class="flex items-center justify-between gap-2">
+          <div>
+            <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-300">
+              Players in Lobby (<span id="lobby-player-count" class="text-violet-300">1 / 4</span>)
+            </h3>
+            <p class="text-[11px] text-slate-500">Share the room code with friends or add bots</p>
+          </div>
+          <button id="btn-fill-bots" type="button" onclick="window.fillWithDemoBots()"
+            class="hidden px-3 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-xs font-extrabold text-emerald-300 transition active:scale-95">
+            🤖 Fill Empty Slots with Bots
+          </button>
+        </div>
+
+        <div id="lobby-slots-container" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+      </div>
+
+      <!-- Host Settings Card -->
+      <div class="rounded-3xl bg-slate-900/90 border border-slate-800 p-4 shadow-xl space-y-3.5">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-300">Match Settings</h3>
+          <span class="px-2.5 py-0.5 rounded-full bg-violet-500/15 border border-violet-500/30 text-[10px] font-bold text-violet-300">
+            Host Controls
+          </span>
+        </div>
+
+        <!-- Switch Game Type -->
+        <div>
+          <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+            Game Mode
+          </label>
+          <div class="grid grid-cols-2 gap-2">
+            <button id="lobby-switch-odd" type="button" onclick="window.switchLobbyGameType('ODD_ONE_OUT')"
+              class="py-2 px-3 rounded-xl border text-xs font-extrabold transition">
+              ❓ Odd One Out (3–6)
+            </button>
+            <button id="lobby-switch-mafia" type="button" onclick="window.switchLobbyGameType('MAFIA')"
+              class="py-2 px-3 rounded-xl border text-xs font-extrabold transition">
+              🔫 Mafia (4–6)
+            </button>
+          </div>
+        </div>
+
+        <!-- Room Capacity -->
+        <div>
+          <label id="lobby-capacity-label" class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+            Number of Players (3 to 6)
+          </label>
+          <div id="lobby-capacity-buttons" class="grid grid-cols-4 gap-2"></div>
+        </div>
+
+        <!-- ODD ONE OUT SETTINGS -->
+        <div id="lobby-odd-settings" class="space-y-3.5">
+          <div>
+            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+              Imposter Awareness Mode
+            </label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <button id="btn-mode-classic" type="button" onclick="window.updateLobbySettings({ imposterKnows: true })"
+                class="p-3 rounded-2xl border border-violet-500 bg-violet-500/15 text-left transition">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-extrabold text-white">🕵️ Classic (Imposter Knows)</span>
+                  <span id="check-mode-classic" class="text-xs text-violet-400 font-bold">●</span>
+                </div>
+                <p class="text-[11px] text-slate-300 mt-0.5 leading-snug">
+                  Imposter sees a crimson "YOU ARE THE IMPOSTER" badge with their odd character.
+                </p>
+              </button>
+
+              <button id="btn-mode-undercover" type="button" onclick="window.updateLobbySettings({ imposterKnows: false })"
+                class="p-3 rounded-2xl border border-slate-800 bg-slate-950/60 text-left transition">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-extrabold text-white">🎭 Undercover (Imposter Blind)</span>
+                  <span id="check-mode-undercover" class="text-xs text-slate-600 font-bold">○</span>
+                </div>
+                <p class="text-[11px] text-slate-400 mt-0.5 leading-snug">
+                  Imposter gets a different character name with NO warning badge!
+                </p>
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+              Character & Word Pack
+            </label>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              <button type="button" onclick="window.updateLobbySettings({ selectedPack: 'ALL' })" data-pack="ALL"
+                class="pack-btn px-3 py-2.5 rounded-xl border text-xs font-bold transition text-center">
+                🎲 Random Mix
+              </button>
+              <button type="button" onclick="window.updateLobbySettings({ selectedPack: 'ANIME' })" data-pack="ANIME"
+                class="pack-btn px-3 py-2.5 rounded-xl border text-xs font-bold transition text-center">
+                ⚔️ Anime Legends
+              </button>
+              <button type="button" onclick="window.updateLobbySettings({ selectedPack: 'CARTOONS' })" data-pack="CARTOONS"
+                class="pack-btn px-3 py-2.5 rounded-xl border text-xs font-bold transition text-center">
+                📺 Cartoons
+              </button>
+              <button type="button" onclick="window.updateLobbySettings({ selectedPack: 'MCU' })" data-pack="MCU"
+                class="pack-btn px-3 py-2.5 rounded-xl border text-xs font-bold transition text-center">
+                🦸 MCU Heroes
+              </button>
+              <button type="button" onclick="window.updateLobbySettings({ selectedPack: 'CLASSIC' })" data-pack="CLASSIC"
+                class="pack-btn col-span-2 sm:col-span-2 px-3 py-2.5 rounded-xl border text-xs font-bold transition text-center">
+                🍕 Classic Everyday Words
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- MAFIA ROLE BREAKDOWN -->
+        <div id="lobby-mafia-settings" class="hidden rounded-2xl bg-rose-950/25 border border-rose-500/30 p-3.5 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold uppercase tracking-wider text-rose-300">🔫 Mafia Role Breakdown</span>
+            <span id="mafia-role-summary-pill" class="text-[11px] font-bold text-slate-300">4 Players Total</span>
+          </div>
+          <div class="grid grid-cols-3 gap-2 text-center">
+            <div class="p-2 rounded-xl bg-rose-500/15 border border-rose-500/30">
+              <div class="text-base">🔫</div>
+              <div class="text-xs font-extrabold text-rose-300">1 Mafia</div>
+              <div class="text-[10px] text-slate-400">Kills at night</div>
+            </div>
+            <div class="p-2 rounded-xl bg-emerald-500/15 border border-emerald-500/30">
+              <div class="text-base">🩺</div>
+              <div class="text-xs font-extrabold text-emerald-300">1 Doctor</div>
+              <div class="text-[10px] text-slate-400">Saves 1 target</div>
+            </div>
+            <div class="p-2 rounded-xl bg-sky-500/15 border border-sky-500/30">
+              <div class="text-base">🧑‍🌾</div>
+              <div id="mafia-villager-count-text" class="text-xs font-extrabold text-sky-300">2 Villagers</div>
+              <div class="text-[10px] text-slate-400">Find the Mafia</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Start Match Button -->
+      <div class="pb-4">
+        <button id="btn-start-game" type="button" onclick="window.startNewRound()" disabled
+          class="w-full py-3.5 px-5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 disabled:from-slate-800 disabled:to-slate-800 disabled:text-slate-500 text-white font-extrabold text-sm sm:text-base shadow-lg transition active:scale-[0.98]">
+          Waiting for Players...
+        </button>
+        <p id="lobby-guest-wait-msg" class="hidden text-center text-xs text-slate-400 py-2">
+          Waiting for the room host to start the match...
+        </p>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- VIEW 3A: ODD ONE OUT ACTIVE ROUND                                     -->
+    <!-- ===================================================================== -->
+    <section id="view-game-odd" class="hidden flex-1 flex flex-col space-y-3 animate-pop-in">
+      <!-- Round & Mode Strip -->
+      <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-900/90 border border-slate-800 rounded-2xl px-3.5 py-2">
+        <div class="flex items-center gap-1.5">
+          <span id="odd-round-badge" class="px-2.5 py-0.5 rounded-lg bg-violet-500/20 border border-violet-500/30 text-xs font-extrabold text-violet-300">
+            ROUND 1
+          </span>
+          <span id="odd-mode-pill" class="px-2.5 py-0.5 rounded-lg bg-slate-800 border border-slate-700 text-[11px] font-bold text-slate-300">
+            🕵️ Classic Mode
+          </span>
+        </div>
+        <span class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-emerald-300">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          Open Chat & Vote
+        </span>
+      </div>
+
+      <!-- Direct Immediate Secret Character Banner (No Flipping!) -->
+      <div id="odd-card-box" class="w-full rounded-3xl bg-gradient-to-br from-violet-600 via-indigo-700 to-slate-900 border border-violet-400/40 p-4 flex flex-col items-center justify-center text-center shadow-2xl shadow-violet-900/40 transition-all">
+        <div class="flex flex-wrap items-center justify-center gap-1.5 mb-1">
+          <span class="px-3 py-0.5 rounded-full bg-black/35 border border-white/15 text-[11px] font-bold uppercase tracking-widest text-violet-100">
+            <span id="odd-category-text">---</span>
+          </span>
+          <span id="odd-imposter-badge" class="hidden px-2.5 py-0.5 rounded-full bg-rose-500 text-white text-[11px] font-extrabold uppercase tracking-wider shadow-md animate-pulse">
+            ⚠️ YOU ARE THE IMPOSTER
+          </span>
+        </div>
+        <h3 id="odd-secret-word" class="font-display text-2xl sm:text-3xl font-extrabold text-white tracking-tight my-0.5 drop-shadow">
+          ---
+        </h3>
+        <p id="odd-role-hint" class="text-[11px] text-violet-100/90 max-w-md mt-0.5 leading-snug">
+          Chat freely for as long as you want and vote below whenever you're ready!
+        </p>
+      </div>
+
+      <!-- Unlimited Open Chat & Integrated In-Chat Voting Panel -->
+      <div class="flex-1 flex flex-col bg-slate-900/90 border border-slate-800 rounded-3xl overflow-hidden shadow-xl">
+        <div class="px-4 py-2.5 border-b border-slate-800 flex items-center justify-between gap-2 bg-slate-950/50">
+          <div>
+            <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-200">Live Discussion & Voting</h4>
+            <p class="text-[10px] text-slate-400">No timer! Send unlimited messages & vote below when ready</p>
+          </div>
+          <span id="odd-voting-progress-pill" class="px-2.5 py-1 rounded-xl bg-amber-500/20 border border-amber-500/40 text-xs font-extrabold text-amber-300 shrink-0">
+            🗳️ 0 / 4 Voted
+          </span>
+        </div>
+
+        <div id="odd-chat-list" class="flex-1 p-3.5 space-y-2.5 overflow-y-auto min-h-[200px] max-h-[280px] sm:max-h-[330px]"></div>
+
+        <form onsubmit="window.sendChatMessage(event, 'odd-chat-input')" class="p-2.5 border-t border-slate-800 bg-slate-950/70 flex gap-2">
+          <input id="odd-chat-input" type="text" maxlength="200" placeholder="Type any clue, question, or accusation..."
+            class="flex-1 min-w-0 px-3.5 py-2.5 rounded-2xl bg-slate-900 border border-slate-700/80 focus:border-violet-500 outline-none text-sm text-white placeholder:text-slate-500" />
+          <button type="submit"
+            class="px-4 py-2.5 rounded-2xl bg-violet-600 hover:bg-violet-500 text-white font-extrabold text-sm transition active:scale-95 shrink-0">
+            Send
+          </button>
+        </form>
+
+        <div class="p-3.5 border-t border-slate-800/90 bg-slate-950/90 space-y-2">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-[11px] font-extrabold uppercase tracking-wider text-amber-300 flex items-center gap-1">
+              <span>🗳️</span> Vote Who Is the Odd One Out:
+            </span>
+            <span id="odd-voting-subtitle" class="text-[11px] font-semibold text-slate-400">
+              Tap a suspect to vote
+            </span>
+          </div>
+          <div id="odd-voting-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- VIEW 3B: MAFIA ACTIVE GAME                                            -->
+    <!-- ===================================================================== -->
+    <section id="view-game-mafia" class="hidden flex-1 flex flex-col space-y-3 animate-pop-in">
+      <!-- Mafia Phase Status Strip -->
+      <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-900/90 border border-slate-800 rounded-2xl px-3.5 py-2">
+        <div class="flex items-center gap-1.5">
+          <span id="mafia-day-badge" class="px-2.5 py-0.5 rounded-lg bg-rose-500/20 border border-rose-500/30 text-xs font-extrabold text-rose-300">
+            NIGHT 1
+          </span>
+          <span id="mafia-alive-pill" class="px-2.5 py-0.5 rounded-lg bg-slate-800 border border-slate-700 text-[11px] font-bold text-slate-300">
+            4 Alive
+          </span>
+        </div>
+        <span id="mafia-phase-indicator" class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-indigo-300">
+          <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+          Night Actions
+        </span>
+      </div>
+
+      <!-- IMMEDIATE SECRET ROLE BANNER -->
+      <div id="mafia-role-banner" class="w-full rounded-3xl bg-gradient-to-br from-sky-700 via-indigo-800 to-slate-950 border border-sky-400/40 p-4 flex flex-col items-center justify-center text-center shadow-2xl transition-all">
+        <div class="flex flex-wrap items-center justify-center gap-1.5 mb-1">
+          <span class="px-3 py-0.5 rounded-full bg-black/35 border border-white/15 text-[11px] font-bold uppercase tracking-widest text-white/90">
+            YOUR SECRET MAFIA ROLE
+          </span>
+          <span id="mafia-eliminated-badge" class="hidden px-2.5 py-0.5 rounded-full bg-rose-600 text-white text-[11px] font-extrabold uppercase tracking-wider">
+            💀 ELIMINATED (SPECTATING)
+          </span>
+        </div>
+        <h3 id="mafia-role-title" class="font-display text-2xl sm:text-3xl font-extrabold text-white tracking-tight my-0.5 drop-shadow">
+          🧑‍🌾 INNOCENT VILLAGER
+        </h3>
+        <p id="mafia-role-desc" class="text-[11px] text-slate-200 max-w-md mt-0.5 leading-snug">
+          Survive the night, discuss clues in the morning, and vote out the Mafia!
+        </p>
+      </div>
+
+      <!-- NIGHT PHASE ACTION PANEL -->
+      <div id="mafia-night-panel" class="rounded-3xl bg-gradient-to-b from-indigo-950/90 to-slate-900/95 border border-indigo-500/40 p-4 shadow-2xl space-y-3">
+        <div class="flex items-center justify-between gap-2">
+          <div>
+            <h4 id="mafia-night-action-title" class="text-sm font-extrabold text-white flex items-center gap-1.5">
+              🌙 Night Phase — City Sleeps
+            </h4>
+            <p id="mafia-night-action-sub" class="text-xs text-indigo-200/80 mt-0.5">
+              Waiting for Mafia & Doctor to make their secret choices...
+            </p>
+          </div>
+          <span id="mafia-night-status-pill" class="px-2.5 py-1 rounded-xl bg-indigo-500/20 border border-indigo-400/30 text-[11px] font-extrabold text-indigo-200 shrink-0">
+            0 / 2 Ready
+          </span>
+        </div>
+
+        <div id="mafia-night-targets-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+
+        <div id="mafia-night-villager-wait" class="hidden p-4 rounded-2xl bg-slate-950/70 border border-slate-800 text-center space-y-1">
+          <div class="text-2xl">😴</div>
+          <p class="text-xs font-bold text-slate-200">You are sleeping safely while the Mafia & Doctor act...</p>
+          <p class="text-[11px] text-slate-400">Morning chat & voting will open automatically as soon as both finish!</p>
+        </div>
+      </div>
+
+      <!-- DAY PHASE: MORNING REPORT + UNLIMITED OPEN CHAT + IN-CHAT VOTING -->
+      <div id="mafia-day-panel" class="hidden flex-1 flex flex-col bg-slate-900/90 border border-slate-800 rounded-3xl overflow-hidden shadow-xl">
+        <div id="mafia-morning-banner" class="px-4 py-2.5 bg-amber-500/15 border-b border-amber-500/30 text-xs font-bold text-amber-200 flex items-center gap-2">
+          <span>☀️</span>
+          <span id="mafia-morning-report-text">Dawn breaks over the village!</span>
+        </div>
+
+        <div class="px-4 py-2 border-b border-slate-800 flex items-center justify-between gap-2 bg-slate-950/50">
+          <div>
+            <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-200">Village Chat & Suspect Voting</h4>
+            <p class="text-[10px] text-slate-400">Unlimited discussion! Vote below to eliminate a suspect</p>
+          </div>
+          <span id="mafia-voting-progress-pill" class="px-2.5 py-1 rounded-xl bg-amber-500/20 border border-amber-500/40 text-xs font-extrabold text-amber-300 shrink-0">
+            🗳️ 0 / 4 Voted
+          </span>
+        </div>
+
+        <div id="mafia-chat-list" class="flex-1 p-3.5 space-y-2.5 overflow-y-auto min-h-[190px] max-h-[260px] sm:max-h-[310px]"></div>
+
+        <form onsubmit="window.sendChatMessage(event, 'mafia-chat-input')" class="p-2.5 border-t border-slate-800 bg-slate-950/70 flex gap-2">
+          <input id="mafia-chat-input" type="text" maxlength="200" placeholder="Discuss who the Mafia is..."
+            class="flex-1 min-w-0 px-3.5 py-2.5 rounded-2xl bg-slate-900 border border-slate-700/80 focus:border-rose-500 outline-none text-sm text-white placeholder:text-slate-500" />
+          <button type="submit" id="mafia-chat-send-btn"
+            class="px-4 py-2.5 rounded-2xl bg-rose-600 hover:bg-rose-500 disabled:bg-slate-800 disabled:text-slate-500 text-white font-extrabold text-sm transition active:scale-95 shrink-0">
+            Send
+          </button>
+        </form>
+
+        <div class="p-3.5 border-t border-slate-800/90 bg-slate-950/90 space-y-2">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-[11px] font-extrabold uppercase tracking-wider text-amber-300 flex items-center gap-1">
+              <span>🗳️</span> Vote Who Is the Mafia:
+            </span>
+            <span id="mafia-voting-subtitle" class="text-[11px] font-semibold text-slate-400">
+              Tap an alive player to vote
+            </span>
+          </div>
+          <div id="mafia-voting-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- VIEW 4: DRAMATIC REVEAL & SCOREBOARD                                  -->
+    <!-- ===================================================================== -->
+    <section id="view-results" class="hidden flex-1 flex flex-col space-y-3.5 animate-pop-in">
+      <!-- Winner Banner -->
+      <div id="results-winner-banner" class="rounded-3xl p-5 text-center border shadow-2xl space-y-1.5 bg-gradient-to-br from-emerald-900/70 via-slate-900 to-slate-950 border-emerald-500/40">
+        <div id="results-winner-emoji" class="text-4xl mb-1">🎉</div>
+        <h2 id="results-winner-title" class="font-display text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          INNOCENTS WIN!
+        </h2>
+        <p id="results-winner-subtitle" class="text-xs sm:text-sm text-slate-300 max-w-md mx-auto">
+          The group caught the culprit!
+        </p>
+      </div>
+
+      <!-- Odd One Out Secret Reveal Card -->
+      <div id="results-odd-card" class="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 shadow-xl space-y-3.5">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2.5">
+          <div>
+            <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Category</span>
+            <span id="reveal-category" class="text-sm font-extrabold text-violet-300">Anime Legends</span>
+          </div>
+          <div class="text-right">
+            <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Active Mode</span>
+            <span id="reveal-mode-badge" class="text-xs font-extrabold text-amber-300">🕵️ Classic Mode</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div class="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/25">
+            <span id="reveal-innocent-count-label" class="text-[11px] font-bold uppercase tracking-wider text-emerald-400">Innocents Had</span>
+            <div id="reveal-innocent-word" class="font-display text-xl font-extrabold text-white mt-0.5">---</div>
+          </div>
+          <div class="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/30">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-rose-400">
+              Imposter (<span id="reveal-imposter-name" class="underline">---</span>) Had
+            </span>
+            <div id="reveal-imposter-word" class="font-display text-xl font-extrabold text-rose-200 mt-0.5">---</div>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Vote Breakdown</h4>
+          <div id="reveal-votes-list" class="space-y-1.5"></div>
+        </div>
+      </div>
+
+      <!-- Mafia Roles Reveal Card -->
+      <div id="results-mafia-card" class="hidden bg-slate-900/90 border border-slate-800 rounded-3xl p-4 shadow-xl space-y-3">
+        <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-300">Final Mafia Role Reveal</h4>
+        <div id="reveal-mafia-roles-list" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+      </div>
+
+      <!-- Multi-Round Scoreboard -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 shadow-xl space-y-2.5">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Match Scoreboard</h4>
+        <div id="reveal-scoreboard-list" class="grid grid-cols-2 sm:grid-cols-3 gap-2"></div>
+      </div>
+
+      <!-- Next Round / Change Settings Controls -->
+      <div class="flex flex-col sm:flex-row gap-2 pt-1 pb-6">
+        <button id="btn-next-round" type="button" onclick="window.startNewRound()"
+          class="hidden flex-1 py-3.5 px-5 rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-extrabold text-sm sm:text-base shadow-lg shadow-violet-600/25 transition active:scale-[0.98]">
+          🔄 Play Next Round
+        </button>
+        <button id="btn-back-lobby" type="button" onclick="window.returnToLobby()"
+          class="hidden py-3.5 px-5 rounded-2xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-bold text-sm transition active:scale-[0.98]">
+          ⚙️ Change Settings
+        </button>
+        <p id="results-guest-wait-msg" class="hidden w-full text-center text-xs text-slate-400 py-2">
+          Waiting for the room host to start the next round...
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ======================================================================= -->
+  <!-- COMPLETE GAME ENGINE WITH YOUR FIREBASE CREDENTIALS                     -->
+  <!-- ======================================================================= -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // =========================================================================
+    // 1. YOUR LIVE FIREBASE PROJECT CREDENTIALS (odd-one-mafia)
+    // =========================================================================
+    const USER_FIREBASE_CONFIG = {
+      apiKey: "AIzaSyCili-PUFb2T9ktK_Q1p-f6lI2TcYgd27E",
+      authDomain: "odd-one-mafia.firebaseapp.com",
+      projectId: "odd-one-mafia",
+      storageBucket: "odd-one-mafia.firebasestorage.app",
+      messagingSenderId: "1013133656554",
+      appId: "1:1013133656554:web:6fe6e294d99e3ac5f77293",
+      measurementId: "G-Y7XSM8QQMP"
+    };
+
+    const activeConfig = (typeof window.__firebase_config !== 'undefined' && window.__firebase_config)
+      ? JSON.parse(window.__firebase_config)
+      : USER_FIREBASE_CONFIG;
+
+    // =========================================================================
+    // 2. COMPLETE CHARACTER & WORD BANK (ANIME, CARTOONS, MCU & CLASSIC)
+    // =========================================================================
+    const WORD_PAIRS = [
+      // --- ANIME LEGENDS: NARUTO ---
+      { pack: "ANIME", category: "Anime • Naruto", majority: "Naruto Uzumaki", odd: "Sasuke Uchiha", clues: ["Trained on Team 7 in Konoha", "Has legendary clan or tailed-beast power", "One of the two strongest shinobi of their era"] },
+      { pack: "ANIME", category: "Anime • Naruto", majority: "Kakashi Hatake", odd: "Itachi Uchiha", clues: ["Famous Sharingan user", "Served in the ANBU Black Ops", "Super calm, tactical, and respected ninja"] },
+      { pack: "ANIME", category: "Anime • Naruto", majority: "Minato Namikaze", odd: "Madara Uchiha", clues: ["Legendary shinobi feared across nations", "Insanely fast and powerful in battle", "Left a massive mark on Konoha history"] },
+      { pack: "ANIME", category: "Anime • Naruto", majority: "Jiraiya", odd: "Orochimaru", clues: ["One of the Legendary Sannin", "Trained under the Third Hokage", "Uses iconic summoning techniques"] },
+      { pack: "ANIME", category: "Anime • Naruto", majority: "Hinata Hyuga", odd: "Sakura Haruno", clues: ["Kunoichi from the Konoha 11", "Married one of the main rivals", "Specialized close-combat fighter"] },
+      { pack: "ANIME", category: "Anime • Naruto", majority: "Gaara", odd: "Rock Lee", clues: ["Stole the spotlight in the Chunin Exams", "Had one of the most iconic arena fights", "Unstoppable determination in early arcs"] },
+
+      // --- ANIME LEGENDS: DEMON SLAYER ---
+      { pack: "ANIME", category: "Anime • Demon Slayer", majority: "Tanjiro Kamado", odd: "Zenitsu Agatsuma", clues: ["Young Demon Slayer Corps member", "Uses a signature Breathing Style", "Travels together in the main trio"] },
+      { pack: "ANIME", category: "Anime • Demon Slayer", majority: "Nezuko Kamado", odd: "Shinobu Kocho", clues: ["Iconic female character with pink/butterfly vibes", "Crucial ally against Upper Rank demons", "Gentle demeanor until combat begins"] },
+      { pack: "ANIME", category: "Anime • Demon Slayer", majority: "Kyojuro Rengoku", odd: "Tengen Uzui", clues: ["Flashy and powerful Hashira", "Starred in a major Demon Slayer arc", "Wields a specialized Nichirin blade"] },
+      { pack: "ANIME", category: "Anime • Demon Slayer", majority: "Inosuke Hashibira", odd: "Giyu Tomioka", clues: ["Fought on Mount Natagumo", "Uses unique swordsmanship techniques", "Very distinct personality in the Corps"] },
+      { pack: "ANIME", category: "Anime • Demon Slayer", majority: "Muzan Kibutsuji", odd: "Akaza", clues: ["Terrifying upper-tier demon", "Regenerates almost instantly", "Fought fiercely against the Hashira"] },
+
+      // --- ANIME LEGENDS: JUJUTSU KAISEN ---
+      { pack: "ANIME", category: "Anime • Jujutsu Kaisen", majority: "Satoru Gojo", odd: "Ryomen Sukuna", clues: ["Overpowered Domain Expansion", "Can solo almost anyone in JJK", "The entire jujutsu world revolves around them"] },
+      { pack: "ANIME", category: "Anime • Jujutsu Kaisen", majority: "Yuji Itadori", odd: "Megumi Fushiguro", clues: ["First-year Tokyo Jujutsu High student", "Taught by Satoru Gojo", "Insane close-combat or shikigami skills"] },
+      { pack: "ANIME", category: "Anime • Jujutsu Kaisen", majority: "Nobara Kugisaki", odd: "Maki Zenin", clues: ["Fearless female jujutsu sorcerer", "Uses cursed tools or weapons in battle", "Never backs down from a fight"] },
+      { pack: "ANIME", category: "Anime • Jujutsu Kaisen", majority: "Kento Nanami", odd: "Toji Fushiguro", clues: ["Fan-favorite adult fighter in JJK", "Uses a bladed weapon in close quarters", "Zero nonsense, pure lethal efficiency"] },
+      { pack: "ANIME", category: "Anime • Jujutsu Kaisen", majority: "Yuta Okkotsu", odd: "Suguru Geto", clues: ["Special Grade sorcerer", "Commands massive cursed energy/spirits", "Central figure in JJK 0"] },
+
+      // --- ANIME LEGENDS: DRAGON BALL Z ---
+      { pack: "ANIME", category: "Anime • Dragon Ball Z", majority: "Goku", odd: "Vegeta", clues: ["Pure-blooded Saiyan warrior", "Achieved Super Saiyan transformations", "Constantly trains to break limits"] },
+      { pack: "ANIME", category: "Anime • Dragon Ball Z", majority: "Gohan", odd: "Future Trunks", clues: ["Half-Saiyan warrior from DBZ", "Had an unforgettable moment in the Cell Saga", "Unleashed huge hidden rage power"] },
+      { pack: "ANIME", category: "Anime • Dragon Ball Z", majority: "Piccolo", odd: "Krillin", clues: ["Day-one Z Fighter ally", "Fought on Planet Namek", "Uses iconic energy beam attacks"] },
+      { pack: "ANIME", category: "Anime • Dragon Ball Z", majority: "Frieza", odd: "Cell", clues: ["Iconic DBZ saga main villain", "Has multiple transformations", "Pushed the Z Fighters to their absolute limit"] },
+      { pack: "ANIME", category: "Anime • Dragon Ball Z", majority: "Majin Buu", odd: "Broly", clues: ["Unstoppable powerhouse in DBZ", "Requires fusion or teamwork to beat", "Pure destructive energy"] },
+
+      // --- ANIME LEGENDS: ONE PIECE ---
+      { pack: "ANIME", category: "Anime • One Piece", majority: "Monkey D. Luffy", odd: "Roronoa Zoro", clues: ["Founding member of the Straw Hat Pirates", "Has a massive bounty on the Grand Line", "Chasing an ultimate dream on the seas"] },
+      { pack: "ANIME", category: "Anime • One Piece", majority: "Sanji", odd: "Shanks", clues: ["Uses powerful Haki in battle", "Suave and iconic One Piece character", "Zero Devil Fruit powers needed"] },
+      { pack: "ANIME", category: "Anime • One Piece", majority: "Portgas D. Ace", odd: "Trafalgar Law", clues: ["Famous pirate captain/commander", "Possesses a powerful Devil Fruit", "Formed a legendary bond with Luffy"] },
+
+      // --- CARTOONS & NOSTALGIA: BEN 10 ---
+      { pack: "CARTOONS", category: "Cartoons • Ben 10", majority: "Ben Tennyson", odd: "Kevin Levin", clues: ["Can transform or absorb alien powers", "Travels across the country in the Rustbucket", "Iconic Cartoon Network hero/rival"] },
+      { pack: "CARTOONS", category: "Cartoons • Ben 10", majority: "Gwen Tennyson", odd: "Grandpa Max", clues: ["Always has Ben's back on road trips", "Knows way more about Plumbers/magic than Ben", "Voice of reason in the Tennyson trio"] },
+      { pack: "CARTOONS", category: "Cartoons • Ben 10", majority: "Heatblast", odd: "Four Arms", clues: ["One of Ben's original 10 Omnitrix aliens", "Heavy hitter in classic Ben 10 fights", "Appeared right in Season 1"] },
+      { pack: "CARTOONS", category: "Cartoons • Ben 10", majority: "XLR8", odd: "Diamondhead", clues: ["Classic Omnitrix alien transformation", "Super distinct silhouette and powers", "Fan-favorite alien from the original series"] },
+      { pack: "CARTOONS", category: "Cartoons • Ben 10", majority: "Vilgax", odd: "Ghostfreak", clues: ["Terrifying classic Ben 10 villain", "Obsessed with taking the Omnitrix", "Gave Ben his hardest battles"] },
+
+      // --- CARTOONS & NOSTALGIA: DORAEMON ---
+      { pack: "CARTOONS", category: "Cartoons • Doraemon", majority: "Doraemon", odd: "Nobita Nobi", clues: ["Main protagonist of the series", "Always using 22nd-century gadgets", "Best friends who share a room in Tokyo"] },
+      { pack: "CARTOONS", category: "Cartoons • Doraemon", majority: "Shizuka Minamoto", odd: "Gian (Takeshi)", clues: ["Elementary school classmate of Nobita", "Part of the main 5-kid friend group", "Goes on crazy gadget adventures together"] },
+      { pack: "CARTOONS", category: "Cartoons • Doraemon", majority: "Suneo Honekawa", odd: "Dorami", clues: ["Knows all about Doraemon's futuristic gadgets", "Classic recurring Doraemon character", "Shows off or saves the day in episodes"] },
+      { pack: "CARTOONS", category: "Cartoons • Doraemon", majority: "Dekisugi", odd: "Jaiko", clues: ["Classmate/neighborhood kid in Doraemon", "Memorable side character in Tokyo", "Connected to Nobita's daily school life"] },
+
+      // --- CARTOONS & NOSTALGIA: POKÉMON ---
+      { pack: "CARTOONS", category: "Cartoons • Pokémon", majority: "Pikachu", odd: "Charizard", clues: ["Ash's iconic Kanto partner", "Mascot-level fame in Pokémon", "Refused to stay inside a normal Poké Ball"] },
+      { pack: "CARTOONS", category: "Cartoons • Pokémon", majority: "Ash Ketchum", odd: "Brock", clues: ["Traveled across Kanto and Johto together", "Knows Pokémon battles inside and out", "Classic original trio member"] },
+      { pack: "CARTOONS", category: "Cartoons • Pokémon", majority: "Mewtwo", odd: "Lucario", clues: ["Starred in its own Pokémon movie", "Uses aura or psychic energy waves", "One of the strongest bipedal Pokémon"] },
+      { pack: "CARTOONS", category: "Cartoons • Pokémon", majority: "Bulbasaur", odd: "Squirtle", clues: ["Original Kanto starter Pokémon", "Joined Ash's team early in Season 1", "Super loyal and stubborn in battle"] },
+      { pack: "CARTOONS", category: "Cartoons • Pokémon", majority: "Jessie (Team Rocket)", odd: "James (Team Rocket)", clues: ["Part of the iconic Team Rocket duo", "Always blasting off again", "Chasing Pikachu in every region"] },
+
+      // --- CARTOONS & NOSTALGIA: NINJA HATTORI ---
+      { pack: "CARTOONS", category: "Cartoons • Ninja Hattori", majority: "Ninja Hattori", odd: "Kenichi Mitsuba", clues: ["Lives under the same roof in Tokyo", "Main duo of the Ninja Hattori show", "Always dealing with school and ninja drama"] },
+      { pack: "CARTOONS", category: "Cartoons • Ninja Hattori", majority: "Shinzo", odd: "Shishimaru", clues: ["Lives with Kenichi and Hattori", "Super loyal and funny sidekick", "Loves snacks and gets into silly trouble"] },
+      { pack: "CARTOONS", category: "Cartoons • Ninja Hattori", majority: "Kemumaki", odd: "Kagechiyo", clues: ["Koga ninja rival", "Always plotting tricks against Hattori", "Lives next door to Kenichi"] },
+      { pack: "CARTOONS", category: "Cartoons • Ninja Hattori", majority: "Yumeko", odd: "Amara", clues: ["Classmate at Kenichi's school", "Central to many Ninja Hattori episodes", "Classic recurring character"] },
+
+      // --- CARTOONS & NOSTALGIA: MOTU PATLU ---
+      { pack: "CARTOONS", category: "Cartoons • Motu Patlu", majority: "Motu", odd: "Patlu", clues: ["Best friends living in Furfuri Nagar", "Always solving problems together", "Iconic duo from Indian animation"] },
+      { pack: "CARTOONS", category: "Cartoons • Motu Patlu", majority: "Inspector Chingum", odd: "Dr. Jhatka", clues: ["Famous resident of Furfuri Nagar", "Always trying to help Motu and Patlu", "Has a memorable catchphrase or inventions"] },
+      { pack: "CARTOONS", category: "Cartoons • Motu Patlu", majority: "Ghasitaram", odd: "John the Don", clues: ["Classic character in Furfuri Nagar", "Always involved in wild schemes", "Iconic Motu Patlu supporting cast"] },
+
+      // --- MCU HEROES & VILLAINS ---
+      { pack: "MCU", category: "MCU • Avengers", majority: "Iron Man", odd: "Captain America", clues: ["Founding leader of the Avengers", "Central figure in Civil War and Endgame", "Sacrificed everything to save the world"] },
+      { pack: "MCU", category: "MCU • Asgard", majority: "Thor", odd: "Loki", clues: ["Royalty from Asgard", "Wields a legendary weapon or magic", "Has a complicated sibling dynamic"] },
+      { pack: "MCU", category: "MCU • Multiverse", majority: "Spider-Man", odd: "Doctor Strange", clues: ["New York-based MCU hero", "Messed with a multiverse spell in No Way Home", "Fought Thanos on Titan"] },
+      { pack: "MCU", category: "MCU • Powerhouses", majority: "Hulk", odd: "Thanos", clues: ["Unmatched raw physical strength in the MCU", "Fought each other in Infinity War", "Giant CGI powerhouse"] },
+      { pack: "MCU", category: "MCU • Avengers", majority: "Black Widow", odd: "Hawkeye", clues: ["Original SHIELD agent & founding Avenger", "Fought together on Vormir", "No superpowers, pure lethal skill"] },
+      { pack: "MCU", category: "MCU • Heroes", majority: "Black Panther", odd: "Winter Soldier", clues: ["Enhanced super-soldier-level fighter", "Connected to Wakanda and vibranium", "Fought in Captain America: Civil War"] },
+      { pack: "MCU", category: "MCU • Avengers", majority: "Scarlet Witch", odd: "Vision", clues: ["Starred together in WandaVision", "Powers tied to the Mind Stone", "One of the strongest Avengers"] },
+      { pack: "MCU", category: "MCU • Cosmic & Quantum", majority: "Ant-Man", odd: "Star-Lord", clues: ["Funny, lighthearted MCU hero", "Saved the universe with a wild plan", "Travels across realms or galaxies"] },
+
+      // --- CLASSIC EVERYDAY WORDS ---
+      { pack: "CLASSIC", category: "Food & Drinks", majority: "Pizza", odd: "Burger", clues: ["Classic weekend comfort food", "Best eaten hot with melted cheese", "Popular party delivery order"] },
+      { pack: "CLASSIC", category: "Places & Travel", majority: "Beach", odd: "Desert", clues: ["Covered in sand", "Gets super bright and hot in the afternoon", "Need sunscreen when visiting"] },
+      { pack: "CLASSIC", category: "Food & Drinks", majority: "Coffee", odd: "Tea", clues: ["Morning caffeine ritual", "Can be served hot or iced", "Found in almost every cafe"] },
+      { pack: "CLASSIC", category: "Animals", majority: "Lion", odd: "Tiger", clues: ["Apex big cat predator", "Roars loudly in the wild", "Iconic zoo attraction"] },
+      { pack: "CLASSIC", category: "Music & Instruments", majority: "Guitar", odd: "Piano", clues: ["Classic instrument for writing songs", "Used in almost every music genre", "Takes practice to master chords"] },
+      { pack: "CLASSIC", category: "Vehicles & Exploration", majority: "Submarine", odd: "Spaceship", clues: ["Sealed vessel for extreme environments", "Crew relies on oxygen systems", "Explores mysterious frontiers"] },
+      { pack: "CLASSIC", category: "Fantasy & Monsters", majority: "Vampire", odd: "Werewolf", clues: ["Classic midnight movie monster", "Connected to the night and moonlight", "Famous supernatural folklore"] },
+      { pack: "CLASSIC", category: "Sports", majority: "Football", odd: "Basketball", clues: ["Fast-paced global team sport", "Played in massive packed stadiums", "Famous world championships"] }
+    ];
+
+    const AVATAR_COLORS = [
+      "from-violet-500 to-indigo-600",
+      "from-emerald-500 to-teal-600",
+      "from-amber-500 to-orange-600",
+      "from-rose-500 to-pink-600",
+      "from-cyan-500 to-blue-600",
+      "from-fuchsia-500 to-purple-600"
+    ];
+
+    const BOT_NAMES = ["Bot Zuko", "Bot Levi", "Bot Nova", "Bot Kira", "Bot Ren"];
+
+    // =========================================================================
+    // 3. FIREBASE REAL-TIME MULTIPLAYER ENGINE (WITH INSTANT UI RENDERING)
+    // =========================================================================
+    let auth = null;
+    let db = null;
+    let firebaseReady = false;
+    let isLocalFallback = false;
+
+    let currentUser = { uid: 'player_' + Math.random().toString(36).slice(2, 10) };
+    let landingGameType = 'ODD_ONE_OUT';
+    let landingMaxPlayers = 4;
+
+    let currentRoomCode = null;
+    let currentRoomData = null;
+    let localChatMessages = [];
+    let roomUnsubscribe = null;
+    let chatUnsubscribe = null;
+    let botActionTimeout = null;
+
+    // Pre-fill room code from ?room=XXXXX invite URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const invitedRoomParam = (urlParams.get('room') || '').toUpperCase().trim();
+    if (invitedRoomParam && invitedRoomParam.length === 5) {
+      document.getElementById('join-code-input').value = invitedRoomParam;
+    }
+
+    async function initFirebaseConnection() {
+      const statusPill = document.getElementById('connection-status-pill');
+      try {
+        const app = initializeApp(activeConfig);
+        auth = getAuth(app);
+        db = getFirestore(app);
+
+        onAuthStateChanged(auth, (user) => {
+          if (user) {
+            currentUser = user;
+            firebaseReady = true;
+            isLocalFallback = false;
+            statusPill.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Online Sync Ready (odd-one-mafia)`;
+            statusPill.className = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-950/80 border border-emerald-500/30 text-[10px] font-semibold text-emerald-300';
+          }
+        });
+
+        await signInAnonymously(auth);
+      } catch (err) {
+        console.warn('Firebase connection notice:', err);
+        isLocalFallback = true;
+        statusPill.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Local Bot Mode (Check Firebase Internet/Rules)`;
+        statusPill.className = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-950/80 border border-amber-500/30 text-[10px] font-semibold text-amber-300';
+      }
+    }
+
+    // =========================================================================
+    // 4. LANDING SCREEN CONTROLS
+    // =========================================================================
+    window.selectLandingGameType = function (type) {
+      landingGameType = type === 'MAFIA' ? 'MAFIA' : 'ODD_ONE_OUT';
+      const oddBtn = document.getElementById('landing-game-odd');
+      const mafiaBtn = document.getElementById('landing-game-mafia');
+      const createBtn = document.getElementById('btn-create-room');
+      const rangeHint = document.getElementById('landing-size-range-hint');
+
+      if (landingGameType === 'MAFIA') {
+        if (landingMaxPlayers < 4) landingMaxPlayers = 4;
+        mafiaBtn.className = 'p-3.5 rounded-2xl border-2 border-rose-500 bg-rose-500/15 text-left transition active:scale-[0.98] shadow-lg shadow-rose-950/30';
+        oddBtn.className = 'p-3.5 rounded-2xl border-2 border-slate-800 bg-slate-950/70 text-left transition active:scale-[0.98]';
+        createBtn.className = 'w-full py-3.5 px-5 rounded-2xl bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-500 hover:to-orange-500 text-white font-extrabold text-sm sm:text-base shadow-lg shadow-rose-600/25 transition active:scale-[0.98]';
+        createBtn.textContent = '🔫 Create Mafia Room';
+        rangeHint.textContent = 'Min 4 • Max 6';
+      } else {
+        oddBtn.className = 'p-3.5 rounded-2xl border-2 border-violet-500 bg-violet-500/15 text-left transition active:scale-[0.98] shadow-lg shadow-violet-950/30';
+        mafiaBtn.className = 'p-3.5 rounded-2xl border-2 border-slate-800 bg-slate-950/70 text-left transition active:scale-[0.98]';
+        createBtn.className = 'w-full py-3.5 px-5 rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-extrabold text-sm sm:text-base shadow-lg shadow-violet-600/25 transition active:scale-[0.98]';
+        createBtn.textContent = '✨ Create Odd One Out Room';
+        rangeHint.textContent = 'Min 3 • Max 6';
+      }
+
+      renderLandingSizeButtons();
+    };
+
+    window.selectLandingSize = function (count) {
+      const min = landingGameType === 'MAFIA' ? 4 : 3;
+      landingMaxPlayers = Math.min(6, Math.max(min, count));
+      renderLandingSizeButtons();
+    };
+
+    function renderLandingSizeButtons() {
+      const container = document.getElementById('landing-size-buttons');
+      const sizes = landingGameType === 'MAFIA' ? [4, 5, 6] : [3, 4, 5, 6];
+      container.className = `grid ${sizes.length === 3 ? 'grid-cols-3' : 'grid-cols-4'} gap-2`;
+      container.innerHTML = '';
+
+      sizes.forEach(sz => {
+        const active = sz === landingMaxPlayers;
+        const activeStyle = landingGameType === 'MAFIA'
+          ? 'border-rose-500 bg-rose-500/20 text-white shadow'
+          : 'border-violet-500 bg-violet-500/20 text-white shadow';
+
+        container.innerHTML += `
+          <button type="button" onclick="window.selectLandingSize(${sz})"
+            class="py-2.5 rounded-xl border text-xs font-extrabold transition active:scale-95 ${
+              active ? activeStyle : 'border-slate-800 bg-slate-950/70 text-slate-300'
+            }">
+            ${sz} Players
+          </button>
+        `;
+      });
+    }
+
+    renderLandingSizeButtons();
+    initFirebaseConnection();
+
+    // =========================================================================
+    // 5. UI & FIRESTORE STORAGE HELPERS (rooms/{roomCode}/messages)
+    // =========================================================================
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const colors = {
+        info: 'bg-slate-900/95 border-violet-500/40 text-slate-100',
+        success: 'bg-emerald-950/95 border-emerald-500/50 text-emerald-200',
+        warning: 'bg-amber-950/95 border-amber-500/50 text-amber-200',
+        error: 'bg-rose-950/95 border-rose-500/50 text-rose-200'
+      };
+      toast.className = `pointer-events-auto px-4 py-2.5 rounded-2xl border shadow-2xl text-xs sm:text-sm font-semibold text-center animate-pop-in ${colors[type] || colors.info}`;
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.25s ease';
+        setTimeout(() => toast.remove(), 250);
+      }, 2800);
+    }
+
+    function switchView(viewId) {
+      ['view-landing', 'view-lobby', 'view-game-odd', 'view-game-mafia', 'view-results'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+      });
+      const target = document.getElementById(viewId);
+      if (target) target.classList.remove('hidden');
+
+      const headerControls = document.getElementById('header-room-controls');
+      if (viewId === 'view-landing') {
+        headerControls.classList.add('hidden');
+        document.getElementById('header-title').textContent = 'ODD ONE MAFIA';
+        document.getElementById('header-subtitle').textContent = 'Odd One Out & Mafia Online';
+        document.getElementById('header-logo-badge').textContent = '?';
+      } else {
+        headerControls.classList.remove('hidden');
+      }
+    }
+
+    function copyTextFallback(text, successMsg) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        showToast(successMsg, 'success');
+      } catch (e) {
+        showToast('Room Code: ' + text, 'info');
+      }
+      document.body.removeChild(textarea);
+    }
+
+    window.copyRoomCode = function () {
+      if (!currentRoomCode) return;
+      copyTextFallback(currentRoomCode, `Copied room code: ${currentRoomCode}`);
+    };
+
+    window.copyInviteLink = function () {
+      if (!currentRoomCode) return;
+      const url = new URL(window.location.href);
+      url.searchParams.set('room', currentRoomCode);
+      copyTextFallback(url.toString(), 'Copied invite link! Send to your friends.');
+    };
+
+    function generateRoomCode() {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let code = '';
+      for (let i = 0; i < 5; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return code;
+    }
+
+    function getPlayerNickname() {
+      const input = document.getElementById('player-name-input');
+      const clean = (input.value || '').trim().replace(/\s+/g, ' ');
+      if (!clean) {
+        showToast('Enter your nickname first!', 'warning');
+        input.focus();
+        return null;
+      }
+      return clean;
+    }
+
+    function getRoomDocRef(code) {
+      return doc(db, 'rooms', code);
+    }
+
+    function getChatCollectionRef(code) {
+      return collection(db, 'rooms', code, 'messages');
+    }
+
+    async function saveRoomPatch(patch) {
+      if (!currentRoomData || !currentRoomCode) return;
+      if (firebaseReady && !isLocalFallback && db) {
+        await updateDoc(getRoomDocRef(currentRoomCode), patch);
+      } else {
+        currentRoomData = { ...currentRoomData, ...patch };
+        renderRoomState(currentRoomData);
+      }
+    }
+
+    async function appendChatMessage(msgObj) {
+      if (!currentRoomCode) return;
+      if (firebaseReady && !isLocalFallback && db) {
+        await addDoc(getChatCollectionRef(currentRoomCode), msgObj);
+      } else {
+        localChatMessages.push({ id: 'msg_' + Date.now() + '_' + Math.random(), ...msgObj });
+        renderChatMessages(localChatMessages);
+      }
+    }
+
+    // =========================================================================
+    // 6. CREATE & JOIN ROOMS
+    // =========================================================================
+    window.createRoom = async function () {
+      const nickname = getPlayerNickname();
+      if (!nickname) return;
+
+      const btn = document.getElementById('btn-create-room');
+      btn.disabled = true;
+
+      try {
+        if (!firebaseReady && db && auth) {
+          try {
+            const cred = await signInAnonymously(auth);
+            if (cred && cred.user) {
+              currentUser = cred.user;
+              firebaseReady = true;
+              isLocalFallback = false;
+            }
+          } catch (e) {
+            isLocalFallback = true;
+          }
+        }
+
+        const code = generateRoomCode();
+        const initialPlayer = {
+          uid: currentUser.uid,
+          name: nickname,
+          colorIdx: 0,
+          score: 0,
+          isBot: false,
+          joinedAt: Date.now()
+        };
+
+        const roomPayload = {
+          roomCode: code,
+          hostId: currentUser.uid,
+          gameType: landingGameType,
+          status: 'lobby',
+          round: 0,
+          maxPlayers: landingMaxPlayers,
+          players: [initialPlayer],
+          imposterKnows: true,
+          selectedPack: 'ALL',
+          activePairIdx: -1,
+          category: '',
+          majorityWord: '',
+          oddWord: '',
+          imposterId: '',
+          usedPairIndices: [],
+          mafiaPhase: 'night',
+          mafiaTurnNumber: 1,
+          mafiaRoles: {},
+          alivePlayerIds: [],
+          nightKillTarget: null,
+          nightSaveTarget: null,
+          morningReport: '',
+          votes: {},
+          createdAt: Date.now()
+        };
+
+        if (firebaseReady && !isLocalFallback && db) {
+          await setDoc(getRoomDocRef(code), roomPayload);
+          subscribeToRoom(code);
+        } else {
+          currentRoomCode = code;
+          currentRoomData = roomPayload;
+          localChatMessages = [];
+          document.getElementById('header-room-code').textContent = code;
+          renderRoomState(currentRoomData);
+        }
+
+        const label = landingGameType === 'MAFIA' ? 'Mafia' : 'Odd One Out';
+        showToast(`Created ${landingMaxPlayers}-player ${label} room ${code}!`, 'success');
+      } catch (err) {
+        console.error('Create room error:', err);
+        showToast('Could not create room. Check internet & try again.', 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    };
+
+    window.joinRoom = async function () {
+      const nickname = getPlayerNickname();
+      if (!nickname) return;
+
+      const codeInput = document.getElementById('join-code-input');
+      const code = (codeInput.value || '').toUpperCase().trim();
+      if (code.length !== 5) {
+        showToast('Enter a valid 5-character room code.', 'warning');
+        codeInput.focus();
+        return;
+      }
+
+      const btn = document.getElementById('btn-join-room');
+      btn.disabled = true;
+
+      try {
+        if (!firebaseReady && db && auth) {
+          const cred = await signInAnonymously(auth);
+          if (cred && cred.user) {
+            currentUser = cred.user;
+            firebaseReady = true;
+            isLocalFallback = false;
+          }
+        }
+
+        const ref = getRoomDocRef(code);
+        const snap = await getDoc(ref);
+
+        if (!snap.exists()) {
+          showToast(`Room "${code}" not found. Check the code!`, 'error');
+          return;
+        }
+
+        const data = snap.data();
+        const maxPlayers = Math.min(6, Math.max(3, Number(data.maxPlayers) || 4));
+        const players = Array.isArray(data.players) ? [...data.players] : [];
+        const existingIdx = players.findIndex(p => p.uid === currentUser.uid);
+
+        if (existingIdx !== -1) {
+          players[existingIdx].name = nickname;
+          await updateDoc(ref, { players });
+          subscribeToRoom(code);
+          return;
+        }
+
+        if (players.length >= maxPlayers) {
+          const botIdx = players.findIndex(p => p.isBot);
+          if (data.status === 'lobby' && botIdx !== -1) {
+            players[botIdx] = {
+              uid: currentUser.uid,
+              name: nickname,
+              colorIdx: players[botIdx].colorIdx,
+              score: 0,
+              isBot: false,
+              joinedAt: Date.now()
+            };
+            await updateDoc(ref, { players });
+            subscribeToRoom(code);
+            showToast(`Joined room ${code}!`, 'success');
+            return;
+          }
+          showToast(`Room is full (${maxPlayers}/${maxPlayers} players)!`, 'warning');
+          return;
+        }
+
+        if (data.status !== 'lobby') {
+          showToast('Match is already in progress in that room.', 'warning');
+          return;
+        }
+
+        const usedColors = new Set(players.map(p => p.colorIdx));
+        let assignedColor = 0;
+        for (let i = 0; i < 6; i++) {
+          if (!usedColors.has(i)) {
+            assignedColor = i;
+            break;
+          }
+        }
+
+        players.push({
+          uid: currentUser.uid,
+          name: nickname,
+          colorIdx: assignedColor,
+          score: 0,
+          isBot: false,
+          joinedAt: Date.now()
+        });
+
+        await updateDoc(ref, { players });
+        subscribeToRoom(code);
+        showToast(`Joined room ${code}!`, 'success');
+      } catch (err) {
+        console.error('Join room error:', err);
+        showToast('Could not join room. Check internet & try again.', 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    };
+
+    window.leaveRoom = async function () {
+      if (roomUnsubscribe) {
+        roomUnsubscribe();
+        roomUnsubscribe = null;
+      }
+      if (chatUnsubscribe) {
+        chatUnsubscribe();
+        chatUnsubscribe = null;
+      }
+      if (botActionTimeout) clearTimeout(botActionTimeout);
+
+      const leavingCode = currentRoomCode;
+      const leavingData = currentRoomData;
+      currentRoomCode = null;
+      currentRoomData = null;
+      localChatMessages = [];
+
+      if (firebaseReady && !isLocalFallback && db && leavingCode && leavingData && currentUser) {
+        try {
+          const remainingHumans = (leavingData.players || []).filter(p => p.uid !== currentUser.uid && !p.isBot);
+          if (remainingHumans.length > 0) {
+            const nextHostId = leavingData.hostId === currentUser.uid ? remainingHumans[0].uid : leavingData.hostId;
+            const updatedPlayers = (leavingData.players || []).filter(p => p.uid !== currentUser.uid);
+            await updateDoc(getRoomDocRef(leavingCode), {
+              players: updatedPlayers,
+              hostId: nextHostId
+            });
+          }
+        } catch (e) {
+          // Ignore cleanup errors
+        }
+      }
+
+      switchView('view-landing');
+    };
+
+    window.switchLobbyGameType = async function (newGameType) {
+      if (!currentRoomData || currentRoomData.hostId !== currentUser.uid) {
+        showToast('Only the room host can switch game mode.', 'warning');
+        return;
+      }
+      const targetType = newGameType === 'MAFIA' ? 'MAFIA' : 'ODD_ONE_OUT';
+      let maxPlayers = Number(currentRoomData.maxPlayers) || 4;
+      if (targetType === 'MAFIA' && maxPlayers < 4) {
+        maxPlayers = 4;
+      }
+      await saveRoomPatch({ gameType: targetType, maxPlayers });
+    };
+
+    window.setMaxPlayers = async function (newCount) {
+      if (!currentRoomData || currentRoomData.hostId !== currentUser.uid) {
+        showToast('Only the room host can change player count.', 'warning');
+        return;
+      }
+      const minPlayers = currentRoomData.gameType === 'MAFIA' ? 4 : 3;
+      const clamped = Math.min(6, Math.max(minPlayers, Number(newCount)));
+      let players = [...(currentRoomData.players || [])];
+
+      while (players.length > clamped) {
+        const lastBotIdx = players.map(p => p.isBot).lastIndexOf(true);
+        if (lastBotIdx !== -1) {
+          players.splice(lastBotIdx, 1);
+        } else {
+          players.pop();
+        }
+      }
+
+      await saveRoomPatch({ maxPlayers: clamped, players });
+    };
+
+    window.updateLobbySettings = async function (partialSettings) {
+      if (!currentRoomData || currentRoomData.hostId !== currentUser.uid) {
+        showToast('Only the room host can change settings.', 'warning');
+        return;
+      }
+      await saveRoomPatch(partialSettings);
+    };
+
+    window.fillWithDemoBots = async function () {
+      if (!currentRoomData || currentRoomData.hostId !== currentUser.uid) return;
+      const minPlayers = currentRoomData.gameType === 'MAFIA' ? 4 : 3;
+      const maxPlayers = Math.min(6, Math.max(minPlayers, Number(currentRoomData.maxPlayers) || 4));
+      const players = [...(currentRoomData.players || [])];
+      if (players.length >= maxPlayers) return;
+
+      const usedColors = new Set(players.map(p => p.colorIdx));
+      let botCounter = 0;
+
+      while (players.length < maxPlayers) {
+        let colorIdx = 0;
+        for (let i = 0; i < 6; i++) {
+          if (!usedColors.has(i)) {
+            colorIdx = i;
+            usedColors.add(i);
+            break;
+          }
+        }
+        players.push({
+          uid: `bot_${Date.now()}_${botCounter}`,
+          name: BOT_NAMES[botCounter % BOT_NAMES.length],
+          colorIdx,
+          score: 0,
+          isBot: true,
+          joinedAt: Date.now() + botCounter
+        });
+        botCounter++;
+      }
+
+      await saveRoomPatch({ players });
+      showToast(`Filled all ${maxPlayers} seats! Ready to start.`, 'success');
+    };
+
+    // =========================================================================
+    // 7. REAL-TIME SUBSCRIPTIONS & STATE ROUTING
+    // =========================================================================
+    function subscribeToRoom(code) {
+      currentRoomCode = code;
+      document.getElementById('header-room-code').textContent = code;
+
+      if (roomUnsubscribe) roomUnsubscribe();
+      if (chatUnsubscribe) chatUnsubscribe();
+
+      roomUnsubscribe = onSnapshot(
+        getRoomDocRef(code),
+        (snapshot) => {
+          if (!snapshot.exists()) {
+            showToast('Room closed.', 'warning');
+            window.leaveRoom();
+            return;
+          }
+          currentRoomData = snapshot.data();
+          renderRoomState(currentRoomData);
+        },
+        (error) => console.error('Room listener error:', error)
+      );
+
+      chatUnsubscribe = onSnapshot(
+        getChatCollectionRef(code),
+        (snapshot) => {
+          const allMessages = [];
+          snapshot.forEach(docSnap => allMessages.push({ id: docSnap.id, ...docSnap.data() }));
+          allMessages.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+          renderChatMessages(allMessages);
+        },
+        (error) => console.error('Chat listener error:', error)
+      );
+    }
+
+    function renderRoomState(data) {
+      const isHost = data.hostId === currentUser.uid;
+      const isMafia = data.gameType === 'MAFIA';
+      const minPlayers = isMafia ? 4 : 3;
+      const maxPlayers = Math.min(6, Math.max(minPlayers, Number(data.maxPlayers) || 4));
+
+      document.getElementById('header-title').textContent = isMafia ? 'MAFIA' : 'ODD ONE OUT';
+      document.getElementById('header-subtitle').textContent = `${maxPlayers}-Player ${isMafia ? 'Social Deduction' : 'Party Game'}`;
+      document.getElementById('header-logo-badge').textContent = isMafia ? '🔫' : '?';
+
+      if (data.status === 'lobby') {
+        if (botActionTimeout) clearTimeout(botActionTimeout);
+        switchView('view-lobby');
+        renderLobby(data, isHost, maxPlayers);
+      } else if (data.status === 'discussion' || data.status === 'voting') {
+        if (isMafia) {
+          switchView('view-game-mafia');
+          renderMafiaGame(data, isHost);
+        } else {
+          switchView('view-game-odd');
+          renderOddOneOutGame(data, isHost);
+        }
+      } else if (data.status === 'results') {
+        if (botActionTimeout) clearTimeout(botActionTimeout);
+        switchView('view-results');
+        renderResults(data, isHost);
+      }
+    }
+
+    // =========================================================================
+    // 8. LOBBY RENDERER
+    // =========================================================================
+    function renderLobby(data, isHost, maxPlayers) {
+      const isMafia = data.gameType === 'MAFIA';
+      document.getElementById('lobby-room-code').textContent = data.roomCode;
+      document.getElementById('lobby-player-count').textContent = `${data.players.length} / ${maxPlayers}`;
+
+      const gameBadge = document.getElementById('lobby-game-badge');
+      gameBadge.textContent = isMafia ? '🔫 MAFIA' : '❓ ODD ONE OUT';
+      gameBadge.className = isMafia
+        ? 'px-2 py-0.5 rounded-full bg-rose-500/20 border border-rose-500/30 text-[10px] font-extrabold text-rose-300'
+        : 'px-2 py-0.5 rounded-full bg-violet-500/20 border border-violet-500/30 text-[10px] font-extrabold text-violet-300';
+
+      document.getElementById('lobby-mode-indicator').textContent = isLocalFallback
+        ? '● Local Bot Mode'
+        : '● Live Firebase Multiplayer Sync';
+
+      const fillBotsBtn = document.getElementById('btn-fill-bots');
+      if (isHost && data.players.length < maxPlayers) {
+        fillBotsBtn.classList.remove('hidden');
+      } else {
+        fillBotsBtn.classList.add('hidden');
+      }
+
+      const slotsContainer = document.getElementById('lobby-slots-container');
+      slotsContainer.innerHTML = '';
+
+      for (let i = 0; i < maxPlayers; i++) {
+        const player = data.players[i];
+        if (player) {
+          const isMe = player.uid === currentUser.uid;
+          const isRoomHost = player.uid === data.hostId;
+          const grad = AVATAR_COLORS[player.colorIdx % AVATAR_COLORS.length];
+          const initials = player.name.slice(0, 2).toUpperCase();
+
+          slotsContainer.innerHTML += `
+            <div class="flex items-center justify-between p-2.5 rounded-2xl bg-slate-950/80 border ${isMe ? 'border-violet-500/50' : 'border-slate-800'}">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br ${grad} flex items-center justify-center font-display font-extrabold text-white text-xs shrink-0 shadow">
+                  ${initials}
+                </div>
+                <div class="truncate">
+                  <div class="flex items-center gap-1">
+                    <span class="font-bold text-xs sm:text-sm text-white truncate">${escapeHtml(player.name)}</span>
+                    ${isMe ? '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-violet-500/20 text-violet-300">YOU</span>' : ''}
+                  </div>
+                  <span class="text-[10px] text-slate-400">
+                    ${isRoomHost ? '👑 Host' : (player.isBot ? '🤖 Demo Bot' : '✅ Ready')}
+                  </span>
+                </div>
+              </div>
+              <span class="text-[11px] font-bold text-emerald-400">In</span>
+            </div>
+          `;
+        } else {
+          slotsContainer.innerHTML += `
+            <div class="flex items-center justify-between p-2.5 rounded-2xl bg-slate-950/35 border border-dashed border-slate-800">
+              <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-600 font-bold text-xs">
+                  #${i + 1}
+                </div>
+                <div>
+                  <span class="font-semibold text-xs text-slate-500">Empty Seat</span>
+                  <span class="block text-[10px] text-slate-600">Open slot</span>
+                </div>
+              </div>
+              <span class="w-2 h-2 rounded-full bg-slate-700 animate-pulse"></span>
+            </div>
+          `;
+        }
+      }
+
+      const switchOdd = document.getElementById('lobby-switch-odd');
+      const switchMafia = document.getElementById('lobby-switch-mafia');
+      switchOdd.disabled = !isHost;
+      switchMafia.disabled = !isHost;
+
+      switchOdd.className = `py-2 px-3 rounded-xl border text-xs font-extrabold transition ${
+        !isMafia ? 'border-violet-500 bg-violet-500/20 text-white' : 'border-slate-800 bg-slate-950/60 text-slate-400'
+      }`;
+      switchMafia.className = `py-2 px-3 rounded-xl border text-xs font-extrabold transition ${
+        isMafia ? 'border-rose-500 bg-rose-500/20 text-white' : 'border-slate-800 bg-slate-950/60 text-slate-400'
+      }`;
+
+      const capLabel = document.getElementById('lobby-capacity-label');
+      const capContainer = document.getElementById('lobby-capacity-buttons');
+      const allowedSizes = isMafia ? [4, 5, 6] : [3, 4, 5, 6];
+      capLabel.textContent = isMafia ? 'Number of Players (4 to 6)' : 'Number of Players (3 to 6)';
+      capContainer.className = `grid ${allowedSizes.length === 3 ? 'grid-cols-3' : 'grid-cols-4'} gap-2`;
+      capContainer.innerHTML = '';
+
+      allowedSizes.forEach(sz => {
+        const active = sz === maxPlayers;
+        const activeClass = isMafia
+          ? 'border-rose-500 bg-rose-500/20 text-white shadow-sm'
+          : 'border-violet-500 bg-violet-500/20 text-white shadow-sm';
+        capContainer.innerHTML += `
+          <button type="button" onclick="window.setMaxPlayers(${sz})" ${!isHost ? 'disabled' : ''}
+            class="py-2 rounded-xl border text-xs font-extrabold transition ${
+              active ? activeClass : 'border-slate-800 bg-slate-950/60 text-slate-400 hover:bg-slate-800/70'
+            }">
+            ${sz} Players
+          </button>
+        `;
+      });
+
+      const oddSettingsEl = document.getElementById('lobby-odd-settings');
+      const mafiaSettingsEl = document.getElementById('lobby-mafia-settings');
+
+      if (isMafia) {
+        oddSettingsEl.classList.add('hidden');
+        mafiaSettingsEl.classList.remove('hidden');
+        const villagersCount = maxPlayers - 2;
+        document.getElementById('mafia-role-summary-pill').textContent = `${maxPlayers} Players Total`;
+        document.getElementById('mafia-villager-count-text').textContent = `${villagersCount} Villager${villagersCount === 1 ? '' : 's'}`;
+      } else {
+        oddSettingsEl.classList.remove('hidden');
+        mafiaSettingsEl.classList.add('hidden');
+
+        const imposterKnows = data.imposterKnows !== false;
+        const selectedPack = data.selectedPack || 'ALL';
+        const btnClassic = document.getElementById('btn-mode-classic');
+        const btnUndercover = document.getElementById('btn-mode-undercover');
+        const checkClassic = document.getElementById('check-mode-classic');
+        const checkUndercover = document.getElementById('check-mode-undercover');
+
+        btnClassic.disabled = !isHost;
+        btnUndercover.disabled = !isHost;
+
+        if (imposterKnows) {
+          btnClassic.className = 'p-3 rounded-2xl border border-violet-500 bg-violet-500/15 text-left transition';
+          btnUndercover.className = 'p-3 rounded-2xl border border-slate-800 bg-slate-950/60 text-left transition opacity-75';
+          checkClassic.textContent = '●';
+          checkClassic.className = 'text-xs text-violet-400 font-bold';
+          checkUndercover.textContent = '○';
+          checkUndercover.className = 'text-xs text-slate-600 font-bold';
+        } else {
+          btnUndercover.className = 'p-3 rounded-2xl border border-amber-500 bg-amber-500/15 text-left transition';
+          btnClassic.className = 'p-3 rounded-2xl border border-slate-800 bg-slate-950/60 text-left transition opacity-75';
+          checkUndercover.textContent = '●';
+          checkUndercover.className = 'text-xs text-amber-400 font-bold';
+          checkClassic.textContent = '○';
+          checkClassic.className = 'text-xs text-slate-600 font-bold';
+        }
+
+        document.querySelectorAll('.pack-btn').forEach(btn => {
+          btn.disabled = !isHost;
+          const isSelected = btn.getAttribute('data-pack') === selectedPack;
+          btn.className = `pack-btn px-3 py-2.5 rounded-xl border text-xs font-bold transition text-center ${
+            btn.getAttribute('data-pack') === 'CLASSIC' ? 'col-span-2 sm:col-span-2 ' : ''
+          }${
+            isSelected
+              ? 'border-cyan-400 bg-cyan-500/20 text-cyan-200 shadow-sm'
+              : 'border-slate-800 bg-slate-950/60 text-slate-400 hover:bg-slate-800/70'
+          }`;
+        });
+      }
+
+      const startBtn = document.getElementById('btn-start-game');
+      const guestMsg = document.getElementById('lobby-guest-wait-msg');
+
+      if (isHost) {
+        startBtn.classList.remove('hidden');
+        guestMsg.classList.add('hidden');
+        if (data.players.length === maxPlayers) {
+          startBtn.disabled = false;
+          startBtn.textContent = isMafia
+            ? `🔫 Start ${maxPlayers}-Player Mafia Match`
+            : `🚀 Start ${maxPlayers}-Player Odd One Out`;
+        } else {
+          startBtn.disabled = true;
+          startBtn.textContent = `Waiting for ${maxPlayers} Players (${data.players.length}/${maxPlayers})...`;
+        }
+      } else {
+        startBtn.classList.add('hidden');
+        guestMsg.classList.remove('hidden');
+      }
+    }
+
+    // =========================================================================
+    // 9. START ROUND
+    // =========================================================================
+    window.startNewRound = async function () {
+      if (!currentRoomData || currentRoomData.hostId !== currentUser.uid) return;
+      const isMafia = currentRoomData.gameType === 'MAFIA';
+      const minPlayers = isMafia ? 4 : 3;
+      const maxPlayers = Math.min(6, Math.max(minPlayers, Number(currentRoomData.maxPlayers) || 4));
+
+      if (currentRoomData.players.length < maxPlayers) {
+        showToast(`Need ${maxPlayers} players to start!`, 'warning');
+        return;
+      }
+
+      const nextRound = (currentRoomData.round || 0) + 1;
+
+      if (isMafia) {
+        const shuffled = [...currentRoomData.players].sort(() => Math.random() - 0.5);
+        const mafiaRoles = {};
+        shuffled.forEach((p, idx) => {
+          if (idx === 0) mafiaRoles[p.uid] = 'MAFIA';
+          else if (idx === 1) mafiaRoles[p.uid] = 'DOCTOR';
+          else mafiaRoles[p.uid] = 'VILLAGER';
+        });
+
+        const alivePlayerIds = currentRoomData.players.map(p => p.uid);
+
+        await saveRoomPatch({
+          status: 'discussion',
+          round: nextRound,
+          mafiaPhase: 'night',
+          mafiaTurnNumber: 1,
+          mafiaRoles,
+          alivePlayerIds,
+          nightKillTarget: null,
+          nightSaveTarget: null,
+          morningReport: '',
+          votes: {}
+        });
+
+        await appendChatMessage({
+          round: nextRound,
+          senderId: 'SYSTEM',
+          senderName: 'Narrator',
+          text: `Match ${nextRound} started! 1 Mafia, 1 Doctor, and ${maxPlayers - 2} Innocent Villagers. Night 1 begins...`,
+          createdAt: Date.now()
+        });
+      } else {
+        const activePack = currentRoomData.selectedPack || 'ALL';
+        const eligibleIndices = WORD_PAIRS
+          .map((item, idx) => ({ item, idx }))
+          .filter(({ item }) => activePack === 'ALL' || item.pack === activePack)
+          .map(({ idx }) => idx);
+
+        const pool = eligibleIndices.length > 0 ? eligibleIndices : WORD_PAIRS.map((_, i) => i);
+        let used = currentRoomData.usedPairIndices || [];
+        let available = pool.filter(idx => !used.includes(idx));
+        if (available.length === 0) {
+          used = used.filter(idx => !pool.includes(idx));
+          available = pool;
+        }
+
+        const pairIdx = available[Math.floor(Math.random() * available.length)];
+        const chosenPair = WORD_PAIRS[pairIdx];
+
+        const swapWords = Math.random() < 0.5;
+        const majorityWord = swapWords ? chosenPair.odd : chosenPair.majority;
+        const oddWord = swapWords ? chosenPair.majority : chosenPair.odd;
+
+        const imposterPlayer = currentRoomData.players[Math.floor(Math.random() * currentRoomData.players.length)];
+        const imposterKnows = currentRoomData.imposterKnows !== false;
+
+        await saveRoomPatch({
+          status: 'discussion',
+          round: nextRound,
+          activePairIdx: pairIdx,
+          category: chosenPair.category,
+          majorityWord,
+          oddWord,
+          imposterId: imposterPlayer.uid,
+          votes: {},
+          usedPairIndices: [...used, pairIdx]
+        });
+
+        await appendChatMessage({
+          round: nextRound,
+          senderId: 'SYSTEM',
+          senderName: 'Game Master',
+          text: `Round ${nextRound} (${chosenPair.category}) • ${maxPlayers} Players • ${imposterKnows ? 'Classic Mode' : 'Undercover Mode'}. Chat freely and vote below whenever ready!`,
+          createdAt: Date.now()
+        });
+      }
+    };
+
+    window.returnToLobby = async function () {
+      if (!currentRoomData || currentRoomData.hostId !== currentUser.uid) return;
+      await saveRoomPatch({ status: 'lobby' });
+    };
+
+    // =========================================================================
+    // 10. ODD ONE OUT GAMEPLAY
+    // =========================================================================
+    function renderOddOneOutGame(data, isHost) {
+      document.getElementById('odd-round-badge').textContent = `ROUND ${data.round}`;
+
+      const amIImposter = data.imposterId === currentUser.uid;
+      const imposterKnows = data.imposterKnows !== false;
+      const showImposterWarning = amIImposter && imposterKnows;
+      const totalPlayers = data.players.length;
+      const innocentCount = totalPlayers - 1;
+
+      document.getElementById('odd-mode-pill').textContent = imposterKnows
+        ? '🕵️ Classic Mode'
+        : '🎭 Undercover Mode';
+
+      const mySecretWord = amIImposter ? data.oddWord : data.majorityWord;
+      document.getElementById('odd-category-text').textContent = data.category;
+      document.getElementById('odd-secret-word').textContent = mySecretWord;
+
+      const cardBox = document.getElementById('odd-card-box');
+      const imposterBadge = document.getElementById('odd-imposter-badge');
+      const roleHint = document.getElementById('odd-role-hint');
+
+      if (showImposterWarning) {
+        cardBox.className = 'w-full rounded-3xl bg-gradient-to-br from-rose-700 via-red-900 to-slate-950 border border-rose-400/50 p-4 flex flex-col items-center justify-center text-center shadow-2xl shadow-rose-900/50 transition-all';
+        imposterBadge.classList.remove('hidden');
+        roleHint.textContent = "You have the odd character! Blend into the chat without getting caught.";
+      } else {
+        cardBox.className = 'w-full rounded-3xl bg-gradient-to-br from-violet-600 via-indigo-700 to-slate-900 border border-violet-400/40 p-4 flex flex-col items-center justify-center text-center shadow-2xl shadow-violet-900/40 transition-all';
+        imposterBadge.classList.add('hidden');
+        roleHint.textContent = imposterKnows
+          ? `${innocentCount} Innocents share this exact name. Chat freely and vote out the 1 Imposter below!`
+          : "Undercover Mode: You don't know if you're the Odd One Out! Chat freely and vote below when ready.";
+      }
+
+      const votes = data.votes || {};
+      const totalVotes = Object.keys(votes).length;
+      const myVote = votes[currentUser.uid];
+
+      document.getElementById('odd-voting-progress-pill').textContent = `🗳️ ${totalVotes} / ${totalPlayers} Voted`;
+      document.getElementById('odd-voting-subtitle').textContent = myVote
+        ? `Vote locked (${totalVotes}/${totalPlayers}) • Keep chatting!`
+        : `Tap a suspect (${totalVotes}/${totalPlayers} voted)`;
+
+      const grid = document.getElementById('odd-voting-grid');
+      grid.innerHTML = '';
+
+      data.players
+        .filter(p => p.uid !== currentUser.uid)
+        .forEach(player => {
+          const isSelected = myVote === player.uid;
+          const grad = AVATAR_COLORS[player.colorIdx % AVATAR_COLORS.length];
+          const initials = player.name.slice(0, 2).toUpperCase();
+          const hasVotedIndicator = Boolean(votes[player.uid]);
+
+          grid.innerHTML += `
+            <button type="button" onclick="window.castVote('${player.uid}')" ${myVote ? 'disabled' : ''}
+              class="p-2.5 rounded-2xl border text-left transition flex items-center justify-between active:scale-[0.98] ${
+                isSelected
+                  ? 'bg-rose-500/20 border-rose-500 shadow-lg shadow-rose-900/30'
+                  : myVote
+                    ? 'bg-slate-900/60 border-slate-800 opacity-65'
+                    : 'bg-slate-900/95 hover:bg-slate-800 border-slate-700 hover:border-amber-400'
+              }">
+              <div class="flex items-center gap-2 min-w-0">
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-br ${grad} flex items-center justify-center font-display font-extrabold text-white text-xs shrink-0">
+                  ${initials}
+                </div>
+                <div class="truncate">
+                  <div class="font-bold text-xs text-white truncate">${escapeHtml(player.name)}</div>
+                  <div class="text-[10px] ${isSelected ? 'text-rose-300 font-bold' : 'text-slate-400'}">
+                    ${isSelected ? '🎯 Your Vote' : (hasVotedIndicator ? '✅ Voted' : 'Tap to vote')}
+                  </div>
+                </div>
+              </div>
+              <span class="text-sm ml-1">${isSelected ? '✅' : '🗳️'}</span>
+            </button>
+          `;
+        });
+
+      if (isHost && totalVotes >= totalPlayers) {
+        finalizeOddOneOutResults(data);
+      } else if (isHost) {
+        scheduleOddOneOutBots(data);
+      }
+    }
+
+    async function finalizeOddOneOutResults(data) {
+      if (data.status === 'results') return;
+      const votes = data.votes || {};
+      const tally = {};
+      data.players.forEach(p => { tally[p.uid] = 0; });
+
+      Object.values(votes).forEach(targetId => {
+        if (tally[targetId] !== undefined) tally[targetId]++;
+      });
+
+      let maxVotes = 0;
+      Object.values(tally).forEach(count => { if (count > maxVotes) maxVotes = count; });
+
+      const topSuspects = Object.keys(tally).filter(uid => tally[uid] === maxVotes && maxVotes > 0);
+      const isTie = topSuspects.length !== 1;
+      const eliminatedId = isTie ? null : topSuspects[0];
+      const innocentsWon = !isTie && eliminatedId === data.imposterId;
+
+      const updatedPlayers = data.players.map(p => {
+        let bonus = 0;
+        if (innocentsWon && p.uid !== data.imposterId) bonus = 100;
+        else if (!innocentsWon && p.uid === data.imposterId) bonus = 150;
+        return { ...p, score: (p.score || 0) + bonus };
+      });
+
+      await saveRoomPatch({
+        status: 'results',
+        players: updatedPlayers,
+        lastRoundOutcome: {
+          mode: 'ODD_ONE_OUT',
+          innocentsWon,
+          isTie,
+          eliminatedId,
+          tally
+        }
+      });
+    }
+
+    // =========================================================================
+    // 11. MAFIA GAMEPLAY (NIGHT KILL/SAVE + DAY CHAT & IN-CHAT VOTING)
+    // =========================================================================
+    function renderMafiaGame(data, isHost) {
+      const roles = data.mafiaRoles || {};
+      const myRole = roles[currentUser.uid] || 'VILLAGER';
+      const aliveIds = Array.isArray(data.alivePlayerIds) ? data.alivePlayerIds : data.players.map(p => p.uid);
+      const amIAlive = aliveIds.includes(currentUser.uid);
+      const phase = data.mafiaPhase || 'night';
+      const turnNum = data.mafiaTurnNumber || 1;
+
+      document.getElementById('mafia-day-badge').textContent = `${phase === 'night' ? '🌙 NIGHT' : '☀️ DAY'} ${turnNum}`;
+      document.getElementById('mafia-alive-pill').textContent = `${aliveIds.length} Alive`;
+      document.getElementById('mafia-phase-indicator').innerHTML = phase === 'night'
+        ? `<span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span> Night Actions`
+        : `<span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> Open Chat & Vote`;
+
+      const roleBanner = document.getElementById('mafia-role-banner');
+      const roleTitle = document.getElementById('mafia-role-title');
+      const roleDesc = document.getElementById('mafia-role-desc');
+      const elimBadge = document.getElementById('mafia-eliminated-badge');
+
+      if (amIAlive) elimBadge.classList.add('hidden');
+      else elimBadge.classList.remove('hidden');
+
+      if (myRole === 'MAFIA') {
+        roleBanner.className = 'w-full rounded-3xl bg-gradient-to-br from-rose-700 via-red-950 to-slate-950 border border-rose-400/50 p-4 flex flex-col items-center justify-center text-center shadow-2xl shadow-rose-900/40';
+        roleTitle.textContent = '🔫 YOU ARE THE MAFIA';
+        roleDesc.textContent = 'Eliminate a player each night and blend into the morning chat so you are not voted out!';
+      } else if (myRole === 'DOCTOR') {
+        roleBanner.className = 'w-full rounded-3xl bg-gradient-to-br from-emerald-700 via-teal-900 to-slate-950 border border-emerald-400/50 p-4 flex flex-col items-center justify-center text-center shadow-2xl shadow-emerald-900/40';
+        roleTitle.textContent = '🩺 YOU ARE THE DOCTOR';
+        roleDesc.textContent = 'Choose 1 alive player each night (including yourself) to protect from a Mafia attack!';
+      } else {
+        roleBanner.className = 'w-full rounded-3xl bg-gradient-to-br from-sky-700 via-indigo-900 to-slate-950 border border-sky-400/40 p-4 flex flex-col items-center justify-center text-center shadow-2xl';
+        roleTitle.textContent = '🧑‍🌾 INNOCENT VILLAGER';
+        roleDesc.textContent = 'Watch closely during the morning discussion and vote out the Mafia!';
+      }
+
+      const nightPanel = document.getElementById('mafia-night-panel');
+      const dayPanel = document.getElementById('mafia-day-panel');
+
+      if (phase === 'night') {
+        nightPanel.classList.remove('hidden');
+        dayPanel.classList.add('hidden');
+        renderMafiaNightPhase(data, isHost, myRole, amIAlive, aliveIds);
+      } else {
+        nightPanel.classList.add('hidden');
+        dayPanel.classList.remove('hidden');
+        renderMafiaDayPhase(data, isHost, amIAlive, aliveIds);
+      }
+    }
+
+    function renderMafiaNightPhase(data, isHost, myRole, amIAlive, aliveIds) {
+      const roles = data.mafiaRoles || {};
+      const doctorUid = Object.keys(roles).find(uid => roles[uid] === 'DOCTOR');
+      const isDoctorAlive = Boolean(doctorUid && aliveIds.includes(doctorUid));
+
+      const killChosen = Boolean(data.nightKillTarget);
+      const saveChosen = !isDoctorAlive || Boolean(data.nightSaveTarget);
+      const neededActions = isDoctorAlive ? 2 : 1;
+      const doneActions = (killChosen ? 1 : 0) + (isDoctorAlive && data.nightSaveTarget ? 1 : 0);
+
+      document.getElementById('mafia-night-status-pill').textContent = `${doneActions} / ${neededActions} Ready`;
+
+      const actionTitle = document.getElementById('mafia-night-action-title');
+      const actionSub = document.getElementById('mafia-night-action-sub');
+      const targetsGrid = document.getElementById('mafia-night-targets-grid');
+      const villagerWait = document.getElementById('mafia-night-villager-wait');
+
+      targetsGrid.innerHTML = '';
+
+      if (amIAlive && myRole === 'MAFIA') {
+        villagerWait.classList.add('hidden');
+        targetsGrid.classList.remove('hidden');
+        actionTitle.textContent = '🔫 Mafia Night Action — Choose Victim';
+        actionSub.textContent = killChosen
+          ? 'Target locked in! Waiting for the Doctor to finish...'
+          : 'Select an alive player to eliminate tonight:';
+
+        data.players
+          .filter(p => aliveIds.includes(p.uid) && p.uid !== currentUser.uid)
+          .forEach(player => {
+            const isSelected = data.nightKillTarget === player.uid;
+            const grad = AVATAR_COLORS[player.colorIdx % AVATAR_COLORS.length];
+            targetsGrid.innerHTML += `
+              <button type="button" onclick="window.submitMafiaNightAction('KILL', '${player.uid}')" ${killChosen ? 'disabled' : ''}
+                class="p-3 rounded-2xl border text-left transition flex items-center justify-between active:scale-[0.98] ${
+                  isSelected
+                    ? 'bg-rose-500/25 border-rose-500 shadow-lg'
+                    : killChosen
+                      ? 'bg-slate-900/50 border-slate-800 opacity-60'
+                      : 'bg-slate-900 hover:bg-slate-800 border-slate-700 hover:border-rose-400'
+                }">
+                <div class="flex items-center gap-2.5 min-w-0">
+                  <div class="w-8 h-8 rounded-xl bg-gradient-to-br ${grad} flex items-center justify-center font-display font-extrabold text-white text-xs shrink-0">
+                    ${escapeHtml(player.name.slice(0, 2).toUpperCase())}
+                  </div>
+                  <div class="truncate">
+                    <div class="font-bold text-xs text-white truncate">${escapeHtml(player.name)}</div>
+                    <div class="text-[10px] ${isSelected ? 'text-rose-300 font-bold' : 'text-slate-400'}">
+                      ${isSelected ? '🎯 Targeted for Elimination' : 'Tap to eliminate'}
+                    </div>
+                  </div>
+                </div>
+                <span class="text-sm">${isSelected ? '🔫' : '🎯'}</span>
+              </button>
+            `;
+          });
+      } else if (amIAlive && myRole === 'DOCTOR') {
+        villagerWait.classList.add('hidden');
+        targetsGrid.classList.remove('hidden');
+        actionTitle.textContent = '🩺 Doctor Night Action — Choose Patient to Save';
+        actionSub.textContent = data.nightSaveTarget
+          ? 'Protection locked in! Waiting for the Mafia to finish...'
+          : 'Select any alive player (including yourself) to protect tonight:';
+
+        data.players
+          .filter(p => aliveIds.includes(p.uid))
+          .forEach(player => {
+            const isSelected = data.nightSaveTarget === player.uid;
+            const isMe = player.uid === currentUser.uid;
+            const grad = AVATAR_COLORS[player.colorIdx % AVATAR_COLORS.length];
+            targetsGrid.innerHTML += `
+              <button type="button" onclick="window.submitMafiaNightAction('SAVE', '${player.uid}')" ${data.nightSaveTarget ? 'disabled' : ''}
+                class="p-3 rounded-2xl border text-left transition flex items-center justify-between active:scale-[0.98] ${
+                  isSelected
+                    ? 'bg-emerald-500/25 border-emerald-500 shadow-lg'
+                    : data.nightSaveTarget
+                      ? 'bg-slate-900/50 border-slate-800 opacity-60'
+                      : 'bg-slate-900 hover:bg-slate-800 border-slate-700 hover:border-emerald-400'
+                }">
+                <div class="flex items-center gap-2.5 min-w-0">
+                  <div class="w-8 h-8 rounded-xl bg-gradient-to-br ${grad} flex items-center justify-center font-display font-extrabold text-white text-xs shrink-0">
+                    ${escapeHtml(player.name.slice(0, 2).toUpperCase())}
+                  </div>
+                  <div class="truncate">
+                    <div class="font-bold text-xs text-white truncate">
+                      ${escapeHtml(player.name)} ${isMe ? '(Yourself)' : ''}
+                    </div>
+                    <div class="text-[10px] ${isSelected ? 'text-emerald-300 font-bold' : 'text-slate-400'}">
+                      ${isSelected ? '🛡️ Protected Tonight' : 'Tap to save'}
+                    </div>
+                  </div>
+                </div>
+                <span class="text-sm">${isSelected ? '🛡️' : '🩺'}</span>
+              </button>
+            `;
+          });
+      } else {
+        targetsGrid.classList.add('hidden');
+        villagerWait.classList.remove('hidden');
+        actionTitle.textContent = '🌙 Night Phase — City Sleeps';
+        actionSub.textContent = 'Waiting for Mafia & Doctor to make their secret choices...';
+      }
+
+      if (isHost) {
+        if (killChosen && saveChosen) {
+          resolveMafiaNightPhase(data);
+        } else {
+          scheduleMafiaNightBots(data, isDoctorAlive);
+        }
+      }
+    }
+
+    window.submitMafiaNightAction = async function (actionType, targetUid) {
+      if (!currentRoomData || currentRoomData.gameType !== 'MAFIA' || currentRoomData.mafiaPhase !== 'night') return;
+      if (actionType === 'KILL' && !currentRoomData.nightKillTarget) {
+        await saveRoomPatch({ nightKillTarget: targetUid });
+        showToast('Night target locked in!', 'warning');
+      } else if (actionType === 'SAVE' && !currentRoomData.nightSaveTarget) {
+        await saveRoomPatch({ nightSaveTarget: targetUid });
+        showToast('Doctor protection locked in!', 'success');
+      }
+    };
+
+    async function resolveMafiaNightPhase(data) {
+      if (data.mafiaPhase !== 'night') return;
+      const killId = data.nightKillTarget;
+      const saveId = data.nightSaveTarget;
+      let aliveIds = [...(data.alivePlayerIds || [])];
+      let morningReport = '';
+
+      if (killId && killId === saveId) {
+        const savedPlayer = data.players.find(p => p.uid === saveId);
+        morningReport = `Miracle at dawn! The Mafia attacked ${savedPlayer ? savedPlayer.name : 'someone'}, but the Doctor saved their life! Nobody died tonight.`;
+      } else if (killId) {
+        aliveIds = aliveIds.filter(id => id !== killId);
+        const victim = data.players.find(p => p.uid === killId);
+        morningReport = `Tragedy at dawn! ${victim ? victim.name : 'A villager'} was eliminated by the Mafia overnight!`;
+      } else {
+        morningReport = 'Dawn breaks quietly. Nobody was eliminated overnight.';
+      }
+
+      const winCheck = evaluateMafiaVictory(data, aliveIds);
+      if (winCheck.gameOver) {
+        await finalizeMafiaMatch(data, aliveIds, winCheck.villagersWon, morningReport);
+        return;
+      }
+
+      await saveRoomPatch({
+        mafiaPhase: 'day',
+        alivePlayerIds: aliveIds,
+        morningReport,
+        votes: {}
+      });
+
+      await appendChatMessage({
+        round: data.round,
+        senderId: 'SYSTEM',
+        senderName: 'Morning News',
+        text: `☀️ Day ${data.mafiaTurnNumber || 1}: ${morningReport} Discuss freely and vote below!`,
+        createdAt: Date.now()
+      });
+    }
+
+    function renderMafiaDayPhase(data, isHost, amIAlive, aliveIds) {
+      document.getElementById('mafia-morning-report-text').textContent = data.morningReport || 'Discuss who the Mafia is!';
+
+      const chatInput = document.getElementById('mafia-chat-input');
+      const chatSendBtn = document.getElementById('mafia-chat-send-btn');
+      chatInput.disabled = !amIAlive;
+      chatSendBtn.disabled = !amIAlive;
+      chatInput.placeholder = amIAlive
+        ? 'Discuss who the Mafia is...'
+        : 'You were eliminated (spectating)...';
+
+      const votes = data.votes || {};
+      const aliveVotersCount = aliveIds.length;
+      const totalVotes = Object.keys(votes).filter(uid => aliveIds.includes(uid)).length;
+      const myVote = votes[currentUser.uid];
+
+      document.getElementById('mafia-voting-progress-pill').textContent = `🗳️ ${totalVotes} / ${aliveVotersCount} Voted`;
+
+      if (!amIAlive) {
+        document.getElementById('mafia-voting-subtitle').textContent = 'You were eliminated (watching alive players vote)';
+      } else if (myVote) {
+        document.getElementById('mafia-voting-subtitle').textContent = `Vote locked (${totalVotes}/${aliveVotersCount}) • Keep chatting!`;
+      } else {
+        document.getElementById('mafia-voting-subtitle').textContent = `Tap a suspect (${totalVotes}/${aliveVotersCount} voted)`;
+      }
+
+      const grid = document.getElementById('mafia-voting-grid');
+      grid.innerHTML = '';
+
+      data.players
+        .filter(p => aliveIds.includes(p.uid) && p.uid !== currentUser.uid)
+        .forEach(player => {
+          const isSelected = myVote === player.uid;
+          const disabled = !amIAlive || Boolean(myVote);
+          const grad = AVATAR_COLORS[player.colorIdx % AVATAR_COLORS.length];
+          const hasVotedIndicator = Boolean(votes[player.uid]);
+
+          grid.innerHTML += `
+            <button type="button" onclick="window.castVote('${player.uid}')" ${disabled ? 'disabled' : ''}
+              class="p-2.5 rounded-2xl border text-left transition flex items-center justify-between active:scale-[0.98] ${
+                isSelected
+                  ? 'bg-rose-500/20 border-rose-500 shadow-lg shadow-rose-900/30'
+                  : disabled
+                    ? 'bg-slate-900/60 border-slate-800 opacity-65'
+                    : 'bg-slate-900/95 hover:bg-slate-800 border-slate-700 hover:border-amber-400'
+              }">
+              <div class="flex items-center gap-2 min-w-0">
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-br ${grad} flex items-center justify-center font-display font-extrabold text-white text-xs shrink-0">
+                  ${escapeHtml(player.name.slice(0, 2).toUpperCase())}
+                </div>
+                <div class="truncate">
+                  <div class="font-bold text-xs text-white truncate">${escapeHtml(player.name)}</div>
+                  <div class="text-[10px] ${isSelected ? 'text-rose-300 font-bold' : 'text-slate-400'}">
+                    ${isSelected ? '🎯 Your Vote' : (hasVotedIndicator ? '✅ Voted' : (amIAlive ? 'Tap to vote' : 'Alive'))}
+                  </div>
+                </div>
+              </div>
+              <span class="text-sm ml-1">${isSelected ? '✅' : '🗳️'}</span>
+            </button>
+          `;
+        });
+
+      if (isHost && totalVotes >= aliveVotersCount) {
+        resolveMafiaDayVote(data, aliveIds);
+      } else if (isHost) {
+        scheduleMafiaDayBots(data, aliveIds);
+      }
+    }
+
+    async function resolveMafiaDayVote(data, aliveIds) {
+      if (data.mafiaPhase !== 'day') return;
+      const votes = data.votes || {};
+      const tally = {};
+      aliveIds.forEach(uid => { tally[uid] = 0; });
+
+      aliveIds.forEach(voterUid => {
+        const target = votes[voterUid];
+        if (target && tally[target] !== undefined) tally[target]++;
+      });
+
+      let maxVotes = 0;
+      Object.values(tally).forEach(c => { if (c > maxVotes) maxVotes = c; });
+
+      const topSuspects = Object.keys(tally).filter(uid => tally[uid] === maxVotes && maxVotes > 0);
+      const isTie = topSuspects.length !== 1;
+      let nextAliveIds = [...aliveIds];
+      let voteSummary = '';
+
+      if (isTie) {
+        voteSummary = 'The village vote ended in a tie! Nobody was eliminated today.';
+      } else {
+        const banishedUid = topSuspects[0];
+        nextAliveIds = nextAliveIds.filter(uid => uid !== banishedUid);
+        const banishedPlayer = data.players.find(p => p.uid === banishedUid);
+        const banishedRole = (data.mafiaRoles || {})[banishedUid];
+        const roleLabel = banishedRole === 'MAFIA' ? 'the MAFIA 🔫' : (banishedRole === 'DOCTOR' ? 'the Doctor 🩺' : 'an Innocent Villager 🧑‍🌾');
+        voteSummary = `The village voted out ${banishedPlayer ? banishedPlayer.name : 'a player'} — they were ${roleLabel}!`;
+      }
+
+      const winCheck = evaluateMafiaVictory(data, nextAliveIds);
+      if (winCheck.gameOver) {
+        await finalizeMafiaMatch(data, nextAliveIds, winCheck.villagersWon, voteSummary);
+        return;
+      }
+
+      const nextTurn = (data.mafiaTurnNumber || 1) + 1;
+      await saveRoomPatch({
+        mafiaPhase: 'night',
+        mafiaTurnNumber: nextTurn,
+        alivePlayerIds: nextAliveIds,
+        nightKillTarget: null,
+        nightSaveTarget: null,
+        votes: {}
+      });
+
+      await appendChatMessage({
+        round: data.round,
+        senderId: 'SYSTEM',
+        senderName: 'Narrator',
+        text: `⚖️ ${voteSummary} Night ${nextTurn} falls over the village...`,
+        createdAt: Date.now()
+      });
+    }
+
+    function evaluateMafiaVictory(data, aliveIds) {
+      const roles = data.mafiaRoles || {};
+      const aliveMafia = aliveIds.filter(uid => roles[uid] === 'MAFIA');
+      const aliveGood = aliveIds.filter(uid => roles[uid] !== 'MAFIA');
+
+      if (aliveMafia.length === 0) {
+        return { gameOver: true, villagersWon: true };
+      }
+      if (aliveMafia.length >= aliveGood.length) {
+        return { gameOver: true, villagersWon: false };
+      }
+      return { gameOver: false, villagersWon: false };
+    }
+
+    async function finalizeMafiaMatch(data, finalAliveIds, villagersWon, summaryText) {
+      const roles = data.mafiaRoles || {};
+      const updatedPlayers = data.players.map(p => {
+        const isMafia = roles[p.uid] === 'MAFIA';
+        let bonus = 0;
+        if (villagersWon && !isMafia) bonus = 100;
+        if (!villagersWon && isMafia) bonus = 150;
+        return { ...p, score: (p.score || 0) + bonus };
+      });
+
+      await saveRoomPatch({
+        status: 'results',
+        alivePlayerIds: finalAliveIds,
+        players: updatedPlayers,
+        lastRoundOutcome: {
+          mode: 'MAFIA',
+          villagersWon,
+          summaryText
+        }
+      });
+    }
+
+    // =========================================================================
+    // 12. CHAT & VOTING HANDLERS
+    // =========================================================================
+    window.sendChatMessage = async function (event, inputId) {
+      event.preventDefault();
+      if (!currentRoomCode || !currentRoomData || !currentUser) return;
+      if (currentRoomData.gameType === 'MAFIA') {
+        const aliveIds = currentRoomData.alivePlayerIds || [];
+        if (!aliveIds.includes(currentUser.uid)) return;
+      }
+
+      const input = document.getElementById(inputId);
+      const text = (input.value || '').trim();
+      if (!text) return;
+
+      const me = (currentRoomData.players || []).find(p => p.uid === currentUser.uid);
+      if (!me) return;
+
+      input.value = '';
+      await appendChatMessage({
+        round: currentRoomData.round,
+        senderId: currentUser.uid,
+        senderName: me.name,
+        colorIdx: me.colorIdx,
+        text,
+        createdAt: Date.now()
+      });
+    };
+
+    function renderChatMessages(allMessages) {
+      if (!currentRoomData) return;
+      const isMafia = currentRoomData.gameType === 'MAFIA';
+      const list = document.getElementById(isMafia ? 'mafia-chat-list' : 'odd-chat-list');
+      if (!list) return;
+
+      const roundMessages = allMessages.filter(m => m.round === currentRoomData.round);
+      list.innerHTML = '';
+
+      roundMessages.forEach(msg => {
+        if (msg.senderId === 'SYSTEM') {
+          list.innerHTML += `
+            <div class="text-center my-1">
+              <span class="inline-block px-3 py-1 rounded-full bg-violet-500/15 border border-violet-500/25 text-[11px] font-semibold text-violet-200">
+                ${escapeHtml(msg.text)}
+              </span>
+            </div>
+          `;
+          return;
+        }
+
+        const isMe = msg.senderId === currentUser.uid;
+        const grad = AVATAR_COLORS[(msg.colorIdx || 0) % AVATAR_COLORS.length];
+
+        if (isMe) {
+          list.innerHTML += `
+            <div class="flex flex-col items-end">
+              <span class="text-[10px] font-bold text-slate-500 mb-0.5 mr-1">You</span>
+              <div class="max-w-[82%] px-3.5 py-2 rounded-2xl rounded-tr-sm ${isMafia ? 'bg-rose-600' : 'bg-violet-600'} text-white text-xs sm:text-sm font-medium shadow">
+                ${escapeHtml(msg.text)}
+              </div>
+            </div>
+          `;
+        } else {
+          list.innerHTML += `
+            <div class="flex items-start gap-2">
+              <div class="w-7 h-7 rounded-lg bg-gradient-to-br ${grad} flex items-center justify-center font-display font-extrabold text-[11px] text-white shrink-0 mt-3.5">
+                ${escapeHtml((msg.senderName || '?').slice(0, 2).toUpperCase())}
+              </div>
+              <div class="flex flex-col items-start max-w-[80%]">
+                <span class="text-[10px] font-bold text-slate-400 mb-0.5 ml-1">${escapeHtml(msg.senderName)}</span>
+                <div class="px-3.5 py-2 rounded-2xl rounded-tl-sm bg-slate-800/95 border border-slate-700/70 text-slate-100 text-xs sm:text-sm font-medium">
+                  ${escapeHtml(msg.text)}
+                </div>
+              </div>
+            </div>
+          `;
+        }
+      });
+
+      list.scrollTop = list.scrollHeight;
+    }
+
+    window.castVote = async function (targetUid) {
+      if (!currentRoomData || (currentRoomData.status !== 'discussion' && currentRoomData.status !== 'voting')) return;
+      if (targetUid === currentUser.uid) return;
+
+      if (currentRoomData.gameType === 'MAFIA') {
+        const aliveIds = currentRoomData.alivePlayerIds || [];
+        if (!aliveIds.includes(currentUser.uid) || currentRoomData.mafiaPhase !== 'day') return;
+      }
+
+      const votes = { ...(currentRoomData.votes || {}) };
+      if (votes[currentUser.uid]) return;
+
+      votes[currentUser.uid] = targetUid;
+      await saveRoomPatch({ votes });
+      showToast('Vote locked in! Keep chatting until everyone votes.', 'success');
+    };
+
+    // =========================================================================
+    // 13. RESULTS & SCOREBOARD RENDERER
+    // =========================================================================
+    function renderResults(data, isHost) {
+      const outcome = data.lastRoundOutcome || {};
+      const isMafia = data.gameType === 'MAFIA' || outcome.mode === 'MAFIA';
+      const totalPlayers = data.players.length;
+
+      const banner = document.getElementById('results-winner-banner');
+      const emoji = document.getElementById('results-winner-emoji');
+      const title = document.getElementById('results-winner-title');
+      const subtitle = document.getElementById('results-winner-subtitle');
+
+      const oddCard = document.getElementById('results-odd-card');
+      const mafiaCard = document.getElementById('results-mafia-card');
+
+      if (isMafia) {
+        oddCard.classList.add('hidden');
+        mafiaCard.classList.remove('hidden');
+
+        const villagersWon = Boolean(outcome.villagersWon);
+        const roles = data.mafiaRoles || {};
+        const mafiaUid = Object.keys(roles).find(uid => roles[uid] === 'MAFIA');
+        const mafiaPlayer = data.players.find(p => p.uid === mafiaUid);
+        const mafiaName = mafiaPlayer ? mafiaPlayer.name : 'Unknown';
+
+        if (villagersWon) {
+          banner.className = 'rounded-3xl p-5 text-center border shadow-2xl space-y-1.5 bg-gradient-to-br from-emerald-900/70 via-slate-900 to-slate-950 border-emerald-500/40';
+          emoji.textContent = '🎉';
+          title.textContent = 'VILLAGERS & DOCTOR WIN!';
+          subtitle.textContent = `${outcome.summaryText || ''} ${mafiaName} (Mafia) was eliminated (+100 pts)!`;
+        } else {
+          banner.className = 'rounded-3xl p-5 text-center border shadow-2xl space-y-1.5 bg-gradient-to-br from-rose-900/75 via-slate-900 to-slate-950 border-rose-500/40';
+          emoji.textContent = '🔫';
+          title.textContent = 'MAFIA WINS!';
+          subtitle.textContent = `${outcome.summaryText || ''} ${mafiaName} took over the village (+150 pts)!`;
+        }
+
+        const rolesList = document.getElementById('reveal-mafia-roles-list');
+        rolesList.innerHTML = '';
+        data.players.forEach(player => {
+          const r = roles[player.uid] || 'VILLAGER';
+          const badge = r === 'MAFIA'
+            ? '<span class="px-2 py-0.5 rounded bg-rose-500/25 text-rose-300 text-[10px] font-extrabold">🔫 MAFIA</span>'
+            : r === 'DOCTOR'
+              ? '<span class="px-2 py-0.5 rounded bg-emerald-500/25 text-emerald-300 text-[10px] font-extrabold">🩺 DOCTOR</span>'
+              : '<span class="px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 text-[10px] font-extrabold">🧑‍🌾 VILLAGER</span>';
+
+          rolesList.innerHTML += `
+            <div class="p-3 rounded-2xl bg-slate-950/80 border border-slate-800 flex items-center justify-between gap-2">
+              <span class="font-bold text-xs text-white truncate">${escapeHtml(player.name)}</span>
+              ${badge}
+            </div>
+          `;
+        });
+      } else {
+        oddCard.classList.remove('hidden');
+        mafiaCard.classList.add('hidden');
+
+        const innocentsWon = Boolean(outcome.innocentsWon);
+        const isTie = Boolean(outcome.isTie);
+        const tally = outcome.tally || {};
+        const innocentCount = totalPlayers - 1;
+
+        const imposterPlayer = data.players.find(p => p.uid === data.imposterId);
+        const imposterName = imposterPlayer ? imposterPlayer.name : 'Unknown';
+
+        if (innocentsWon) {
+          banner.className = 'rounded-3xl p-5 text-center border shadow-2xl space-y-1.5 bg-gradient-to-br from-emerald-900/70 via-slate-900 to-slate-950 border-emerald-500/40';
+          emoji.textContent = '🎉';
+          title.textContent = 'INNOCENTS WIN!';
+          subtitle.textContent = `The group caught ${imposterName} (+100 pts each)!`;
+        } else {
+          banner.className = 'rounded-3xl p-5 text-center border shadow-2xl space-y-1.5 bg-gradient-to-br from-rose-900/75 via-slate-900 to-slate-950 border-rose-500/40';
+          emoji.textContent = '😈';
+          title.textContent = 'IMPOSTER WINS!';
+          subtitle.textContent = isTie
+            ? `The vote ended in a tie! ${imposterName} escaped (+150 pts)!`
+            : `The group voted out the wrong player! ${imposterName} fooled everyone (+150 pts)!`;
+        }
+
+        document.getElementById('reveal-category').textContent = data.category;
+        document.getElementById('reveal-mode-badge').textContent = data.imposterKnows !== false
+          ? '🕵️ Classic (Imposter Knew)'
+          : '🎭 Undercover (Imposter Blind)';
+        document.getElementById('reveal-innocent-count-label').textContent = `${innocentCount} Innocents Had`;
+        document.getElementById('reveal-innocent-word').textContent = data.majorityWord;
+        document.getElementById('reveal-imposter-name').textContent = imposterName;
+        document.getElementById('reveal-imposter-word').textContent = data.oddWord;
+
+        const votesList = document.getElementById('reveal-votes-list');
+        votesList.innerHTML = '';
+
+        data.players.forEach(player => {
+          const count = tally[player.uid] || 0;
+          const pct = Math.round((count / totalPlayers) * 100);
+          const isImp = player.uid === data.imposterId;
+
+          votesList.innerHTML += `
+            <div class="p-2.5 rounded-xl bg-slate-950/70 border ${isImp ? 'border-rose-500/40' : 'border-slate-800'}">
+              <div class="flex items-center justify-between text-xs font-bold mb-1">
+                <span class="text-white">
+                  ${escapeHtml(player.name)}
+                  ${isImp ? '<span class="ml-1.5 px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 text-[10px]">IMPOSTER</span>' : ''}
+                </span>
+                <span class="text-slate-300">${count} vote${count === 1 ? '' : 's'}</span>
+              </div>
+              <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                <div class="h-full rounded-full ${isImp ? 'bg-rose-500' : 'bg-violet-500'}" style="width: ${pct}%"></div>
+              </div>
+            </div>
+          `;
+        });
+      }
+
+      const scoreboard = document.getElementById('reveal-scoreboard-list');
+      scoreboard.innerHTML = '';
+      const sortedPlayers = [...data.players].sort((a, b) => (b.score || 0) - (a.score || 0));
+
+      sortedPlayers.forEach((player, idx) => {
+        const grad = AVATAR_COLORS[player.colorIdx % AVATAR_COLORS.length];
+        scoreboard.innerHTML += `
+          <div class="p-2.5 rounded-2xl bg-slate-950/80 border border-slate-800 text-center">
+            <div class="w-7 h-7 mx-auto rounded-lg bg-gradient-to-br ${grad} flex items-center justify-center font-display font-extrabold text-[11px] text-white mb-1">
+              ${idx === 0 ? '👑' : escapeHtml(player.name.slice(0, 2).toUpperCase())}
+            </div>
+            <div class="font-bold text-xs text-white truncate">${escapeHtml(player.name)}</div>
+            <div class="font-display font-extrabold text-sm text-amber-300">${player.score || 0} pts</div>
+          </div>
+        `;
+      });
+
+      const nextBtn = document.getElementById('btn-next-round');
+      const lobbyBtn = document.getElementById('btn-back-lobby');
+      const guestWait = document.getElementById('results-guest-wait-msg');
+
+      if (isHost) {
+        nextBtn.classList.remove('hidden');
+        lobbyBtn.classList.remove('hidden');
+        guestWait.classList.add('hidden');
+      } else {
+        nextBtn.classList.add('hidden');
+        lobbyBtn.classList.add('hidden');
+        guestWait.classList.remove('hidden');
+      }
+    }
+
+    // =========================================================================
+    // 14. DEMO BOT AI
+    // =========================================================================
+    function scheduleOddOneOutBots(data) {
+      const bots = data.players.filter(p => p.isBot);
+      if (bots.length === 0) return;
+      const votes = data.votes || {};
+      const unvotedBots = bots.filter(b => !votes[b.uid]);
+      if (unvotedBots.length === 0) return;
+
+      if (botActionTimeout) clearTimeout(botActionTimeout);
+      botActionTimeout = setTimeout(async () => {
+        if (!currentRoomData || currentRoomData.gameType !== 'ODD_ONE_OUT' || currentRoomData.status !== 'discussion') return;
+        const bot = unvotedBots[0];
+        const pairData = typeof data.activePairIdx === 'number' && data.activePairIdx >= 0
+          ? WORD_PAIRS[data.activePairIdx]
+          : null;
+        const isBotImposter = bot.uid === data.imposterId;
+        const imposterKnows = data.imposterKnows !== false;
+
+        let cluePool = [
+          'Definitely an iconic character everyone knows!',
+          'Super recognizable from the main storyline.',
+          "Let's see what everyone else says 👀"
+        ];
+        if (pairData && Array.isArray(pairData.clues) && pairData.clues.length > 0) {
+          cluePool = (!isBotImposter || !imposterKnows)
+            ? pairData.clues
+            : ['Totally iconic in this series!', 'Everyone knows them right away.', pairData.clues[0]];
+        }
+
+        const clue = cluePool[Math.floor(Math.random() * cluePool.length)];
+        const candidates = data.players.filter(p => p.uid !== bot.uid);
+        const impCandidate = candidates.find(c => c.uid === data.imposterId);
+        const target = (impCandidate && Math.random() < 0.5)
+          ? impCandidate.uid
+          : candidates[Math.floor(Math.random() * candidates.length)].uid;
+
+        await appendChatMessage({
+          round: currentRoomData.round,
+          senderId: bot.uid,
+          senderName: bot.name,
+          colorIdx: bot.colorIdx,
+          text: clue,
+          createdAt: Date.now()
+        });
+
+        await saveRoomPatch({
+          votes: { ...(currentRoomData.votes || {}), [bot.uid]: target }
+        });
+      }, 2200);
+    }
+
+    function scheduleMafiaNightBots(data, isDoctorAlive) {
+      const roles = data.mafiaRoles || {};
+      const aliveIds = data.alivePlayerIds || [];
+      const mafiaBot = data.players.find(p => p.isBot && roles[p.uid] === 'MAFIA' && aliveIds.includes(p.uid));
+      const doctorBot = data.players.find(p => p.isBot && roles[p.uid] === 'DOCTOR' && aliveIds.includes(p.uid));
+
+      const needsMafiaBot = Boolean(mafiaBot && !data.nightKillTarget);
+      const needsDoctorBot = Boolean(isDoctorAlive && doctorBot && !data.nightSaveTarget);
+      if (!needsMafiaBot && !needsDoctorBot) return;
+
+      if (botActionTimeout) clearTimeout(botActionTimeout);
+      botActionTimeout = setTimeout(async () => {
+        if (!currentRoomData || currentRoomData.gameType !== 'MAFIA' || currentRoomData.mafiaPhase !== 'night') return;
+        const patch = {};
+        if (needsMafiaBot) {
+          const targets = aliveIds.filter(uid => uid !== mafiaBot.uid);
+          patch.nightKillTarget = targets[Math.floor(Math.random() * targets.length)];
+        }
+        if (needsDoctorBot) {
+          patch.nightSaveTarget = aliveIds[Math.floor(Math.random() * aliveIds.length)];
+        }
+        await saveRoomPatch(patch);
+      }, 1800);
+    }
+
+    function scheduleMafiaDayBots(data, aliveIds) {
+      const aliveBots = data.players.filter(p => p.isBot && aliveIds.includes(p.uid));
+      if (aliveBots.length === 0) return;
+
+      const votes = data.votes || {};
+      const unvotedBots = aliveBots.filter(b => !votes[b.uid]);
+      if (unvotedBots.length === 0) return;
+
+      if (botActionTimeout) clearTimeout(botActionTimeout);
+      botActionTimeout = setTimeout(async () => {
+        if (!currentRoomData || currentRoomData.gameType !== 'MAFIA' || currentRoomData.mafiaPhase !== 'day') return;
+        const bot = unvotedBots[0];
+        const roles = data.mafiaRoles || {};
+        const lines = roles[bot.uid] === 'MAFIA'
+          ? ["I'm just an Innocent Villager, swear!", "Somebody is being super quiet right now 👀", "Let's think carefully before voting."]
+          : ["Who seemed suspicious overnight?", "Doctor clutched up or someone is bluffing!", "Let's vote carefully so Mafia doesn't win."];
+
+        const candidates = aliveIds.filter(uid => uid !== bot.uid);
+        const mafiaCandidate = candidates.find(uid => roles[uid] === 'MAFIA');
+        const target = (roles[bot.uid] !== 'MAFIA' && mafiaCandidate && Math.random() < 0.45)
+          ? mafiaCandidate
+          : candidates[Math.floor(Math.random() * candidates.length)];
+
+        await appendChatMessage({
+          round: currentRoomData.round,
+          senderId: bot.uid,
+          senderName: bot.name,
+          colorIdx: bot.colorIdx,
+          text: lines[Math.floor(Math.random() * lines.length)],
+          createdAt: Date.now()
+        });
+
+        await saveRoomPatch({
+          votes: { ...(currentRoomData.votes || {}), [bot.uid]: target }
+        });
+      }, 2200);
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+  </script>
+</body>
+</html>
