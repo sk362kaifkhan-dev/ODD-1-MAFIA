@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>ODD ONE MAFIA — Online Party Game</title>
+  <title>ODD ONE MAFIA — Online Multiplayer Party Game</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,7 +18,7 @@
       padding: 0;
       min-height: 100vh;
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: #070b14;
+      background-color: #060913;
       color: #f8fafc;
       overflow-x: hidden;
     }
@@ -45,9 +45,9 @@
     }
   </style>
 </head>
-<body class="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-950/70 via-slate-950 to-slate-950 flex flex-col">
+<body class="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-950/75 via-slate-950 to-slate-950 flex flex-col">
 
-  <!-- Toast Banner Container (Never uses alert() or confirm()) -->
+  <!-- Non-blocking Toast Banner Container -->
   <div id="toast-container" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 w-[92%] max-w-md pointer-events-none"></div>
 
   <!-- Sticky Top Navigation Bar -->
@@ -61,7 +61,7 @@
           <h1 id="header-title" class="font-display font-extrabold text-base sm:text-lg tracking-tight text-white leading-none">
             ODD ONE MAFIA
           </h1>
-          <span id="header-subtitle" class="text-[11px] text-slate-400 font-medium">Odd One Out & Mafia Online</span>
+          <span id="header-subtitle" class="text-[11px] text-slate-400 font-medium">Odd One Out • Mafia • Guess The Name</span>
         </div>
       </div>
 
@@ -84,16 +84,15 @@
     <!-- VIEW 1: LANDING / HOME SCREEN                                         -->
     <!-- ===================================================================== -->
     <section id="view-landing" class="flex-1 flex flex-col justify-center space-y-4 animate-pop-in">
-      <!-- Hero Banner -->
-      <div class="rounded-3xl bg-gradient-to-br from-slate-900/95 via-indigo-950/50 to-slate-900/95 border border-slate-800 p-4 sm:p-5 text-center shadow-2xl space-y-2">
-        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-500/15 border border-violet-500/30 text-[11px] font-bold text-violet-300 uppercase tracking-wider">
-          <span>⚔️ Anime & Cartoons</span> • <span>🦸 MCU</span> • <span>🔫 Mafia</span>
+      <div class="rounded-3xl bg-gradient-to-br from-slate-900/95 via-indigo-950/55 to-slate-900/95 border border-slate-800 p-4 sm:p-5 text-center shadow-2xl space-y-2">
+        <div class="inline-flex flex-wrap items-center justify-center gap-1.5 px-3 py-1 rounded-full bg-violet-500/15 border border-violet-500/30 text-[11px] font-bold text-violet-300 uppercase tracking-wider">
+          <span>⚔️ 14 Anime</span> • <span>📺 11 Cartoons</span> • <span>🇮🇳 Pop Culture</span>
         </div>
         <h2 class="font-display text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
           ODD ONE MAFIA
         </h2>
         <p class="text-xs sm:text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
-          Play <span class="text-violet-300 font-bold">Odd One Out</span> (3–6 players) or <span class="text-rose-400 font-bold">Mafia</span> (4–6 players) online with friends! Create a room, chat freely, and vote out the culprit.
+          3 multiplayer party games in one room! Play <span class="text-violet-300 font-bold">Odd One Out</span> (with Cross-Universe mode), <span class="text-rose-400 font-bold">Mafia</span>, or <span class="text-amber-300 font-bold">Guess The Name</span>!
         </p>
         <div id="connection-status-pill" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-950/80 border border-slate-800 text-[10px] font-semibold text-amber-300">
           <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
@@ -106,28 +105,39 @@
         <!-- Step 1: Select Game Mode -->
         <div>
           <span class="block text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-2">
-            1. Select Game Mode
+            1. Choose Game Mode
           </span>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
             <button id="landing-game-odd" type="button" onclick="window.selectLandingGameType('ODD_ONE_OUT')"
-              class="p-3.5 rounded-2xl border-2 border-violet-500 bg-violet-500/15 text-left transition active:scale-[0.98] shadow-lg shadow-violet-950/30">
-              <div class="flex items-center justify-between">
-                <span class="font-display font-extrabold text-sm sm:text-base text-white">❓ Odd One Out</span>
-                <span class="px-2 py-0.5 rounded-full bg-violet-500/30 text-[10px] font-extrabold text-violet-200">3–6 Players</span>
+              class="p-3 rounded-2xl border-2 border-violet-500 bg-violet-500/15 text-left transition active:scale-[0.98] shadow-lg shadow-violet-950/30">
+              <div class="flex items-center justify-between gap-1">
+                <span class="font-display font-extrabold text-xs sm:text-sm text-white">❓ Odd One Out</span>
+                <span class="px-1.5 py-0.5 rounded-full bg-violet-500/30 text-[9px] font-extrabold text-violet-200 shrink-0">3–6P</span>
               </div>
               <p class="text-[11px] text-slate-300 mt-1 leading-snug">
-                Innocents share the same Anime/Cartoon/MCU character while 1 Imposter gets a different one. Chat & vote!
+                Same-Universe or Cross-Universe character pairs. Chat & 2-click vote!
               </p>
             </button>
 
             <button id="landing-game-mafia" type="button" onclick="window.selectLandingGameType('MAFIA')"
-              class="p-3.5 rounded-2xl border-2 border-slate-800 bg-slate-950/70 text-left transition active:scale-[0.98]">
-              <div class="flex items-center justify-between">
-                <span class="font-display font-extrabold text-sm sm:text-base text-white">🔫 Mafia</span>
-                <span class="px-2 py-0.5 rounded-full bg-rose-500/20 text-[10px] font-extrabold text-rose-300">4–6 Players</span>
+              class="p-3 rounded-2xl border-2 border-slate-800 bg-slate-950/70 text-left transition active:scale-[0.98]">
+              <div class="flex items-center justify-between gap-1">
+                <span class="font-display font-extrabold text-xs sm:text-sm text-white">🔫 Mafia</span>
+                <span class="px-1.5 py-0.5 rounded-full bg-rose-500/20 text-[9px] font-extrabold text-rose-300 shrink-0">4–6P</span>
               </div>
               <p class="text-[11px] text-slate-400 mt-1 leading-snug">
-                1 Mafia kills at night, 1 Doctor saves a player, and Innocent Villagers debate & vote out the Mafia!
+                1 Mafia kills, 1 Doctor saves, Villagers debate & vote out the Mafia!
+              </p>
+            </button>
+
+            <button id="landing-game-guess" type="button" onclick="window.selectLandingGameType('GUESS_THE_NAME')"
+              class="p-3 rounded-2xl border-2 border-slate-800 bg-slate-950/70 text-left transition active:scale-[0.98]">
+              <div class="flex items-center justify-between gap-1">
+                <span class="font-display font-extrabold text-xs sm:text-sm text-white">🎭 Guess Name</span>
+                <span class="px-1.5 py-0.5 rounded-full bg-amber-500/20 text-[9px] font-extrabold text-amber-300 shrink-0">3–6P</span>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-1 leading-snug">
+                1 player gets a character & gives chat hints. First guesser wins!
               </p>
             </button>
           </div>
@@ -138,7 +148,7 @@
           <label for="player-name-input" class="block text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
             2. Your Player Nickname
           </label>
-          <input id="player-name-input" type="text" maxlength="16" placeholder="e.g. Naruto, Gojo, Tony..."
+          <input id="player-name-input" type="text" maxlength="16" placeholder="e.g. Sasuke, Gojo, Bheem..."
             class="w-full px-4 py-3 rounded-2xl bg-slate-950 border border-slate-700/80 focus:border-violet-500 outline-none text-sm font-semibold text-white placeholder:text-slate-500" />
         </div>
 
@@ -232,19 +242,23 @@
           </span>
         </div>
 
-        <!-- Switch Game Type -->
+        <!-- Switch Game Type (3 Games) -->
         <div>
           <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
             Game Mode
           </label>
-          <div class="grid grid-cols-2 gap-2">
+          <div class="grid grid-cols-3 gap-1.5">
             <button id="lobby-switch-odd" type="button" onclick="window.switchLobbyGameType('ODD_ONE_OUT')"
-              class="py-2 px-3 rounded-xl border text-xs font-extrabold transition">
-              ❓ Odd One Out (3–6)
+              class="py-2 px-2 rounded-xl border text-[11px] sm:text-xs font-extrabold transition">
+              ❓ Odd One Out
             </button>
             <button id="lobby-switch-mafia" type="button" onclick="window.switchLobbyGameType('MAFIA')"
-              class="py-2 px-3 rounded-xl border text-xs font-extrabold transition">
-              🔫 Mafia (4–6)
+              class="py-2 px-2 rounded-xl border text-[11px] sm:text-xs font-extrabold transition">
+              🔫 Mafia
+            </button>
+            <button id="lobby-switch-guess" type="button" onclick="window.switchLobbyGameType('GUESS_THE_NAME')"
+              class="py-2 px-2 rounded-xl border text-[11px] sm:text-xs font-extrabold transition">
+              🎭 Guess Name
             </button>
           </div>
         </div>
@@ -257,8 +271,39 @@
           <div id="lobby-capacity-buttons" class="grid grid-cols-4 gap-2"></div>
         </div>
 
-        <!-- ODD ONE OUT SETTINGS -->
+        <!-- ODD ONE OUT SPECIFIC SETTINGS -->
         <div id="lobby-odd-settings" class="space-y-3.5">
+          <!-- Universe Pairing Mode (Same Universe vs Cross-Universe) -->
+          <div>
+            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+              Character Pairing Style
+            </label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <button id="btn-universe-same" type="button" onclick="window.updateLobbySettings({ crossServerMode: false })"
+                class="p-3 rounded-2xl border border-violet-500 bg-violet-500/15 text-left transition">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-extrabold text-white">🏠 Same-Universe</span>
+                  <span id="check-universe-same" class="text-xs text-violet-400 font-bold">●</span>
+                </div>
+                <p class="text-[11px] text-slate-300 mt-0.5 leading-snug">
+                  Both characters come from the same show (e.g., Naruto vs Sasuke).
+                </p>
+              </button>
+
+              <button id="btn-universe-cross" type="button" onclick="window.updateLobbySettings({ crossServerMode: true })"
+                class="p-3 rounded-2xl border border-slate-800 bg-slate-950/60 text-left transition">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-extrabold text-white">🌌 Cross-Universe</span>
+                  <span id="check-universe-cross" class="text-xs text-slate-600 font-bold">○</span>
+                </div>
+                <p class="text-[11px] text-slate-400 mt-0.5 leading-snug">
+                  Similar archetypes across different anime/shows (e.g., Sasuke vs Vegeta or Megumi)!
+                </p>
+              </button>
+            </div>
+          </div>
+
+          <!-- Imposter Awareness Mode -->
           <div>
             <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
               Imposter Awareness Mode
@@ -287,33 +332,30 @@
               </button>
             </div>
           </div>
+        </div>
 
-          <div>
-            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
-              Character & Word Pack
-            </label>
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              <button type="button" onclick="window.updateLobbySettings({ selectedPack: 'ALL' })" data-pack="ALL"
-                class="pack-btn px-3 py-2.5 rounded-xl border text-xs font-bold transition text-center">
-                🎲 Random Mix
-              </button>
-              <button type="button" onclick="window.updateLobbySettings({ selectedPack: 'ANIME' })" data-pack="ANIME"
-                class="pack-btn px-3 py-2.5 rounded-xl border text-xs font-bold transition text-center">
-                ⚔️ Anime Legends
-              </button>
-              <button type="button" onclick="window.updateLobbySettings({ selectedPack: 'CARTOONS' })" data-pack="CARTOONS"
-                class="pack-btn px-3 py-2.5 rounded-xl border text-xs font-bold transition text-center">
-                📺 Cartoons
-              </button>
-              <button type="button" onclick="window.updateLobbySettings({ selectedPack: 'MCU' })" data-pack="MCU"
-                class="pack-btn px-3 py-2.5 rounded-xl border text-xs font-bold transition text-center">
-                🦸 MCU Heroes
-              </button>
-              <button type="button" onclick="window.updateLobbySettings({ selectedPack: 'CLASSIC' })" data-pack="CLASSIC"
-                class="pack-btn col-span-2 sm:col-span-2 px-3 py-2.5 rounded-xl border text-xs font-bold transition text-center">
-                🍕 Classic Everyday Words
-              </button>
-            </div>
+        <!-- SHARED PACK SELECTOR (Shown for Odd One Out AND Guess The Name) -->
+        <div id="lobby-pack-selector-wrapper">
+          <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+            Character & Word Pack
+          </label>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" onclick="window.updateLobbySettings({ selectedPack: 'ALL' })" data-pack="ALL"
+              class="pack-btn px-3 py-2.5 rounded-xl border text-xs font-bold transition text-center">
+              🎲 Random Mix (All)
+            </button>
+            <button type="button" onclick="window.updateLobbySettings({ selectedPack: 'ANIME' })" data-pack="ANIME"
+              class="pack-btn px-3 py-2.5 rounded-xl border text-xs font-bold transition text-center">
+              ⚔️ 14 Anime Legends
+            </button>
+            <button type="button" onclick="window.updateLobbySettings({ selectedPack: 'CARTOONS' })" data-pack="CARTOONS"
+              class="pack-btn px-3 py-2.5 rounded-xl border text-xs font-bold transition text-center">
+              📺 11 Cartoons
+            </button>
+            <button type="button" onclick="window.updateLobbySettings({ selectedPack: 'EVERYDAY' })" data-pack="EVERYDAY"
+              class="pack-btn px-3 py-2.5 rounded-xl border text-xs font-bold transition text-center">
+              🇮🇳 Everyday & Pop Culture
+            </button>
           </div>
         </div>
 
@@ -341,6 +383,14 @@
             </div>
           </div>
         </div>
+
+        <!-- GUESS THE NAME RULES CARD -->
+        <div id="lobby-guess-settings" class="hidden rounded-2xl bg-amber-950/25 border border-amber-500/30 p-3.5 space-y-1.5">
+          <span class="text-xs font-extrabold uppercase tracking-wider text-amber-300">🎭 How Guess The Name Works</span>
+          <p class="text-[11px] text-slate-300 leading-relaxed">
+            Each round, 1 player becomes the <span class="font-bold text-amber-200">Clue Giver</span> and receives a secret character or item. They describe it in chat without saying the name! The Clue Giver taps the first player who guesses right to award <span class="font-bold text-emerald-300">+100 pts</span> to the winner (<span class="font-bold text-amber-300">+50 pts</span> to Clue Giver, 0 to others).
+          </p>
+        </div>
       </div>
 
       <!-- Start Match Button -->
@@ -366,7 +416,10 @@
             ROUND 1
           </span>
           <span id="odd-mode-pill" class="px-2.5 py-0.5 rounded-lg bg-slate-800 border border-slate-700 text-[11px] font-bold text-slate-300">
-            🕵️ Classic Mode
+            🕵️ Classic
+          </span>
+          <span id="odd-universe-pill" class="px-2.5 py-0.5 rounded-lg bg-indigo-500/20 border border-indigo-500/30 text-[11px] font-bold text-indigo-300">
+            🏠 Same-Universe
           </span>
         </div>
         <span class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-emerald-300">
@@ -375,7 +428,7 @@
         </span>
       </div>
 
-      <!-- Direct Immediate Secret Character Banner (No Flipping!) -->
+      <!-- Direct Immediate Secret Character Banner -->
       <div id="odd-card-box" class="w-full rounded-3xl bg-gradient-to-br from-violet-600 via-indigo-700 to-slate-900 border border-violet-400/40 p-4 flex flex-col items-center justify-center text-center shadow-2xl shadow-violet-900/40 transition-all">
         <div class="flex flex-wrap items-center justify-center gap-1.5 mb-1">
           <span class="px-3 py-0.5 rounded-full bg-black/35 border border-white/15 text-[11px] font-bold uppercase tracking-widest text-violet-100">
@@ -393,19 +446,19 @@
         </p>
       </div>
 
-      <!-- Unlimited Open Chat & Integrated In-Chat Voting Panel -->
+      <!-- Unlimited Open Chat & 2-Click Voting Panel -->
       <div class="flex-1 flex flex-col bg-slate-900/90 border border-slate-800 rounded-3xl overflow-hidden shadow-xl">
         <div class="px-4 py-2.5 border-b border-slate-800 flex items-center justify-between gap-2 bg-slate-950/50">
           <div>
-            <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-200">Live Discussion & Voting</h4>
-            <p class="text-[10px] text-slate-400">No timer! Send unlimited messages & vote below when ready</p>
+            <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-200">Live Discussion & 2-Step Voting</h4>
+            <p class="text-[10px] text-slate-400">Chat freely! Tap a name below, then confirm Yes/No to vote</p>
           </div>
           <span id="odd-voting-progress-pill" class="px-2.5 py-1 rounded-xl bg-amber-500/20 border border-amber-500/40 text-xs font-extrabold text-amber-300 shrink-0">
             🗳️ 0 / 4 Voted
           </span>
         </div>
 
-        <div id="odd-chat-list" class="flex-1 p-3.5 space-y-2.5 overflow-y-auto min-h-[200px] max-h-[280px] sm:max-h-[330px]"></div>
+        <div id="odd-chat-list" class="flex-1 p-3.5 space-y-2.5 overflow-y-auto min-h-[190px] max-h-[260px] sm:max-h-[310px]"></div>
 
         <form onsubmit="window.sendChatMessage(event, 'odd-chat-input')" class="p-2.5 border-t border-slate-800 bg-slate-950/70 flex gap-2">
           <input id="odd-chat-input" type="text" maxlength="200" placeholder="Type any clue, question, or accusation..."
@@ -416,13 +469,14 @@
           </button>
         </form>
 
+        <!-- 2-Click Voting Panel -->
         <div class="p-3.5 border-t border-slate-800/90 bg-slate-950/90 space-y-2">
           <div class="flex items-center justify-between gap-2">
             <span class="text-[11px] font-extrabold uppercase tracking-wider text-amber-300 flex items-center gap-1">
               <span>🗳️</span> Vote Who Is the Odd One Out:
             </span>
             <span id="odd-voting-subtitle" class="text-[11px] font-semibold text-slate-400">
-              Tap a suspect to vote
+              Tap a name to select
             </span>
           </div>
           <div id="odd-voting-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
@@ -434,7 +488,6 @@
     <!-- VIEW 3B: MAFIA ACTIVE GAME                                            -->
     <!-- ===================================================================== -->
     <section id="view-game-mafia" class="hidden flex-1 flex flex-col space-y-3 animate-pop-in">
-      <!-- Mafia Phase Status Strip -->
       <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-900/90 border border-slate-800 rounded-2xl px-3.5 py-2">
         <div class="flex items-center gap-1.5">
           <span id="mafia-day-badge" class="px-2.5 py-0.5 rounded-lg bg-rose-500/20 border border-rose-500/30 text-xs font-extrabold text-rose-300">
@@ -450,7 +503,7 @@
         </span>
       </div>
 
-      <!-- IMMEDIATE SECRET ROLE BANNER -->
+      <!-- Secret Mafia Role Banner -->
       <div id="mafia-role-banner" class="w-full rounded-3xl bg-gradient-to-br from-sky-700 via-indigo-800 to-slate-950 border border-sky-400/40 p-4 flex flex-col items-center justify-center text-center shadow-2xl transition-all">
         <div class="flex flex-wrap items-center justify-center gap-1.5 mb-1">
           <span class="px-3 py-0.5 rounded-full bg-black/35 border border-white/15 text-[11px] font-bold uppercase tracking-widest text-white/90">
@@ -468,7 +521,7 @@
         </p>
       </div>
 
-      <!-- NIGHT PHASE ACTION PANEL -->
+      <!-- Night Phase Action Panel -->
       <div id="mafia-night-panel" class="rounded-3xl bg-gradient-to-b from-indigo-950/90 to-slate-900/95 border border-indigo-500/40 p-4 shadow-2xl space-y-3">
         <div class="flex items-center justify-between gap-2">
           <div>
@@ -493,7 +546,7 @@
         </div>
       </div>
 
-      <!-- DAY PHASE: MORNING REPORT + UNLIMITED OPEN CHAT + IN-CHAT VOTING -->
+      <!-- Day Phase: Morning Report + Chat + 2-Click Voting -->
       <div id="mafia-day-panel" class="hidden flex-1 flex flex-col bg-slate-900/90 border border-slate-800 rounded-3xl overflow-hidden shadow-xl">
         <div id="mafia-morning-banner" class="px-4 py-2.5 bg-amber-500/15 border-b border-amber-500/30 text-xs font-bold text-amber-200 flex items-center gap-2">
           <span>☀️</span>
@@ -502,15 +555,15 @@
 
         <div class="px-4 py-2 border-b border-slate-800 flex items-center justify-between gap-2 bg-slate-950/50">
           <div>
-            <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-200">Village Chat & Suspect Voting</h4>
-            <p class="text-[10px] text-slate-400">Unlimited discussion! Vote below to eliminate a suspect</p>
+            <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-200">Village Chat & 2-Step Voting</h4>
+            <p class="text-[10px] text-slate-400">Tap a suspect below, then confirm Yes/No to vote</p>
           </div>
           <span id="mafia-voting-progress-pill" class="px-2.5 py-1 rounded-xl bg-amber-500/20 border border-amber-500/40 text-xs font-extrabold text-amber-300 shrink-0">
             🗳️ 0 / 4 Voted
           </span>
         </div>
 
-        <div id="mafia-chat-list" class="flex-1 p-3.5 space-y-2.5 overflow-y-auto min-h-[190px] max-h-[260px] sm:max-h-[310px]"></div>
+        <div id="mafia-chat-list" class="flex-1 p-3.5 space-y-2.5 overflow-y-auto min-h-[180px] max-h-[250px] sm:max-h-[300px]"></div>
 
         <form onsubmit="window.sendChatMessage(event, 'mafia-chat-input')" class="p-2.5 border-t border-slate-800 bg-slate-950/70 flex gap-2">
           <input id="mafia-chat-input" type="text" maxlength="200" placeholder="Discuss who the Mafia is..."
@@ -527,10 +580,89 @@
               <span>🗳️</span> Vote Who Is the Mafia:
             </span>
             <span id="mafia-voting-subtitle" class="text-[11px] font-semibold text-slate-400">
-              Tap an alive player to vote
+              Tap an alive player to select
             </span>
           </div>
           <div id="mafia-voting-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- VIEW 3C: GUESS THE NAME (DUMB CHARADES IN CHAT)                       -->
+    <!-- ===================================================================== -->
+    <section id="view-game-guess" class="hidden flex-1 flex flex-col space-y-3 animate-pop-in">
+      <!-- Top Status Strip -->
+      <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-900/90 border border-slate-800 rounded-2xl px-3.5 py-2">
+        <div class="flex items-center gap-1.5">
+          <span id="guess-round-badge" class="px-2.5 py-0.5 rounded-lg bg-amber-500/20 border border-amber-500/30 text-xs font-extrabold text-amber-300">
+            ROUND 1
+          </span>
+          <span id="guess-category-pill" class="px-2.5 py-0.5 rounded-lg bg-slate-800 border border-slate-700 text-[11px] font-bold text-slate-300">
+            Anime • Naruto
+          </span>
+        </div>
+        <span class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-amber-300">
+          <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+          Chat Charades
+        </span>
+      </div>
+
+      <!-- Secret Character Banner (Only Clue Giver Sees Secret Name; Guessers See Clue Giver Info) -->
+      <div id="guess-role-banner" class="w-full rounded-3xl bg-gradient-to-br from-amber-600 via-orange-700 to-slate-900 border border-amber-400/40 p-4 flex flex-col items-center justify-center text-center shadow-2xl shadow-amber-900/35">
+        <div class="flex flex-wrap items-center justify-center gap-1.5 mb-1">
+          <span id="guess-banner-tag" class="px-3 py-0.5 rounded-full bg-black/35 border border-white/15 text-[11px] font-bold uppercase tracking-widest text-amber-100">
+            🎭 YOU ARE THE CLUE GIVER
+          </span>
+        </div>
+        <h3 id="guess-secret-display" class="font-display text-2xl sm:text-3xl font-extrabold text-white tracking-tight my-0.5 drop-shadow">
+          ---
+        </h3>
+        <p id="guess-banner-desc" class="text-[11px] text-amber-100/90 max-w-md mt-0.5 leading-snug">
+          Describe this character in chat without saying their name! Tap the first correct guesser below to declare them the winner.
+        </p>
+
+        <!-- Clue Giver Skip / New Word Button -->
+        <button id="btn-guess-skip-word" type="button" onclick="window.skipGuessWord()"
+          class="hidden mt-2.5 px-3.5 py-1.5 rounded-xl bg-black/35 hover:bg-black/50 border border-white/20 text-[11px] font-extrabold text-amber-100 transition active:scale-95">
+          🔀 Don't Know This One? Get New Word
+        </button>
+      </div>
+
+      <!-- Live Guessing Chat & Clue Giver Winner Declaration Panel -->
+      <div class="flex-1 flex flex-col bg-slate-900/90 border border-slate-800 rounded-3xl overflow-hidden shadow-xl">
+        <div class="px-4 py-2.5 border-b border-slate-800 flex items-center justify-between gap-2 bg-slate-950/50">
+          <div>
+            <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-200">Live Hints & Guessing Chat</h4>
+            <p id="guess-chat-sub" class="text-[10px] text-slate-400">Type your guesses fast — first right answer wins!</p>
+          </div>
+          <span class="px-2.5 py-1 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-[11px] font-extrabold text-emerald-300 shrink-0">
+            🏆 Winner: +100 pts
+          </span>
+        </div>
+
+        <div id="guess-chat-list" class="flex-1 p-3.5 space-y-2.5 overflow-y-auto min-h-[190px] max-h-[260px] sm:max-h-[310px]"></div>
+
+        <form onsubmit="window.sendGuessChatMessage(event)" class="p-2.5 border-t border-slate-800 bg-slate-950/70 flex gap-2">
+          <input id="guess-chat-input" type="text" maxlength="200" placeholder="Type a hint or your guess..."
+            class="flex-1 min-w-0 px-3.5 py-2.5 rounded-2xl bg-slate-900 border border-slate-700/80 focus:border-amber-400 outline-none text-sm text-white placeholder:text-slate-500" />
+          <button type="submit"
+            class="px-4 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-sm transition active:scale-95 shrink-0">
+            Send
+          </button>
+        </form>
+
+        <!-- Clue Giver Winner Declaration Panel -->
+        <div id="guess-declare-winner-box" class="hidden p-3.5 border-t border-slate-800/90 bg-slate-950/90 space-y-2">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-[11px] font-extrabold uppercase tracking-wider text-emerald-300 flex items-center gap-1">
+              <span>🏆</span> Declare First Correct Guesser as Winner:
+            </span>
+            <span class="text-[10px] font-semibold text-slate-400">
+              2-step confirm
+            </span>
+          </div>
+          <div id="guess-players-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
         </div>
       </div>
     </section>
@@ -554,11 +686,11 @@
       <div id="results-odd-card" class="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 shadow-xl space-y-3.5">
         <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2.5">
           <div>
-            <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Category</span>
+            <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Category / Universe</span>
             <span id="reveal-category" class="text-sm font-extrabold text-violet-300">Anime Legends</span>
           </div>
           <div class="text-right">
-            <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Active Mode</span>
+            <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Mode</span>
             <span id="reveal-mode-badge" class="text-xs font-extrabold text-amber-300">🕵️ Classic Mode</span>
           </div>
         </div>
@@ -566,13 +698,15 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           <div class="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/25">
             <span id="reveal-innocent-count-label" class="text-[11px] font-bold uppercase tracking-wider text-emerald-400">Innocents Had</span>
-            <div id="reveal-innocent-word" class="font-display text-xl font-extrabold text-white mt-0.5">---</div>
+            <div id="reveal-innocent-word" class="font-display text-lg sm:text-xl font-extrabold text-white mt-0.5">---</div>
+            <span id="reveal-innocent-universe" class="text-[11px] font-semibold text-emerald-300/80"></span>
           </div>
           <div class="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/30">
             <span class="text-[11px] font-bold uppercase tracking-wider text-rose-400">
               Imposter (<span id="reveal-imposter-name" class="underline">---</span>) Had
             </span>
-            <div id="reveal-imposter-word" class="font-display text-xl font-extrabold text-rose-200 mt-0.5">---</div>
+            <div id="reveal-imposter-word" class="font-display text-lg sm:text-xl font-extrabold text-rose-200 mt-0.5">---</div>
+            <span id="reveal-imposter-universe" class="text-[11px] font-semibold text-rose-300/80"></span>
           </div>
         </div>
 
@@ -586,6 +720,14 @@
       <div id="results-mafia-card" class="hidden bg-slate-900/90 border border-slate-800 rounded-3xl p-4 shadow-xl space-y-3">
         <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-300">Final Mafia Role Reveal</h4>
         <div id="reveal-mafia-roles-list" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+      </div>
+
+      <!-- Guess The Name Reveal Card -->
+      <div id="results-guess-card" class="hidden bg-slate-900/90 border border-slate-800 rounded-3xl p-4 shadow-xl space-y-2.5 text-center">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-amber-300">Secret Character / Word Was</span>
+        <div id="reveal-guess-word" class="font-display text-2xl sm:text-3xl font-extrabold text-white">---</div>
+        <div id="reveal-guess-universe" class="text-xs font-semibold text-slate-400">---</div>
+        <div id="reveal-guess-points-summary" class="text-xs text-emerald-300 font-bold pt-1"></div>
       </div>
 
       <!-- Multi-Round Scoreboard -->
@@ -613,7 +755,7 @@
   </main>
 
   <!-- ======================================================================= -->
-  <!-- COMPLETE GAME ENGINE WITH YOUR FIREBASE CREDENTIALS                     -->
+  <!-- COMPLETE GAME ENGINE WITH FIREBASE REAL-TIME SYNC                       -->
   <!-- ======================================================================= -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -621,7 +763,7 @@
     import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // =========================================================================
-    // 1. YOUR LIVE FIREBASE PROJECT CREDENTIALS (odd-one-mafia)
+    // 1. LIVE FIREBASE CONFIGURATION (odd-one-mafia)
     // =========================================================================
     const USER_FIREBASE_CONFIG = {
       apiKey: "AIzaSyCili-PUFb2T9ktK_Q1p-f6lI2TcYgd27E",
@@ -638,93 +780,237 @@
       : USER_FIREBASE_CONFIG;
 
     // =========================================================================
-    // 2. COMPLETE CHARACTER & WORD BANK (ANIME, CARTOONS, MCU & CLASSIC)
+    // 2. COMPLETE CHARACTER & WORD DATABASE
+    //    - 14 Anime Series
+    //    - 11 Cartoons
+    //    - 12 Everyday Things & Pop Culture Categories
+    //    - Archetype tags enable smart Cross-Universe similarity matching!
     // =========================================================================
-    const WORD_PAIRS = [
-      // --- ANIME LEGENDS: NARUTO ---
-      { pack: "ANIME", category: "Anime • Naruto", majority: "Naruto Uzumaki", odd: "Sasuke Uchiha", clues: ["Trained on Team 7 in Konoha", "Has legendary clan or tailed-beast power", "One of the two strongest shinobi of their era"] },
-      { pack: "ANIME", category: "Anime • Naruto", majority: "Kakashi Hatake", odd: "Itachi Uchiha", clues: ["Famous Sharingan user", "Served in the ANBU Black Ops", "Super calm, tactical, and respected ninja"] },
-      { pack: "ANIME", category: "Anime • Naruto", majority: "Minato Namikaze", odd: "Madara Uchiha", clues: ["Legendary shinobi feared across nations", "Insanely fast and powerful in battle", "Left a massive mark on Konoha history"] },
-      { pack: "ANIME", category: "Anime • Naruto", majority: "Jiraiya", odd: "Orochimaru", clues: ["One of the Legendary Sannin", "Trained under the Third Hokage", "Uses iconic summoning techniques"] },
-      { pack: "ANIME", category: "Anime • Naruto", majority: "Hinata Hyuga", odd: "Sakura Haruno", clues: ["Kunoichi from the Konoha 11", "Married one of the main rivals", "Specialized close-combat fighter"] },
-      { pack: "ANIME", category: "Anime • Naruto", majority: "Gaara", odd: "Rock Lee", clues: ["Stole the spotlight in the Chunin Exams", "Had one of the most iconic arena fights", "Unstoppable determination in early arcs"] },
+    const CHARACTER_DATABASE = [
+      // ==================== 14 ANIME UNIVERSES ====================
+      // 1. Dragon Ball Z
+      { name: "Goku", universe: "Dragon Ball Z", pack: "ANIME", archetype: "SHONEN_HERO", clues: ["Pure-blooded Saiyan who loves fighting strong opponents", "Transforms into Super Saiyan with golden hair", "Uses the Kamehameha wave"] },
+      { name: "Vegeta", universe: "Dragon Ball Z", pack: "ANIME", archetype: "RIVAL_ANTIHERO", clues: ["Proud Prince of all Saiyans", "Started as a ruthless rival before becoming an ally", "Always determined to surpass the main hero"] },
+      { name: "Gohan", universe: "Dragon Ball Z", pack: "ANIME", archetype: "YOUNG_PRODIGY", clues: ["Half-Saiyan son who unleashed massive hidden rage", "Defeated Cell with a one-handed Kamehameha", "Balances studying with martial arts"] },
+      { name: "Piccolo", universe: "Dragon Ball Z", pack: "ANIME", archetype: "OP_MENTOR", clues: ["Green Namekian warrior who trained Gohan", "Fires the Special Beam Cannon", "Calm tactical fighter"] },
+      { name: "Frieza", universe: "Dragon Ball Z", pack: "ANIME", archetype: "ICONIC_VILLAIN", clues: ["Galactic tyrant who destroyed Planet Vegeta", "Has multiple sleek transformations including a golden form", "Iconic Dragon Ball Z villain"] },
+      { name: "Future Trunks", universe: "Dragon Ball Z", pack: "ANIME", archetype: "FIERCE_SWORDSMAN", clues: ["Time-traveling Saiyan warrior carrying a sword", "Son of Vegeta and Bulma", "Sliced Mecha Frieza into pieces"] },
 
-      // --- ANIME LEGENDS: DEMON SLAYER ---
-      { pack: "ANIME", category: "Anime • Demon Slayer", majority: "Tanjiro Kamado", odd: "Zenitsu Agatsuma", clues: ["Young Demon Slayer Corps member", "Uses a signature Breathing Style", "Travels together in the main trio"] },
-      { pack: "ANIME", category: "Anime • Demon Slayer", majority: "Nezuko Kamado", odd: "Shinobu Kocho", clues: ["Iconic female character with pink/butterfly vibes", "Crucial ally against Upper Rank demons", "Gentle demeanor until combat begins"] },
-      { pack: "ANIME", category: "Anime • Demon Slayer", majority: "Kyojuro Rengoku", odd: "Tengen Uzui", clues: ["Flashy and powerful Hashira", "Starred in a major Demon Slayer arc", "Wields a specialized Nichirin blade"] },
-      { pack: "ANIME", category: "Anime • Demon Slayer", majority: "Inosuke Hashibira", odd: "Giyu Tomioka", clues: ["Fought on Mount Natagumo", "Uses unique swordsmanship techniques", "Very distinct personality in the Corps"] },
-      { pack: "ANIME", category: "Anime • Demon Slayer", majority: "Muzan Kibutsuji", odd: "Akaza", clues: ["Terrifying upper-tier demon", "Regenerates almost instantly", "Fought fiercely against the Hashira"] },
+      // 2. Naruto
+      { name: "Naruto Uzumaki", universe: "Naruto", pack: "ANIME", archetype: "SHONEN_HERO", clues: ["Orange-clad ninja who dreams of becoming Hokage", "Seals the Nine-Tails Fox inside himself", "Uses Shadow Clones and Rasengan"] },
+      { name: "Sasuke Uchiha", universe: "Naruto", pack: "ANIME", archetype: "RIVAL_ANTIHERO", clues: ["Last surviving Uchiha in Konoha seeking revenge", "Wields the Sharingan and Rinnegan", "Team 7 rival who left the village for power"] },
+      { name: "Kakashi Hatake", universe: "Naruto", pack: "ANIME", archetype: "OP_MENTOR", clues: ["Mask-wearing silver-haired Team 7 sensei", "Known as the Copy Ninja with one Sharingan eye", "Creator of the Chidori"] },
+      { name: "Itachi Uchiha", universe: "Naruto", pack: "ANIME", archetype: "TRAGIC_GENIUS", clues: ["Prodigy who wiped out his clan to protect his little brother", "Akatsuki member who mastered Tsukuyomi", "Always pokes his brother's forehead"] },
+      { name: "Madara Uchiha", universe: "Naruto", pack: "ANIME", archetype: "ICONIC_VILLAIN", clues: ["Legendary co-founder of Konoha and rival of Hashirama", "Dropped two meteors on the Shinobi Alliance", "Master of the Susanoo"] },
+      { name: "Sakura Haruno", universe: "Naruto", pack: "ANIME", archetype: "HEROINE_FIGHTER", clues: ["Pink-haired kunoichi of Team 7", "Trained under Tsunade in medical ninjutsu and monster strength", "Married Sasuke Uchiha"] },
 
-      // --- ANIME LEGENDS: JUJUTSU KAISEN ---
-      { pack: "ANIME", category: "Anime • Jujutsu Kaisen", majority: "Satoru Gojo", odd: "Ryomen Sukuna", clues: ["Overpowered Domain Expansion", "Can solo almost anyone in JJK", "The entire jujutsu world revolves around them"] },
-      { pack: "ANIME", category: "Anime • Jujutsu Kaisen", majority: "Yuji Itadori", odd: "Megumi Fushiguro", clues: ["First-year Tokyo Jujutsu High student", "Taught by Satoru Gojo", "Insane close-combat or shikigami skills"] },
-      { pack: "ANIME", category: "Anime • Jujutsu Kaisen", majority: "Nobara Kugisaki", odd: "Maki Zenin", clues: ["Fearless female jujutsu sorcerer", "Uses cursed tools or weapons in battle", "Never backs down from a fight"] },
-      { pack: "ANIME", category: "Anime • Jujutsu Kaisen", majority: "Kento Nanami", odd: "Toji Fushiguro", clues: ["Fan-favorite adult fighter in JJK", "Uses a bladed weapon in close quarters", "Zero nonsense, pure lethal efficiency"] },
-      { pack: "ANIME", category: "Anime • Jujutsu Kaisen", majority: "Yuta Okkotsu", odd: "Suguru Geto", clues: ["Special Grade sorcerer", "Commands massive cursed energy/spirits", "Central figure in JJK 0"] },
+      // 3. Attack on Titan
+      { name: "Eren Yeager", universe: "Attack on Titan", pack: "ANIME", archetype: "SHONEN_HERO", clues: ["Vowed to wipe out every Titan after Wall Maria fell", "Inherits the Attack Titan and Founding Titan", "Obsessed with freedom beyond the walls"] },
+      { name: "Levi Ackerman", universe: "Attack on Titan", pack: "ANIME", archetype: "OP_MENTOR", clues: ["Humanity's Strongest Soldier in the Survey Corps", "Spin-attacks Titans with dual ODM blades", "Obsessed with cleanliness and tea"] },
+      { name: "Mikasa Ackerman", universe: "Attack on Titan", pack: "ANIME", archetype: "HEROINE_FIGHTER", clues: ["Always wears the red scarf Eren wrapped around her", "Elite Ackerman warrior with unmatched ODM agility", "Fiercely protective of Eren"] },
+      { name: "Armin Arlert", universe: "Attack on Titan", pack: "ANIME", archetype: "GENIUS_STRATEGIST", clues: ["Brilliant tactician who dreams of seeing the ocean", "Inherits the Colossal Titan", "Best friend of Eren and Mikasa"] },
+      { name: "Erwin Smith", universe: "Attack on Titan", pack: "ANIME", archetype: "CAPTAIN_LEADER", clues: ["Fearless Commander of the Survey Corps", "Led the final charge against the Beast Titan", "Lost his right arm to a Titan"] },
 
-      // --- ANIME LEGENDS: DRAGON BALL Z ---
-      { pack: "ANIME", category: "Anime • Dragon Ball Z", majority: "Goku", odd: "Vegeta", clues: ["Pure-blooded Saiyan warrior", "Achieved Super Saiyan transformations", "Constantly trains to break limits"] },
-      { pack: "ANIME", category: "Anime • Dragon Ball Z", majority: "Gohan", odd: "Future Trunks", clues: ["Half-Saiyan warrior from DBZ", "Had an unforgettable moment in the Cell Saga", "Unleashed huge hidden rage power"] },
-      { pack: "ANIME", category: "Anime • Dragon Ball Z", majority: "Piccolo", odd: "Krillin", clues: ["Day-one Z Fighter ally", "Fought on Planet Namek", "Uses iconic energy beam attacks"] },
-      { pack: "ANIME", category: "Anime • Dragon Ball Z", majority: "Frieza", odd: "Cell", clues: ["Iconic DBZ saga main villain", "Has multiple transformations", "Pushed the Z Fighters to their absolute limit"] },
-      { pack: "ANIME", category: "Anime • Dragon Ball Z", majority: "Majin Buu", odd: "Broly", clues: ["Unstoppable powerhouse in DBZ", "Requires fusion or teamwork to beat", "Pure destructive energy"] },
+      // 4. Demon Slayer
+      { name: "Tanjiro Kamado", universe: "Demon Slayer", pack: "ANIME", archetype: "SHONEN_HERO", clues: ["Kind-hearted demon slayer with a checkered haori", "Carries his sister inside a wooden box on his back", "Uses Water and Sun Breathing"] },
+      { name: "Nezuko Kamado", universe: "Demon Slayer", pack: "ANIME", archetype: "SUPERNATURAL_ALLY", clues: ["Turned into a demon yet refuses to eat humans", "Wears a bamboo muzzle and shrinks or grows in size", "Uses Blood Demon Art flames"] },
+      { name: "Zenitsu Agatsuma", universe: "Demon Slayer", pack: "ANIME", archetype: "COMIC_POWERHOUSE", clues: ["Yellow-haired slayer who panics when awake", "Becomes lightning-fast when asleep", "Masters Thunder Breathing First Form"] },
+      { name: "Inosuke Hashibira", universe: "Demon Slayer", pack: "ANIME", archetype: "WILD_FIGHTER", clues: ["Wears a hollow boar mask and dual serrated swords", "Raised in the mountains by boars", "Uses Beast Breathing"] },
+      { name: "Kyojuro Rengoku", universe: "Demon Slayer", pack: "ANIME", archetype: "OP_MENTOR", clues: ["Passionate Flame Hashira with fiery hair", "Protected all 200 passengers on the Mugen Train", "Famous for saying 'Set your heart ablaze'"] },
+      { name: "Giyu Tomioka", universe: "Demon Slayer", pack: "ANIME", archetype: "FIERCE_SWORDSMAN", clues: ["Stoic Water Hashira with a two-toned haori", "Spared Nezuko in the snow in Episode 1", "Created the Eleventh Form: Dead Calm"] },
+      { name: "Muzan Kibutsuji", universe: "Demon Slayer", pack: "ANIME", archetype: "ICONIC_VILLAIN", clues: ["The Demon King and progenitor of all demons", "Searches endlessly for the Blue Spider Lily", "Commands the Twelve Kizuki"] },
 
-      // --- ANIME LEGENDS: ONE PIECE ---
-      { pack: "ANIME", category: "Anime • One Piece", majority: "Monkey D. Luffy", odd: "Roronoa Zoro", clues: ["Founding member of the Straw Hat Pirates", "Has a massive bounty on the Grand Line", "Chasing an ultimate dream on the seas"] },
-      { pack: "ANIME", category: "Anime • One Piece", majority: "Sanji", odd: "Shanks", clues: ["Uses powerful Haki in battle", "Suave and iconic One Piece character", "Zero Devil Fruit powers needed"] },
-      { pack: "ANIME", category: "Anime • One Piece", majority: "Portgas D. Ace", odd: "Trafalgar Law", clues: ["Famous pirate captain/commander", "Possesses a powerful Devil Fruit", "Formed a legendary bond with Luffy"] },
+      // 5. One Piece
+      { name: "Monkey D. Luffy", universe: "One Piece", pack: "ANIME", archetype: "SHONEN_HERO", clues: ["Straw-hat pirate captain made of rubber", "Ate the Gum-Gum Fruit and aims to be King of the Pirates", "Loves meat and adventures"] },
+      { name: "Roronoa Zoro", universe: "One Piece", pack: "ANIME", archetype: "FIERCE_SWORDSMAN", clues: ["Green-haired pirate who fights with Three-Sword Style", "Has zero sense of direction and always gets lost", "Aims to become the World's Greatest Swordsman"] },
+      { name: "Sanji", universe: "One Piece", pack: "ANIME", archetype: "RIVAL_ANTIHERO", clues: ["Straw Hat cook who only fights with powerful kicks", "Never hits a woman and loves cooking", "Constantly bickers with Zoro"] },
+      { name: "Portgas D. Ace", universe: "One Piece", pack: "ANIME", archetype: "TRAGIC_GENIUS", clues: ["Luffy's sworn older brother with freckles and a cowboy hat", "Wielded the Flame-Flame Devil Fruit", "Second Division Commander of the Whitebeard Pirates"] },
+      { name: "Shanks", universe: "One Piece", pack: "ANIME", archetype: "OP_MENTOR", clues: ["Red-haired Yonko captain who gave Luffy his straw hat", "Lost his left arm saving young Luffy", "Master of Conqueror's Haki"] },
 
-      // --- CARTOONS & NOSTALGIA: BEN 10 ---
-      { pack: "CARTOONS", category: "Cartoons • Ben 10", majority: "Ben Tennyson", odd: "Kevin Levin", clues: ["Can transform or absorb alien powers", "Travels across the country in the Rustbucket", "Iconic Cartoon Network hero/rival"] },
-      { pack: "CARTOONS", category: "Cartoons • Ben 10", majority: "Gwen Tennyson", odd: "Grandpa Max", clues: ["Always has Ben's back on road trips", "Knows way more about Plumbers/magic than Ben", "Voice of reason in the Tennyson trio"] },
-      { pack: "CARTOONS", category: "Cartoons • Ben 10", majority: "Heatblast", odd: "Four Arms", clues: ["One of Ben's original 10 Omnitrix aliens", "Heavy hitter in classic Ben 10 fights", "Appeared right in Season 1"] },
-      { pack: "CARTOONS", category: "Cartoons • Ben 10", majority: "XLR8", odd: "Diamondhead", clues: ["Classic Omnitrix alien transformation", "Super distinct silhouette and powers", "Fan-favorite alien from the original series"] },
-      { pack: "CARTOONS", category: "Cartoons • Ben 10", majority: "Vilgax", odd: "Ghostfreak", clues: ["Terrifying classic Ben 10 villain", "Obsessed with taking the Omnitrix", "Gave Ben his hardest battles"] },
+      // 6. Jujutsu Kaisen
+      { name: "Yuji Itadori", universe: "Jujutsu Kaisen", pack: "ANIME", archetype: "SHONEN_HERO", clues: ["Athletic teenager who swallowed a cursed finger", "Vessel of Ryomen Sukuna", "Lands consecutive Black Flashes in close combat"] },
+      { name: "Satoru Gojo", universe: "Jujutsu Kaisen", pack: "ANIME", archetype: "OP_MENTOR", clues: ["Blindfolded teacher and the strongest jujutsu sorcerer", "Possesses the Six Eyes and Limitless", "Uses Hollow Purple and Infinite Void"] },
+      { name: "Megumi Fushiguro", universe: "Jujutsu Kaisen", pack: "ANIME", archetype: "RIVAL_ANTIHERO", clues: ["Calm dark-haired first-year sorcerer", "Summons shadow shikigami with the Ten Shadows Technique", "Partnered with Yuji and Nobara"] },
+      { name: "Nobara Kugisaki", universe: "Jujutsu Kaisen", pack: "ANIME", archetype: "HEROINE_FIGHTER", clues: ["Confident sorcerer who fights with a hammer, nails, and straw doll", "Came from the countryside to Tokyo", "Uses Resonance cursed technique"] },
+      { name: "Ryomen Sukuna", universe: "Jujutsu Kaisen", pack: "ANIME", archetype: "ICONIC_VILLAIN", clues: ["The undisputed King of Curses from the Heian Era", "Uses Dismantle, Cleave, and Malevolent Shrine", "Takes over Yuji's body"] },
+      { name: "Kento Nanami", universe: "Jujutsu Kaisen", pack: "ANIME", archetype: "CAPTAIN_LEADER", clues: ["Former salaryman turned Grade 1 sorcerer", "Wields a wrapped blunt blade with Ratio Technique", "Hates working overtime"] },
 
-      // --- CARTOONS & NOSTALGIA: DORAEMON ---
-      { pack: "CARTOONS", category: "Cartoons • Doraemon", majority: "Doraemon", odd: "Nobita Nobi", clues: ["Main protagonist of the series", "Always using 22nd-century gadgets", "Best friends who share a room in Tokyo"] },
-      { pack: "CARTOONS", category: "Cartoons • Doraemon", majority: "Shizuka Minamoto", odd: "Gian (Takeshi)", clues: ["Elementary school classmate of Nobita", "Part of the main 5-kid friend group", "Goes on crazy gadget adventures together"] },
-      { pack: "CARTOONS", category: "Cartoons • Doraemon", majority: "Suneo Honekawa", odd: "Dorami", clues: ["Knows all about Doraemon's futuristic gadgets", "Classic recurring Doraemon character", "Shows off or saves the day in episodes"] },
-      { pack: "CARTOONS", category: "Cartoons • Doraemon", majority: "Dekisugi", odd: "Jaiko", clues: ["Classmate/neighborhood kid in Doraemon", "Memorable side character in Tokyo", "Connected to Nobita's daily school life"] },
+      // 7. Death Note
+      { name: "Light Yagami", universe: "Death Note", pack: "ANIME", archetype: "GENIUS_STRATEGIST", clues: ["Top honor student who finds a Shinigami notebook", "Eliminates criminals under the alias Kira", "Plays a deadly mind game against L"] },
+      { name: "L Lawliet", universe: "Death Note", pack: "ANIME", archetype: "GENIUS_STRATEGIST", clues: ["World's greatest detective who sits crouched in chairs", "Obsessed with sweets and cake", "Hunts down Kira without showing his real face"] },
+      { name: "Ryuk", universe: "Death Note", pack: "ANIME", archetype: "SUPERNATURAL_ALLY", clues: ["Bored Shinigami who dropped his Death Note into the human world", "Addicted to eating juicy red apples", "Follows Light Yagami everywhere"] },
 
-      // --- CARTOONS & NOSTALGIA: POKÉMON ---
-      { pack: "CARTOONS", category: "Cartoons • Pokémon", majority: "Pikachu", odd: "Charizard", clues: ["Ash's iconic Kanto partner", "Mascot-level fame in Pokémon", "Refused to stay inside a normal Poké Ball"] },
-      { pack: "CARTOONS", category: "Cartoons • Pokémon", majority: "Ash Ketchum", odd: "Brock", clues: ["Traveled across Kanto and Johto together", "Knows Pokémon battles inside and out", "Classic original trio member"] },
-      { pack: "CARTOONS", category: "Cartoons • Pokémon", majority: "Mewtwo", odd: "Lucario", clues: ["Starred in its own Pokémon movie", "Uses aura or psychic energy waves", "One of the strongest bipedal Pokémon"] },
-      { pack: "CARTOONS", category: "Cartoons • Pokémon", majority: "Bulbasaur", odd: "Squirtle", clues: ["Original Kanto starter Pokémon", "Joined Ash's team early in Season 1", "Super loyal and stubborn in battle"] },
-      { pack: "CARTOONS", category: "Cartoons • Pokémon", majority: "Jessie (Team Rocket)", odd: "James (Team Rocket)", clues: ["Part of the iconic Team Rocket duo", "Always blasting off again", "Chasing Pikachu in every region"] },
+      // 8. Black Clover
+      { name: "Asta", universe: "Black Clover", pack: "ANIME", archetype: "SHONEN_HERO", clues: ["Loud, muscular orphan born with zero magic", "Wields Anti-Magic swords from a five-leaf grimoire", "Aims to become the Wizard King"] },
+      { name: "Yuno", universe: "Black Clover", pack: "ANIME", archetype: "RIVAL_ANTIHERO", clues: ["Calm, handsome wind-magic prodigy raised beside Asta", "Chosen by the four-leaf clover grimoire", "Member of the Golden Dawn"] },
+      { name: "Yami Sukehiro", universe: "Black Clover", pack: "ANIME", archetype: "OP_MENTOR", clues: ["Katana-wielding Captain of the Black Bulls", "Uses Dark Magic and tells his squad to surpass their limits", "Always smoking or in the bathroom"] },
 
-      // --- CARTOONS & NOSTALGIA: NINJA HATTORI ---
-      { pack: "CARTOONS", category: "Cartoons • Ninja Hattori", majority: "Ninja Hattori", odd: "Kenichi Mitsuba", clues: ["Lives under the same roof in Tokyo", "Main duo of the Ninja Hattori show", "Always dealing with school and ninja drama"] },
-      { pack: "CARTOONS", category: "Cartoons • Ninja Hattori", majority: "Shinzo", odd: "Shishimaru", clues: ["Lives with Kenichi and Hattori", "Super loyal and funny sidekick", "Loves snacks and gets into silly trouble"] },
-      { pack: "CARTOONS", category: "Cartoons • Ninja Hattori", majority: "Kemumaki", odd: "Kagechiyo", clues: ["Koga ninja rival", "Always plotting tricks against Hattori", "Lives next door to Kenichi"] },
-      { pack: "CARTOONS", category: "Cartoons • Ninja Hattori", majority: "Yumeko", odd: "Amara", clues: ["Classmate at Kenichi's school", "Central to many Ninja Hattori episodes", "Classic recurring character"] },
+      // 9. Chainsaw Man
+      { name: "Denji", universe: "Chainsaw Man", pack: "ANIME", archetype: "SHONEN_HERO", clues: ["Pulls a starter cord on his chest to sprout chainsaws", "Fused with his devil dog Pochita", "Dreams of simple things like toast with jam"] },
+      { name: "Power", universe: "Chainsaw Man", pack: "ANIME", archetype: "WILD_FIGHTER", clues: ["Chaotic Blood Fiend with red horns", "Loves her cat Meowy and hates vegetables", "Public Safety Devil Hunter alongside Denji"] },
+      { name: "Aki Hayakawa", universe: "Chainsaw Man", pack: "ANIME", archetype: "RIVAL_ANTIHERO", clues: ["Serious topknot-wearing Devil Hunter", "Makes contracts with the Fox and Curse Devils", "Takes care of Denji and Power"] },
+      { name: "Makima", universe: "Chainsaw Man", pack: "ANIME", archetype: "ICONIC_VILLAIN", clues: ["Mysterious high-ranking Public Safety leader with ringed eyes", "Controls people and devils effortlessly", "Denji's manipulative boss"] },
 
-      // --- CARTOONS & NOSTALGIA: MOTU PATLU ---
-      { pack: "CARTOONS", category: "Cartoons • Motu Patlu", majority: "Motu", odd: "Patlu", clues: ["Best friends living in Furfuri Nagar", "Always solving problems together", "Iconic duo from Indian animation"] },
-      { pack: "CARTOONS", category: "Cartoons • Motu Patlu", majority: "Inspector Chingum", odd: "Dr. Jhatka", clues: ["Famous resident of Furfuri Nagar", "Always trying to help Motu and Patlu", "Has a memorable catchphrase or inventions"] },
-      { pack: "CARTOONS", category: "Cartoons • Motu Patlu", majority: "Ghasitaram", odd: "John the Don", clues: ["Classic character in Furfuri Nagar", "Always involved in wild schemes", "Iconic Motu Patlu supporting cast"] },
+      // 10. One Punch Man
+      { name: "Saitama", universe: "One Punch Man", pack: "ANIME", archetype: "OP_MENTOR", clues: ["Bald hero who defeats every monster with a single punch", "Did 100 push-ups, sit-ups, and squats daily", "Always hunting supermarket bargain sales"] },
+      { name: "Genos", universe: "One Punch Man", pack: "ANIME", archetype: "YOUNG_PRODIGY", clues: ["Blonde cyborg hero who insists on being Saitama's disciple", "Takes notes on everything Saitama says", "Uses Incineration Cannons"] },
+      { name: "Garou", universe: "One Punch Man", pack: "ANIME", archetype: "RIVAL_ANTIHERO", clues: ["Martial arts prodigy known as the Hero Hunter", "Former top student of Bang (Silver Fang)", "Evolves mid-battle against heroes"] },
 
-      // --- MCU HEROES & VILLAINS ---
-      { pack: "MCU", category: "MCU • Avengers", majority: "Iron Man", odd: "Captain America", clues: ["Founding leader of the Avengers", "Central figure in Civil War and Endgame", "Sacrificed everything to save the world"] },
-      { pack: "MCU", category: "MCU • Asgard", majority: "Thor", odd: "Loki", clues: ["Royalty from Asgard", "Wields a legendary weapon or magic", "Has a complicated sibling dynamic"] },
-      { pack: "MCU", category: "MCU • Multiverse", majority: "Spider-Man", odd: "Doctor Strange", clues: ["New York-based MCU hero", "Messed with a multiverse spell in No Way Home", "Fought Thanos on Titan"] },
-      { pack: "MCU", category: "MCU • Powerhouses", majority: "Hulk", odd: "Thanos", clues: ["Unmatched raw physical strength in the MCU", "Fought each other in Infinity War", "Giant CGI powerhouse"] },
-      { pack: "MCU", category: "MCU • Avengers", majority: "Black Widow", odd: "Hawkeye", clues: ["Original SHIELD agent & founding Avenger", "Fought together on Vormir", "No superpowers, pure lethal skill"] },
-      { pack: "MCU", category: "MCU • Heroes", majority: "Black Panther", odd: "Winter Soldier", clues: ["Enhanced super-soldier-level fighter", "Connected to Wakanda and vibranium", "Fought in Captain America: Civil War"] },
-      { pack: "MCU", category: "MCU • Avengers", majority: "Scarlet Witch", odd: "Vision", clues: ["Starred together in WandaVision", "Powers tied to the Mind Stone", "One of the strongest Avengers"] },
-      { pack: "MCU", category: "MCU • Cosmic & Quantum", majority: "Ant-Man", odd: "Star-Lord", clues: ["Funny, lighthearted MCU hero", "Saved the universe with a wild plan", "Travels across realms or galaxies"] },
+      // 11. My Hero Academia
+      { name: "Izuku Midoriya", universe: "My Hero Academia", pack: "ANIME", archetype: "SHONEN_HERO", clues: ["Born Quirkless before inheriting One For All from All Might", "Mutters hero analysis notes constantly", "Hero name is Deku"] },
+      { name: "Katsuki Bakugo", universe: "My Hero Academia", pack: "ANIME", archetype: "RIVAL_ANTIHERO", clues: ["Explosive hot-headed childhood rival of Deku", "Sweats nitroglycerin to launch massive blasts", "Determined to be the #1 Hero"] },
+      { name: "Shoto Todoroki", universe: "My Hero Academia", pack: "ANIME", archetype: "TRAGIC_GENIUS", clues: ["Half-Cold Half-Hot hero with red-and-white hair", "Has a burn scar over his left eye", "Son of the Flame Hero Endeavor"] },
+      { name: "All Might", universe: "My Hero Academia", pack: "ANIME", archetype: "OP_MENTOR", clues: ["Former #1 Hero and Symbol of Peace", "Shouts 'I am here!' with a giant smile", "Passed One For All to Deku"] },
 
-      // --- CLASSIC EVERYDAY WORDS ---
-      { pack: "CLASSIC", category: "Food & Drinks", majority: "Pizza", odd: "Burger", clues: ["Classic weekend comfort food", "Best eaten hot with melted cheese", "Popular party delivery order"] },
-      { pack: "CLASSIC", category: "Places & Travel", majority: "Beach", odd: "Desert", clues: ["Covered in sand", "Gets super bright and hot in the afternoon", "Need sunscreen when visiting"] },
-      { pack: "CLASSIC", category: "Food & Drinks", majority: "Coffee", odd: "Tea", clues: ["Morning caffeine ritual", "Can be served hot or iced", "Found in almost every cafe"] },
-      { pack: "CLASSIC", category: "Animals", majority: "Lion", odd: "Tiger", clues: ["Apex big cat predator", "Roars loudly in the wild", "Iconic zoo attraction"] },
-      { pack: "CLASSIC", category: "Music & Instruments", majority: "Guitar", odd: "Piano", clues: ["Classic instrument for writing songs", "Used in almost every music genre", "Takes practice to master chords"] },
-      { pack: "CLASSIC", category: "Vehicles & Exploration", majority: "Submarine", odd: "Spaceship", clues: ["Sealed vessel for extreme environments", "Crew relies on oxygen systems", "Explores mysterious frontiers"] },
-      { pack: "CLASSIC", category: "Fantasy & Monsters", majority: "Vampire", odd: "Werewolf", clues: ["Classic midnight movie monster", "Connected to the night and moonlight", "Famous supernatural folklore"] },
-      { pack: "CLASSIC", category: "Sports", majority: "Football", odd: "Basketball", clues: ["Fast-paced global team sport", "Played in massive packed stadiums", "Famous world championships"] }
+      // 12. Spy x Family
+      { name: "Loid Forger", universe: "Spy x Family", pack: "ANIME", archetype: "GENIUS_STRATEGIST", clues: ["Master spy codenamed Twilight", "Created a fake family for Operation Strix", "Works undercover as a psychiatrist"] },
+      { name: "Yor Forger", universe: "Spy x Family", pack: "ANIME", archetype: "HEROINE_FIGHTER", clues: ["Sweet city hall clerk who is secretly an assassin called Thorn Princess", "Terrible at cooking but superhumanly strong", "Adoptive mother of Anya"] },
+      { name: "Anya Forger", universe: "Spy x Family", pack: "ANIME", archetype: "COMIC_POWERHOUSE", clues: ["Pink-haired telepathic little girl who reads minds", "Loves peanuts and Spy Wars cartoons", "Attends Eden Academy"] },
+
+      // 13. Haikyuu!!
+      { name: "Shoyo Hinata", universe: "Haikyuu!!", pack: "ANIME", archetype: "SHONEN_HERO", clues: ["Short orange-haired volleyball middle blocker with insane vertical jump", "Inspired by the Little Giant", "Plays for Karasuno High"] },
+      { name: "Tobio Kageyama", universe: "Haikyuu!!", pack: "ANIME", archetype: "RIVAL_ANTIHERO", clues: ["Genius volleyball setter nicknamed King of the Court", "Delivers pinpoint freak quick sets to Hinata", "Obsessed with milk and volleyball"] },
+      { name: "Kenma Kozume", universe: "Haikyuu!!", pack: "ANIME", archetype: "GENIUS_STRATEGIST", clues: ["Quiet gaming-obsessed setter for Nekoma High", "The tactical brain of his volleyball team", "Best friend of Kuroo"] },
+
+      // 14. Bleach
+      { name: "Ichigo Kurosaki", universe: "Bleach", pack: "ANIME", archetype: "SHONEN_HERO", clues: ["Orange-haired teenager who becomes a Substitute Soul Reaper", "Wields the giant zanpakuto Zangetsu", "Fires Getsuga Tensho"] },
+      { name: "Rukia Kuchiki", universe: "Bleach", pack: "ANIME", archetype: "HEROINE_FIGHTER", clues: ["Soul Reaper who transferred her powers to Ichigo", "Wields the ice zanpakuto Sode no Shirayuki", "Loves bunny drawings"] },
+      { name: "Sosuke Aizen", universe: "Bleach", pack: "ANIME", archetype: "ICONIC_VILLAIN", clues: ["Former 5th Division Captain who orchestrated everything", "Wields Kyoka Suigetsu's complete hypnosis", "Iconic Bleach mastermind"] },
+      { name: "Kenpachi Zaraki", universe: "Bleach", pack: "ANIME", archetype: "WILD_FIGHTER", clues: ["Battle-loving Captain of Squad 11", "Wears an eyepatch that seals his spiritual pressure", "Never uses fancy kido, just pure sword strength"] },
+
+      // ==================== 11 CARTOON UNIVERSES ====================
+      // 1. Doraemon
+      { name: "Doraemon", universe: "Doraemon", pack: "CARTOONS", archetype: "ICONIC_MASCOT", clues: ["Blue robotic cat from the 22nd century", "Pulls futuristic gadgets from his 4D pocket", "Terrified of mice and loves dorayaki"] },
+      { name: "Nobita Nobi", universe: "Doraemon", pack: "CARTOONS", archetype: "LAZY_KID_HERO", clues: ["Glasses-wearing boy who always gets zero on tests", "Runs crying to Doraemon for gadgets", "Expert at sleeping fast and cat's cradle"] },
+      { name: "Shizuka Minamoto", universe: "Doraemon", pack: "CARTOONS", archetype: "HEROINE_FIGHTER", clues: ["Kind classmate whom Nobita wants to marry", "Loves taking baths and playing the violin", "Smartest friend in Nobita's group"] },
+      { name: "Gian (Takeshi)", universe: "Doraemon", pack: "CARTOONS", archetype: "STRONG_BULLY_PAL", clues: ["Big neighborhood bully who forces everyone to attend his terrible concerts", "Actually fiercely protective of his friends in movies", "Best friend of Suneo"] },
+
+      // 2. Ben 10
+      { name: "Ben Tennyson", universe: "Ben 10", pack: "CARTOONS", archetype: "SHONEN_HERO", clues: ["10-year-old boy who found the Omnitrix watch", "Slams the watch dial to transform into aliens", "Travels in the Rustbucket RV"] },
+      { name: "Gwen Tennyson", universe: "Ben 10", pack: "CARTOONS", archetype: "HEROINE_FIGHTER", clues: ["Ben's smart red-haired cousin", "Uses pink Anodite energy shields and spellbooks", "Voice of reason on summer road trips"] },
+      { name: "Kevin Levin", universe: "Ben 10", pack: "CARTOONS", archetype: "RIVAL_ANTIHERO", clues: ["Absorbs metal, stone, and energy with his hands", "Started as Ben's rival before joining his team", "Loves his green muscle car"] },
+      { name: "Four Arms", universe: "Ben 10", pack: "CARTOONS", archetype: "STRONG_BULLY_PAL", clues: ["Red-skinned Tetramand alien with four muscular arms", "Ben's go-to heavy hitter in Season 1", "Creates shockwaves by clapping all four hands"] },
+
+      // 3. Shinchan
+      { name: "Shinchan Nohara", universe: "Shinchan", pack: "CARTOONS", archetype: "LAZY_KID_HERO", clues: ["5-year-old troublemaker in a red shirt and yellow shorts", "Loves Action Kamen and Chocobi snacks", "Annoys his mom Misae constantly"] },
+      { name: "Shiro", universe: "Shinchan", pack: "CARTOONS", archetype: "ANIMAL_SIDEKICK", clues: ["Fluffy white dog adopted by Shinchan", "Smarter and more responsible than Shinchan", "Does the cotton-ball trick"] },
+      { name: "Kazama", universe: "Shinchan", pack: "CARTOONS", archetype: "RIVAL_ANTIHERO", clues: ["Polite, studious friend of Shinchan in Futaba Kindergarten", "Secretly loves magical girl anime", "Always gets teased when Shinchan whispers in his ear"] },
+
+      // 4. Pokémon
+      { name: "Pikachu", universe: "Pokémon", pack: "CARTOONS", archetype: "ICONIC_MASCOT", clues: ["Yellow Electric-type mouse Pokémon with red cheeks", "Rides on Ash's shoulder and refuses a Poké Ball", "Famous for Thunderbolt"] },
+      { name: "Ash Ketchum", universe: "Pokémon", pack: "CARTOONS", archetype: "SHONEN_HERO", clues: ["Trainer from Pallet Town who turns his cap backward", "Travels across regions to become a Pokémon Master", "Best partner is Pikachu"] },
+      { name: "Charizard", universe: "Pokémon", pack: "CARTOONS", archetype: "STRONG_BULLY_PAL", clues: ["Orange fire-breathing dragon-like Pokémon", "Ignored Ash's commands until earning his respect", "Tail flame never goes out"] },
+
+      // 5. Chhota Bheem
+      { name: "Chhota Bheem", universe: "Chhota Bheem", pack: "CARTOONS", archetype: "SHONEN_HERO", clues: ["Strong boy from Dholakpur who wears an orange dhoti", "Gains unstoppable strength after eating Tuntun Mausi's ladoos", "Protects King Indraverma's kingdom"] },
+      { name: "Chutki", universe: "Chhota Bheem", pack: "CARTOONS", archetype: "HEROINE_FIGHTER", clues: ["Bheem's smart best friend with two braids", "Daughter of Tuntun Mausi", "Always carries extra ladoos for Bheem"] },
+      { name: "Kalia", universe: "Chhota Bheem", pack: "CARTOONS", archetype: "STRONG_BULLY_PAL", clues: ["Jealous rival of Bheem in Dholakpur", "Always accompanied by twins Dholu and Bholu", "Tries to outshine Bheem but ends up needing rescue"] },
+
+      // 6. Motu Patlu
+      { name: "Motu", universe: "Motu Patlu", pack: "CARTOONS", archetype: "LAZY_KID_HERO", clues: ["Chubby resident of Furfuri Nagar in a red tunic", "Loves samosas which suddenly give him superhero strength", "Best friend of Patlu"] },
+      { name: "Patlu", universe: "Motu Patlu", pack: "CARTOONS", archetype: "GENIUS_STRATEGIST", clues: ["Thin, glasses-wearing smart friend in Furfuri Nagar", "Always rescues Motu from trouble", "Famous for 'Khaali pet mere dimaag ki batti nahi jalti'"] },
+      { name: "Inspector Chingum", universe: "Motu Patlu", pack: "CARTOONS", archetype: "CAPTAIN_LEADER", clues: ["Mustachioed police inspector of Furfuri Nagar", "Says 'Chingum ke changul se bachna namumkin'", "Rides a bike and fires coconuts"] },
+
+      // 7. Zig & Sharko
+      { name: "Zig", universe: "Zig & Sharko", pack: "CARTOONS", archetype: "LAZY_KID_HERO", clues: ["Skinny brown hyena stranded on an island", "Plots endlessly to eat Marina the mermaid", "Always gets flattened by Sharko"] },
+      { name: "Sharko", universe: "Zig & Sharko", pack: "CARTOONS", archetype: "STRONG_BULLY_PAL", clues: ["Muscular great white shark who walks on land", "Bodyguard and boyfriend of Marina", "Beats up Zig every time he gets near Marina"] },
+      { name: "Marina", universe: "Zig & Sharko", pack: "CARTOONS", archetype: "HEROINE_FIGHTER", clues: ["Cheerful red-haired mermaid who loves singing", "Completely oblivious to Zig's traps", "Protected by Sharko"] },
+
+      // 8. Ninja Hattori
+      { name: "Hattori Kanzo", universe: "Ninja Hattori", pack: "CARTOONS", archetype: "ICONIC_MASCOT", clues: ["Little Iga ninja in blue robes who lives with Kenichi", "Says 'Ding ding!' after every ninja trick", "Protects Kenichi from Kemumaki"] },
+      { name: "Shishimaru", universe: "Ninja Hattori", pack: "CARTOONS", archetype: "ANIMAL_SIDEKICK", clues: ["Yellow ninja dog who can roll into a fireball", "Obsessed with eating chocolate rolls", "Companion of Hattori and Shinzo"] },
+      { name: "Kemumaki", universe: "Ninja Hattori", pack: "CARTOONS", archetype: "RIVAL_ANTIHERO", clues: ["Koga ninja rival dressed in green", "Has a ninja cat named Kagechiyo", "Competes with Hattori for Yumeko's attention"] },
+
+      // 9. Tom & Jerry
+      { name: "Tom Cat", universe: "Tom & Jerry", pack: "CARTOONS", archetype: "LAZY_KID_HERO", clues: ["Grey-and-white house cat who chases Jerry nonstop", "Sets elaborate traps that always backfire on him", "Iconic classic cartoon cat"] },
+      { name: "Jerry Mouse", universe: "Tom & Jerry", pack: "CARTOONS", archetype: "ICONIC_MASCOT", clues: ["Clever little brown mouse living in a baseboard hole", "Outsmarts Tom every single episode", "Loves yellow Swiss cheese"] },
+      { name: "Spike Bulldog", universe: "Tom & Jerry", pack: "CARTOONS", archetype: "STRONG_BULLY_PAL", clues: ["Tough grey bulldog with a spiked collar", "Protective father of his pup Tyke", "Clobbers Tom whenever his nap is disturbed"] },
+
+      // 10. Oggy and the Cockroaches
+      { name: "Oggy", universe: "Oggy and the Cockroaches", pack: "CARTOONS", archetype: "LAZY_KID_HERO", clues: ["Lazy blue cat with a red nose who just wants to watch TV", "Tormented daily by three cockroaches in his house", "Swats cockroaches with a flyswatter"] },
+      { name: "Jack", universe: "Oggy and the Cockroaches", pack: "CARTOONS", archetype: "STRONG_BULLY_PAL", clues: ["Green-furred hot-tempered cousin of Oggy", "Builds wild contraptions to catch the cockroaches", "Drives a monster truck"] },
+      { name: "Joey (Cockroach)", universe: "Oggy and the Cockroaches", pack: "CARTOONS", archetype: "GENIUS_STRATEGIST", clues: ["Short purple-headed leader of the three cockroaches", "Has one pink eye and one yellow eye", "Masterminds raids on Oggy's fridge"] },
+
+      // 11. Roll No. 21
+      { name: "Kris (Roll No. 21)", universe: "Roll No. 21", pack: "CARTOONS", archetype: "SHONEN_HERO", clues: ["Blue-skinned boy at Mathura Anath Ashram", "Modern incarnation of Lord Krishna", "Plays his flute to defeat Kanishk's monsters"] },
+      { name: "Kanishk", universe: "Roll No. 21", pack: "CARTOONS", archetype: "ICONIC_VILLAIN", clues: ["Evil principal of Mathura Anath Ashram", "Modern incarnation of Kansa", "Summons demons to defeat Kris"] },
+
+      // ==================== 12 EVERYDAY & POP CULTURE CATEGORIES ====================
+      // 1. Indian Celebrities
+      { name: "Shah Rukh Khan", universe: "Indian Celebrities", pack: "EVERYDAY", archetype: "BOLLYWOOD_STAR", clues: ["King of Bollywood known for his signature open-arms pose", "Starred in DDLJ, Pathaan, and Jawan", "Owner of Kolkata Knight Riders"] },
+      { name: "Salman Khan", universe: "Indian Celebrities", pack: "EVERYDAY", archetype: "BOLLYWOOD_STAR", clues: ["Bollywood Bhaijaan famous for his turquoise bracelet", "Starred in Bajrangi Bhaijaan, Sultan, and Tiger", "Host of Bigg Boss"] },
+      { name: "Ranbir Kapoor", universe: "Indian Celebrities", pack: "EVERYDAY", archetype: "BOLLYWOOD_STAR", clues: ["Starred in Rockstar, Yeh Jawaani Hai Deewani, and Animal", "Son of Rishi and Neetu Kapoor", "Married to Alia Bhatt"] },
+      { name: "Allu Arjun", universe: "Indian Celebrities", pack: "EVERYDAY", archetype: "BOLLYWOOD_STAR", clues: ["Stylish Star famous for 'Pushpa: The Rise' and 'Jhukega Nahi'", "Iconic dance moves in Telugu cinema", "National Award winner"] },
+      { name: "Virat Kohli", universe: "Indian Celebrities", pack: "EVERYDAY", archetype: "CRICKET_LEGEND", clues: ["King Kohli — Indian batting superstar with jersey #18", "Famous for aggressive chase masterclasses", "Married to Anushka Sharma"] },
+      { name: "MS Dhoni", universe: "Indian Celebrities", pack: "EVERYDAY", archetype: "CRICKET_LEGEND", clues: ["Captain Cool with jersey #7 and the helicopter shot", "Won all three ICC trophies for India", "Beloved CSK legend"] },
+
+      // 2. Indian YouTubers
+      { name: "CarryMinati", universe: "Indian YouTubers", pack: "EVERYDAY", archetype: "COMEDY_YOUTUBER", clues: ["Ajey Nagar — India's biggest roasting YouTuber", "Famous for 'Toh kaise hain aap log'", "Released Yalgaar"] },
+      { name: "BB Ki Vines", universe: "Indian YouTubers", pack: "EVERYDAY", archetype: "COMEDY_YOUTUBER", clues: ["Bhuvan Bam — plays Titu Mama, Sameer Fuddi, and Bablu Ji", "First Indian individual creator to cross 10M subscribers", "Starred in Taaza Khabar"] },
+      { name: "Ashish Chanchlani", universe: "Indian YouTubers", pack: "EVERYDAY", archetype: "COMEDY_YOUTUBER", clues: ["Ulhasnagar comedy sketch creator famous for 'Bijli ka bill tera baap bharega'", "Makes hilarious family & exam skits", "Huge Marvel fan"] },
+      { name: "Techno Gamerz", universe: "Indian YouTubers", pack: "EVERYDAY", archetype: "GAMING_YOUTUBER", clues: ["Ujjwal Chaurasia — India's top GTA 5 & Minecraft gaming creator", "Famous for his GTA 5 story series", "Over 40 million subscribers"] },
+      { name: "Triggered Insaan", universe: "Indian YouTubers", pack: "EVERYDAY", archetype: "GAMING_YOUTUBER", clues: ["Nischay Malhan — family-friendly roast & commentary creator", "Brother of Fukra Insaan", "Streams games on Live Insaan"] },
+      { name: "Sourav Joshi", universe: "Indian YouTubers", pack: "EVERYDAY", archetype: "VLOG_YOUTUBER", clues: ["India's #1 daily family vlogger from Uttarakhand", "Features his cousin Piyush and dog Oreo", "Started with sketching videos"] },
+
+      // 3. Fruits
+      { name: "Mango", universe: "Fruits", pack: "EVERYDAY", archetype: "FRUIT_ITEM", clues: ["King of Fruits in India during summer", "Sweet yellow-orange pulp with a single large seed", "Used to make Aamras and Alphonso shakes"] },
+      { name: "Watermelon", universe: "Fruits", pack: "EVERYDAY", archetype: "FRUIT_ITEM", clues: ["Giant green-striped fruit with juicy red flesh inside", "Over 90% water — best eaten chilled in summer", "Filled with tiny black seeds"] },
+      { name: "Banana", universe: "Fruits", pack: "EVERYDAY", archetype: "FRUIT_ITEM", clues: ["Curved yellow fruit you peel from the top", "Rich in potassium and instant energy", "Favorite snack of monkeys"] },
+      { name: "Pineapple", universe: "Fruits", pack: "EVERYDAY", archetype: "FRUIT_ITEM", clues: ["Spiky tropical fruit with a leafy green crown", "Sweet and tangy yellow rings inside", "Debated pizza topping"] },
+
+      // 4. Snacks
+      { name: "Samosa", universe: "Snacks", pack: "EVERYDAY", archetype: "SNACK_ITEM", clues: ["Crispy golden triangular pastry stuffed with spiced potatoes", "Served hot with green mint and tamarind chutney", "India's #1 evening tea-time snack"] },
+      { name: "Pani Puri", universe: "Snacks", pack: "EVERYDAY", archetype: "SNACK_ITEM", clues: ["Hollow crispy puri filled with potato, chickpeas, and spicy tangy water", "Also called Golgappa or Puchka", "Eaten in one whole bite at street stalls"] },
+      { name: "Vada Pav", universe: "Snacks", pack: "EVERYDAY", archetype: "SNACK_ITEM", clues: ["Mumbai's iconic spicy potato fritter sandwiched inside a pav bun", "Served with dry garlic chutney and fried green chili", "Known as the Indian burger"] },
+      { name: "Momos", universe: "Snacks", pack: "EVERYDAY", archetype: "SNACK_ITEM", clues: ["Steamed or fried dumplings stuffed with veggies or chicken", "Served with fiery red chili garlic chutney", "Popular street snack across North India"] },
+
+      // 5. Sweets
+      { name: "Gulab Jamun", universe: "Sweets", pack: "EVERYDAY", archetype: "SWEET_ITEM", clues: ["Soft fried khoya balls soaked in warm rose-cardamom sugar syrup", "Dark golden-brown Indian wedding dessert", "Tastes amazing warm with vanilla ice cream"] },
+      { name: "Jalebi", universe: "Sweets", pack: "EVERYDAY", archetype: "SWEET_ITEM", clues: ["Crispy orange spiral coils dipped in saffron sugar syrup", "Often paired with fafda or rabri", "Juicy crunch in every swirl"] },
+      { name: "Kaju Katli", universe: "Sweets", pack: "EVERYDAY", archetype: "SWEET_ITEM", clues: ["Diamond-shaped cashew fudge topped with edible silver varq", "Most gifted mithai during Diwali", "Smooth melt-in-the-mouth texture"] },
+      { name: "Rasmalai", universe: "Sweets", pack: "EVERYDAY", archetype: "SWEET_ITEM", clues: ["Soft flattened paneer discs soaked in chilled saffron-pistachio milk", "Served cold in bowls", "Rich Bengali milk dessert"] },
+
+      // 6. Dairy
+      { name: "Paneer", universe: "Dairy", pack: "EVERYDAY", archetype: "DAIRY_ITEM", clues: ["Soft white cottage cheese cubes used in Tikka and Shahi gravies", "Main protein source in Indian vegetarian feasts", "Does not melt when grilled"] },
+      { name: "Butter", universe: "Dairy", pack: "EVERYDAY", archetype: "DAIRY_ITEM", clues: ["Creamy yellow dairy spread melted on pav bhaji and parathas", "Famous Amul mascot girl advertises it", "Churned from cream"] },
+      { name: "Cheese", universe: "Dairy", pack: "EVERYDAY", archetype: "DAIRY_ITEM", clues: ["Stretchy mozzarella or cheddar grated over pizzas and sandwiches", "Comes in slices, cubes, and blocks", "Melts into gooey goodness"] },
+      { name: "Curd (Dahi)", universe: "Dairy", pack: "EVERYDAY", archetype: "DAIRY_ITEM", clues: ["Thick fermented yogurt eaten with rice, parathas, or raita", "Considered lucky with sugar before exams", "Cooling probiotic dairy staple"] },
+
+      // 7. Drinks
+      { name: "Masala Chai", universe: "Drinks", pack: "EVERYDAY", archetype: "DRINK_ITEM", clues: ["Hot Indian milk tea brewed with ginger, cardamom, and tea leaves", "Served in small cutting glasses or kulhads", "Morning fuel for millions"] },
+      { name: "Cold Coffee", universe: "Drinks", pack: "EVERYDAY", archetype: "DRINK_ITEM", clues: ["Chilled frothy coffee blended with milk, ice, and chocolate syrup", "Topped with cocoa powder or vanilla scoop", "Cafe favorite"] },
+      { name: "Mango Lassi", universe: "Drinks", pack: "EVERYDAY", archetype: "DRINK_ITEM", clues: ["Thick creamy yogurt smoothie blended with sweet mango pulp", "Served chilled in tall glasses", "Refreshing summer Punjabi drink"] },
+      { name: "Nimbu Pani", universe: "Drinks", pack: "EVERYDAY", archetype: "DRINK_ITEM", clues: ["Freshly squeezed lemon water with black salt, sugar, and mint", "Instant summer hydration drink", "Also called Shikanji"] },
+
+      // 8. Stationery
+      { name: "Ballpoint Pen", universe: "Stationery", pack: "EVERYDAY", archetype: "STATIONERY_ITEM", clues: ["Everyday blue or black ink writing tool with a cap", "Used in school exams and offices", "Often borrowed and never returned"] },
+      { name: "Pencil", universe: "Stationery", pack: "EVERYDAY", archetype: "STATIONERY_ITEM", clues: ["Wooden graphite writing stick that needs sharpening", "Marks can be rubbed out with an eraser", "Apsara or Nataraj classic"] },
+      { name: "Eraser", universe: "Stationery", pack: "EVERYDAY", archetype: "STATIONERY_ITEM", clues: ["Soft white rubber block used to wipe away pencil mistakes", "Leaves little rubber crumbs on the notebook", "Gets poked with pencils by bored students"] },
+      { name: "Highlighter", universe: "Stationery", pack: "EVERYDAY", archetype: "STATIONERY_ITEM", clues: ["Fluorescent neon yellow or pink chisel-tip marker", "Used to mark important lines in textbooks", "Bright glowing ink"] },
+
+      // 9. Transport
+      { name: "Auto Rickshaw", universe: "Transport", pack: "EVERYDAY", archetype: "TRANSPORT_ITEM", clues: ["Three-wheeled black-and-yellow or green-and-yellow city vehicle", "Weaves through Indian traffic with a meter", "Open sides with a black canopy roof"] },
+      { name: "Metro Rail", universe: "Transport", pack: "EVERYDAY", archetype: "TRANSPORT_ITEM", clues: ["Air-conditioned urban rapid transit train running above or underground", "Uses smart cards or QR tokens at gates", "Beats city road traffic"] },
+      { name: "Aeroplane", universe: "Transport", pack: "EVERYDAY", archetype: "TRANSPORT_ITEM", clues: ["Jet-powered aircraft flying high above the clouds", "Requires boarding passes and airport security", "Fastest way across countries"] },
+      { name: "Bicycle", universe: "Transport", pack: "EVERYDAY", archetype: "TRANSPORT_ITEM", clues: ["Two-wheeled pedal-powered vehicle with handlebars and a bell", "Zero fuel needed, pure leg power", "First ride kids learn to balance"] },
+
+      // 10. Gadgets
+      { name: "Smartphone", universe: "Gadgets", pack: "EVERYDAY", archetype: "GADGET_ITEM", clues: ["Pocket touchscreen device used for WhatsApp, games, and reels", "Charged daily with a USB-C or Lightning cable", "Everyone checks it first thing in the morning"] },
+      { name: "Wireless Earbuds", universe: "Gadgets", pack: "EVERYDAY", archetype: "GADGET_ITEM", clues: ["Tiny Bluetooth earphones stored inside a pocket charging case", "Used for music, calls, and noise cancellation", "Easy to misplace one bud"] },
+      { name: "Smartwatch", universe: "Gadgets", pack: "EVERYDAY", archetype: "GADGET_ITEM", clues: ["Digital wrist gadget that counts steps, heart rate, and notifications", "Touchscreen watch face with replaceable straps", "Syncs to your phone"] },
+      { name: "Gaming Laptop", universe: "Gadgets", pack: "EVERYDAY", archetype: "GADGET_ITEM", clues: ["Portable computer with RGB backlit keyboard and loud cooling fans", "Built with a dedicated graphics card for high-FPS games", "Heavy to carry in a backpack"] },
+
+      // 11. Footwear
+      { name: "Sneakers", universe: "Footwear", pack: "EVERYDAY", archetype: "FOOTWEAR_ITEM", clues: ["Lace-up casual sports shoes with cushioned rubber soles", "Worn daily with jeans or joggers", "Collected by sneakerheads"] },
+      { name: "Crocs", universe: "Footwear", pack: "EVERYDAY", archetype: "FOOTWEAR_ITEM", clues: ["Lightweight foam clogs full of ventilation holes", "Has a heel strap you can flip into 'sports mode'", "Waterproof and super comfy"] },
+      { name: "Flip-Flops", universe: "Footwear", pack: "EVERYDAY", archetype: "FOOTWEAR_ITEM", clues: ["Flat rubber chappals with a Y-shaped strap between the toes", "Worn at home, beaches, and quick errands", "Makes a slapping sound when walking"] },
+      { name: "Formal Loafers", universe: "Footwear", pack: "EVERYDAY", archetype: "FOOTWEAR_ITEM", clues: ["Slip-on leather shoes with no laces", "Worn to weddings, parties, and office meetings", "Polished sleek look"] },
+
+      // 12. Weather
+      { name: "Monsoon Rain", universe: "Weather", pack: "EVERYDAY", archetype: "WEATHER_ITEM", clues: ["Heavy seasonal downpour accompanied by petrichor smell", "Requires umbrellas, raincoats, and chai-pakora", "Brings relief after scorching summer heat"] },
+      { name: "Thunderstorm", universe: "Weather", pack: "EVERYDAY", archetype: "WEATHER_ITEM", clues: ["Dark storm clouds with bright lightning flashes and loud thunder", "Gusty winds and heavy rain", "Makes windows rattle"] },
+      { name: "Snowfall", universe: "Weather", pack: "EVERYDAY", archetype: "WEATHER_ITEM", clues: ["Soft white ice flakes drifting down in freezing winter", "Blankets mountains like Manali and Kashmir", "Perfect for snowballs and snowmen"] },
+      { name: "Rainbow", universe: "Weather", pack: "EVERYDAY", archetype: "WEATHER_ITEM", clues: ["Seven-colored arch (VIBGYOR) appearing in the sky", "Forms when sunlight shines through raindrops", "Magical post-rain sight"] }
     ];
 
     const AVATAR_COLORS = [
@@ -739,7 +1025,7 @@
     const BOT_NAMES = ["Bot Zuko", "Bot Levi", "Bot Nova", "Bot Kira", "Bot Ren"];
 
     // =========================================================================
-    // 3. FIREBASE REAL-TIME MULTIPLAYER ENGINE (WITH INSTANT UI RENDERING)
+    // 3. FIREBASE REAL-TIME MULTIPLAYER STATE
     // =========================================================================
     let auth = null;
     let db = null;
@@ -756,6 +1042,10 @@
     let roomUnsubscribe = null;
     let chatUnsubscribe = null;
     let botActionTimeout = null;
+
+    // Local 2-Click Confirmation State (Never auto-votes on 1st click)
+    let pendingVoteTargetUid = null;
+    let pendingGuessWinnerUid = null;
 
     // Pre-fill room code from ?room=XXXXX invite URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -794,22 +1084,31 @@
     // 4. LANDING SCREEN CONTROLS
     // =========================================================================
     window.selectLandingGameType = function (type) {
-      landingGameType = type === 'MAFIA' ? 'MAFIA' : 'ODD_ONE_OUT';
+      landingGameType = ['ODD_ONE_OUT', 'MAFIA', 'GUESS_THE_NAME'].includes(type) ? type : 'ODD_ONE_OUT';
       const oddBtn = document.getElementById('landing-game-odd');
       const mafiaBtn = document.getElementById('landing-game-mafia');
+      const guessBtn = document.getElementById('landing-game-guess');
       const createBtn = document.getElementById('btn-create-room');
       const rangeHint = document.getElementById('landing-size-range-hint');
 
+      const inactiveCls = 'p-3 rounded-2xl border-2 border-slate-800 bg-slate-950/70 text-left transition active:scale-[0.98]';
+      oddBtn.className = inactiveCls;
+      mafiaBtn.className = inactiveCls;
+      guessBtn.className = inactiveCls;
+
       if (landingGameType === 'MAFIA') {
         if (landingMaxPlayers < 4) landingMaxPlayers = 4;
-        mafiaBtn.className = 'p-3.5 rounded-2xl border-2 border-rose-500 bg-rose-500/15 text-left transition active:scale-[0.98] shadow-lg shadow-rose-950/30';
-        oddBtn.className = 'p-3.5 rounded-2xl border-2 border-slate-800 bg-slate-950/70 text-left transition active:scale-[0.98]';
+        mafiaBtn.className = 'p-3 rounded-2xl border-2 border-rose-500 bg-rose-500/15 text-left transition active:scale-[0.98] shadow-lg shadow-rose-950/30';
         createBtn.className = 'w-full py-3.5 px-5 rounded-2xl bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-500 hover:to-orange-500 text-white font-extrabold text-sm sm:text-base shadow-lg shadow-rose-600/25 transition active:scale-[0.98]';
         createBtn.textContent = '🔫 Create Mafia Room';
         rangeHint.textContent = 'Min 4 • Max 6';
+      } else if (landingGameType === 'GUESS_THE_NAME') {
+        guessBtn.className = 'p-3 rounded-2xl border-2 border-amber-500 bg-amber-500/15 text-left transition active:scale-[0.98] shadow-lg shadow-amber-950/30';
+        createBtn.className = 'w-full py-3.5 px-5 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-extrabold text-sm sm:text-base shadow-lg shadow-amber-600/25 transition active:scale-[0.98]';
+        createBtn.textContent = '🎭 Create Guess The Name Room';
+        rangeHint.textContent = 'Min 3 • Max 6';
       } else {
-        oddBtn.className = 'p-3.5 rounded-2xl border-2 border-violet-500 bg-violet-500/15 text-left transition active:scale-[0.98] shadow-lg shadow-violet-950/30';
-        mafiaBtn.className = 'p-3.5 rounded-2xl border-2 border-slate-800 bg-slate-950/70 text-left transition active:scale-[0.98]';
+        oddBtn.className = 'p-3 rounded-2xl border-2 border-violet-500 bg-violet-500/15 text-left transition active:scale-[0.98] shadow-lg shadow-violet-950/30';
         createBtn.className = 'w-full py-3.5 px-5 rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-extrabold text-sm sm:text-base shadow-lg shadow-violet-600/25 transition active:scale-[0.98]';
         createBtn.textContent = '✨ Create Odd One Out Room';
         rangeHint.textContent = 'Min 3 • Max 6';
@@ -834,7 +1133,9 @@
         const active = sz === landingMaxPlayers;
         const activeStyle = landingGameType === 'MAFIA'
           ? 'border-rose-500 bg-rose-500/20 text-white shadow'
-          : 'border-violet-500 bg-violet-500/20 text-white shadow';
+          : landingGameType === 'GUESS_THE_NAME'
+            ? 'border-amber-500 bg-amber-500/20 text-white shadow'
+            : 'border-violet-500 bg-violet-500/20 text-white shadow';
 
         container.innerHTML += `
           <button type="button" onclick="window.selectLandingSize(${sz})"
@@ -851,7 +1152,7 @@
     initFirebaseConnection();
 
     // =========================================================================
-    // 5. UI & FIRESTORE STORAGE HELPERS (rooms/{roomCode}/messages)
+    // 5. UI & FIRESTORE STORAGE HELPERS
     // =========================================================================
     function showToast(message, type = 'info') {
       const container = document.getElementById('toast-container');
@@ -873,7 +1174,7 @@
     }
 
     function switchView(viewId) {
-      ['view-landing', 'view-lobby', 'view-game-odd', 'view-game-mafia', 'view-results'].forEach(id => {
+      ['view-landing', 'view-lobby', 'view-game-odd', 'view-game-mafia', 'view-game-guess', 'view-results'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.add('hidden');
       });
@@ -884,7 +1185,7 @@
       if (viewId === 'view-landing') {
         headerControls.classList.add('hidden');
         document.getElementById('header-title').textContent = 'ODD ONE MAFIA';
-        document.getElementById('header-subtitle').textContent = 'Odd One Out & Mafia Online';
+        document.getElementById('header-subtitle').textContent = 'Odd One Out • Mafia • Guess The Name';
         document.getElementById('header-logo-badge').textContent = '?';
       } else {
         headerControls.classList.remove('hidden');
@@ -1009,14 +1310,21 @@
           round: 0,
           maxPlayers: landingMaxPlayers,
           players: [initialPlayer],
+          // Odd One Out settings
           imposterKnows: true,
+          crossServerMode: false,
           selectedPack: 'ALL',
-          activePairIdx: -1,
           category: '',
           majorityWord: '',
+          majorityUniverse: '',
           oddWord: '',
+          oddUniverse: '',
+          activeClues: [],
           imposterId: '',
-          usedPairIndices: [],
+          // Anti-repeat history: stores "MajorityName|OddName" strings and recent majority names
+          usedPairsHistory: [],
+          recentMajorityHistory: [],
+          // Mafia state
           mafiaPhase: 'night',
           mafiaTurnNumber: 1,
           mafiaRoles: {},
@@ -1024,6 +1332,13 @@
           nightKillTarget: null,
           nightSaveTarget: null,
           morningReport: '',
+          // Guess The Name state
+          clueGiverId: '',
+          guessSecretWord: '',
+          guessSecretUniverse: '',
+          guessWinnerId: '',
+          usedGuessWords: [],
+          // Shared voting
           votes: {},
           createdAt: Date.now()
         };
@@ -1039,7 +1354,11 @@
           renderRoomState(currentRoomData);
         }
 
-        const label = landingGameType === 'MAFIA' ? 'Mafia' : 'Odd One Out';
+        const label = landingGameType === 'MAFIA'
+          ? 'Mafia'
+          : landingGameType === 'GUESS_THE_NAME'
+            ? 'Guess The Name'
+            : 'Odd One Out';
         showToast(`Created ${landingMaxPlayers}-player ${label} room ${code}!`, 'success');
       } catch (err) {
         console.error('Create room error:', err);
@@ -1164,6 +1483,8 @@
       currentRoomCode = null;
       currentRoomData = null;
       localChatMessages = [];
+      pendingVoteTargetUid = null;
+      pendingGuessWinnerUid = null;
 
       if (firebaseReady && !isLocalFallback && db && leavingCode && leavingData && currentUser) {
         try {
@@ -1189,7 +1510,7 @@
         showToast('Only the room host can switch game mode.', 'warning');
         return;
       }
-      const targetType = newGameType === 'MAFIA' ? 'MAFIA' : 'ODD_ONE_OUT';
+      const targetType = ['ODD_ONE_OUT', 'MAFIA', 'GUESS_THE_NAME'].includes(newGameType) ? newGameType : 'ODD_ONE_OUT';
       let maxPlayers = Number(currentRoomData.maxPlayers) || 4;
       if (targetType === 'MAFIA' && maxPlayers < 4) {
         maxPlayers = 4;
@@ -1278,7 +1599,16 @@
             window.leaveRoom();
             return;
           }
+          const prevRound = currentRoomData ? currentRoomData.round : -1;
+          const prevPhase = currentRoomData ? currentRoomData.mafiaPhase : '';
           currentRoomData = snapshot.data();
+
+          // Reset pending 2-click selections whenever round or phase transitions
+          if (currentRoomData.round !== prevRound || currentRoomData.mafiaPhase !== prevPhase) {
+            pendingVoteTargetUid = null;
+            pendingGuessWinnerUid = null;
+          }
+
           renderRoomState(currentRoomData);
         },
         (error) => console.error('Room listener error:', error)
@@ -1298,22 +1628,35 @@
 
     function renderRoomState(data) {
       const isHost = data.hostId === currentUser.uid;
-      const isMafia = data.gameType === 'MAFIA';
-      const minPlayers = isMafia ? 4 : 3;
+      const gType = data.gameType || 'ODD_ONE_OUT';
+      const minPlayers = gType === 'MAFIA' ? 4 : 3;
       const maxPlayers = Math.min(6, Math.max(minPlayers, Number(data.maxPlayers) || 4));
 
-      document.getElementById('header-title').textContent = isMafia ? 'MAFIA' : 'ODD ONE OUT';
-      document.getElementById('header-subtitle').textContent = `${maxPlayers}-Player ${isMafia ? 'Social Deduction' : 'Party Game'}`;
-      document.getElementById('header-logo-badge').textContent = isMafia ? '🔫' : '?';
+      if (gType === 'MAFIA') {
+        document.getElementById('header-title').textContent = 'MAFIA';
+        document.getElementById('header-subtitle').textContent = `${maxPlayers}-Player Social Deduction`;
+        document.getElementById('header-logo-badge').textContent = '🔫';
+      } else if (gType === 'GUESS_THE_NAME') {
+        document.getElementById('header-title').textContent = 'GUESS THE NAME';
+        document.getElementById('header-subtitle').textContent = `${maxPlayers}-Player Chat Charades`;
+        document.getElementById('header-logo-badge').textContent = '🎭';
+      } else {
+        document.getElementById('header-title').textContent = 'ODD ONE OUT';
+        document.getElementById('header-subtitle').textContent = `${maxPlayers}-Player Party Game`;
+        document.getElementById('header-logo-badge').textContent = '?';
+      }
 
       if (data.status === 'lobby') {
         if (botActionTimeout) clearTimeout(botActionTimeout);
         switchView('view-lobby');
         renderLobby(data, isHost, maxPlayers);
       } else if (data.status === 'discussion' || data.status === 'voting') {
-        if (isMafia) {
+        if (gType === 'MAFIA') {
           switchView('view-game-mafia');
           renderMafiaGame(data, isHost);
+        } else if (gType === 'GUESS_THE_NAME') {
+          switchView('view-game-guess');
+          renderGuessTheNameGame(data, isHost);
         } else {
           switchView('view-game-odd');
           renderOddOneOutGame(data, isHost);
@@ -1329,15 +1672,25 @@
     // 8. LOBBY RENDERER
     // =========================================================================
     function renderLobby(data, isHost, maxPlayers) {
-      const isMafia = data.gameType === 'MAFIA';
+      const gType = data.gameType || 'ODD_ONE_OUT';
+      const isMafia = gType === 'MAFIA';
+      const isGuess = gType === 'GUESS_THE_NAME';
+      const isOdd = gType === 'ODD_ONE_OUT';
+
       document.getElementById('lobby-room-code').textContent = data.roomCode;
       document.getElementById('lobby-player-count').textContent = `${data.players.length} / ${maxPlayers}`;
 
       const gameBadge = document.getElementById('lobby-game-badge');
-      gameBadge.textContent = isMafia ? '🔫 MAFIA' : '❓ ODD ONE OUT';
-      gameBadge.className = isMafia
-        ? 'px-2 py-0.5 rounded-full bg-rose-500/20 border border-rose-500/30 text-[10px] font-extrabold text-rose-300'
-        : 'px-2 py-0.5 rounded-full bg-violet-500/20 border border-violet-500/30 text-[10px] font-extrabold text-violet-300';
+      if (isMafia) {
+        gameBadge.textContent = '🔫 MAFIA';
+        gameBadge.className = 'px-2 py-0.5 rounded-full bg-rose-500/20 border border-rose-500/30 text-[10px] font-extrabold text-rose-300';
+      } else if (isGuess) {
+        gameBadge.textContent = '🎭 GUESS THE NAME';
+        gameBadge.className = 'px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/30 text-[10px] font-extrabold text-amber-300';
+      } else {
+        gameBadge.textContent = '❓ ODD ONE OUT';
+        gameBadge.className = 'px-2 py-0.5 rounded-full bg-violet-500/20 border border-violet-500/30 text-[10px] font-extrabold text-violet-300';
+      }
 
       document.getElementById('lobby-mode-indicator').textContent = isLocalFallback
         ? '● Local Bot Mode'
@@ -1398,18 +1751,25 @@
         }
       }
 
+      // Game Mode Switch Buttons
       const switchOdd = document.getElementById('lobby-switch-odd');
       const switchMafia = document.getElementById('lobby-switch-mafia');
+      const switchGuess = document.getElementById('lobby-switch-guess');
       switchOdd.disabled = !isHost;
       switchMafia.disabled = !isHost;
+      switchGuess.disabled = !isHost;
 
-      switchOdd.className = `py-2 px-3 rounded-xl border text-xs font-extrabold transition ${
-        !isMafia ? 'border-violet-500 bg-violet-500/20 text-white' : 'border-slate-800 bg-slate-950/60 text-slate-400'
+      switchOdd.className = `py-2 px-2 rounded-xl border text-[11px] sm:text-xs font-extrabold transition ${
+        isOdd ? 'border-violet-500 bg-violet-500/20 text-white' : 'border-slate-800 bg-slate-950/60 text-slate-400'
       }`;
-      switchMafia.className = `py-2 px-3 rounded-xl border text-xs font-extrabold transition ${
+      switchMafia.className = `py-2 px-2 rounded-xl border text-[11px] sm:text-xs font-extrabold transition ${
         isMafia ? 'border-rose-500 bg-rose-500/20 text-white' : 'border-slate-800 bg-slate-950/60 text-slate-400'
       }`;
+      switchGuess.className = `py-2 px-2 rounded-xl border text-[11px] sm:text-xs font-extrabold transition ${
+        isGuess ? 'border-amber-500 bg-amber-500/20 text-white' : 'border-slate-800 bg-slate-950/60 text-slate-400'
+      }`;
 
+      // Room Capacity Buttons
       const capLabel = document.getElementById('lobby-capacity-label');
       const capContainer = document.getElementById('lobby-capacity-buttons');
       const allowedSizes = isMafia ? [4, 5, 6] : [3, 4, 5, 6];
@@ -1421,7 +1781,9 @@
         const active = sz === maxPlayers;
         const activeClass = isMafia
           ? 'border-rose-500 bg-rose-500/20 text-white shadow-sm'
-          : 'border-violet-500 bg-violet-500/20 text-white shadow-sm';
+          : isGuess
+            ? 'border-amber-500 bg-amber-500/20 text-white shadow-sm'
+            : 'border-violet-500 bg-violet-500/20 text-white shadow-sm';
         capContainer.innerHTML += `
           <button type="button" onclick="window.setMaxPlayers(${sz})" ${!isHost ? 'disabled' : ''}
             class="py-2 rounded-xl border text-xs font-extrabold transition ${
@@ -1434,49 +1796,84 @@
 
       const oddSettingsEl = document.getElementById('lobby-odd-settings');
       const mafiaSettingsEl = document.getElementById('lobby-mafia-settings');
+      const guessSettingsEl = document.getElementById('lobby-guess-settings');
+      const packWrapperEl = document.getElementById('lobby-pack-selector-wrapper');
+
+      oddSettingsEl.classList.add('hidden');
+      mafiaSettingsEl.classList.add('hidden');
+      guessSettingsEl.classList.add('hidden');
 
       if (isMafia) {
-        oddSettingsEl.classList.add('hidden');
         mafiaSettingsEl.classList.remove('hidden');
+        packWrapperEl.classList.add('hidden');
         const villagersCount = maxPlayers - 2;
         document.getElementById('mafia-role-summary-pill').textContent = `${maxPlayers} Players Total`;
         document.getElementById('mafia-villager-count-text').textContent = `${villagersCount} Villager${villagersCount === 1 ? '' : 's'}`;
       } else {
-        oddSettingsEl.classList.remove('hidden');
-        mafiaSettingsEl.classList.add('hidden');
-
-        const imposterKnows = data.imposterKnows !== false;
-        const selectedPack = data.selectedPack || 'ALL';
-        const btnClassic = document.getElementById('btn-mode-classic');
-        const btnUndercover = document.getElementById('btn-mode-undercover');
-        const checkClassic = document.getElementById('check-mode-classic');
-        const checkUndercover = document.getElementById('check-mode-undercover');
-
-        btnClassic.disabled = !isHost;
-        btnUndercover.disabled = !isHost;
-
-        if (imposterKnows) {
-          btnClassic.className = 'p-3 rounded-2xl border border-violet-500 bg-violet-500/15 text-left transition';
-          btnUndercover.className = 'p-3 rounded-2xl border border-slate-800 bg-slate-950/60 text-left transition opacity-75';
-          checkClassic.textContent = '●';
-          checkClassic.className = 'text-xs text-violet-400 font-bold';
-          checkUndercover.textContent = '○';
-          checkUndercover.className = 'text-xs text-slate-600 font-bold';
+        packWrapperEl.classList.remove('hidden');
+        if (isGuess) {
+          guessSettingsEl.classList.remove('hidden');
         } else {
-          btnUndercover.className = 'p-3 rounded-2xl border border-amber-500 bg-amber-500/15 text-left transition';
-          btnClassic.className = 'p-3 rounded-2xl border border-slate-800 bg-slate-950/60 text-left transition opacity-75';
-          checkUndercover.textContent = '●';
-          checkUndercover.className = 'text-xs text-amber-400 font-bold';
-          checkClassic.textContent = '○';
-          checkClassic.className = 'text-xs text-slate-600 font-bold';
+          oddSettingsEl.classList.remove('hidden');
+
+          // Same-Universe vs Cross-Universe Toggle
+          const isCross = Boolean(data.crossServerMode);
+          const btnSame = document.getElementById('btn-universe-same');
+          const btnCross = document.getElementById('btn-universe-cross');
+          const checkSame = document.getElementById('check-universe-same');
+          const checkCross = document.getElementById('check-universe-cross');
+          btnSame.disabled = !isHost;
+          btnCross.disabled = !isHost;
+
+          if (!isCross) {
+            btnSame.className = 'p-3 rounded-2xl border border-violet-500 bg-violet-500/15 text-left transition';
+            btnCross.className = 'p-3 rounded-2xl border border-slate-800 bg-slate-950/60 text-left transition opacity-75';
+            checkSame.textContent = '●';
+            checkSame.className = 'text-xs text-violet-400 font-bold';
+            checkCross.textContent = '○';
+            checkCross.className = 'text-xs text-slate-600 font-bold';
+          } else {
+            btnCross.className = 'p-3 rounded-2xl border border-indigo-400 bg-indigo-500/20 text-left transition';
+            btnSame.className = 'p-3 rounded-2xl border border-slate-800 bg-slate-950/60 text-left transition opacity-75';
+            checkCross.textContent = '●';
+            checkCross.className = 'text-xs text-indigo-300 font-bold';
+            checkSame.textContent = '○';
+            checkSame.className = 'text-xs text-slate-600 font-bold';
+          }
+
+          // Classic vs Undercover Toggle
+          const imposterKnows = data.imposterKnows !== false;
+          const btnClassic = document.getElementById('btn-mode-classic');
+          const btnUndercover = document.getElementById('btn-mode-undercover');
+          const checkClassic = document.getElementById('check-mode-classic');
+          const checkUndercover = document.getElementById('check-mode-undercover');
+
+          btnClassic.disabled = !isHost;
+          btnUndercover.disabled = !isHost;
+
+          if (imposterKnows) {
+            btnClassic.className = 'p-3 rounded-2xl border border-violet-500 bg-violet-500/15 text-left transition';
+            btnUndercover.className = 'p-3 rounded-2xl border border-slate-800 bg-slate-950/60 text-left transition opacity-75';
+            checkClassic.textContent = '●';
+            checkClassic.className = 'text-xs text-violet-400 font-bold';
+            checkUndercover.textContent = '○';
+            checkUndercover.className = 'text-xs text-slate-600 font-bold';
+          } else {
+            btnUndercover.className = 'p-3 rounded-2xl border border-amber-500 bg-amber-500/15 text-left transition';
+            btnClassic.className = 'p-3 rounded-2xl border border-slate-800 bg-slate-950/60 text-left transition opacity-75';
+            checkUndercover.textContent = '●';
+            checkUndercover.className = 'text-xs text-amber-400 font-bold';
+            checkClassic.textContent = '○';
+            checkClassic.className = 'text-xs text-slate-600 font-bold';
+          }
         }
 
+        // Pack Selector Buttons
+        const selectedPack = data.selectedPack || 'ALL';
         document.querySelectorAll('.pack-btn').forEach(btn => {
           btn.disabled = !isHost;
           const isSelected = btn.getAttribute('data-pack') === selectedPack;
           btn.className = `pack-btn px-3 py-2.5 rounded-xl border text-xs font-bold transition text-center ${
-            btn.getAttribute('data-pack') === 'CLASSIC' ? 'col-span-2 sm:col-span-2 ' : ''
-          }${
             isSelected
               ? 'border-cyan-400 bg-cyan-500/20 text-cyan-200 shadow-sm'
               : 'border-slate-800 bg-slate-950/60 text-slate-400 hover:bg-slate-800/70'
@@ -1494,7 +1891,9 @@
           startBtn.disabled = false;
           startBtn.textContent = isMafia
             ? `🔫 Start ${maxPlayers}-Player Mafia Match`
-            : `🚀 Start ${maxPlayers}-Player Odd One Out`;
+            : isGuess
+              ? `🎭 Start ${maxPlayers}-Player Guess The Name`
+              : `🚀 Start ${maxPlayers}-Player Odd One Out`;
         } else {
           startBtn.disabled = true;
           startBtn.textContent = `Waiting for ${maxPlayers} Players (${data.players.length}/${maxPlayers})...`;
@@ -1506,12 +1905,91 @@
     }
 
     // =========================================================================
-    // 9. START ROUND
+    // 9. DYNAMIC ANTI-REPEAT PAIRING ENGINE (SAME-UNIVERSE & CROSS-UNIVERSE)
+    // =========================================================================
+    function generateDynamicOddOneOutPair(selectedPack, isCrossServer, usedPairsHistory, recentMajorityHistory) {
+      const pool = CHARACTER_DATABASE.filter(c => selectedPack === 'ALL' || c.pack === selectedPack);
+      const activePool = pool.length >= 2 ? pool : CHARACTER_DATABASE;
+
+      // Build all valid (majority, odd) pairs based on Same-Universe vs Cross-Universe
+      let validPairs = [];
+
+      if (isCrossServer) {
+        // Cross-Universe: different universes, preferably matching archetype (e.g., Sasuke [Naruto] vs Vegeta [DBZ] or Megumi [JJK])
+        for (const maj of activePool) {
+          for (const odd of activePool) {
+            if (maj.name === odd.name) continue;
+            if (maj.universe === odd.universe) continue;
+            if (maj.pack !== odd.pack) continue; // Keep Anime vs Anime, Cartoon vs Cartoon, Everyday vs Everyday
+            if (maj.archetype === odd.archetype) {
+              validPairs.push({ maj, odd, priority: 1 });
+            }
+          }
+        }
+        // Fallback if a pack has fewer matching archetypes across universes
+        if (validPairs.length === 0) {
+          for (const maj of activePool) {
+            for (const odd of activePool) {
+              if (maj.name !== odd.name && maj.universe !== odd.universe && maj.pack === odd.pack) {
+                validPairs.push({ maj, odd, priority: 2 });
+              }
+            }
+          }
+        }
+      } else {
+        // Same-Universe: two distinct characters from the exact same anime/cartoon/everyday category
+        for (const maj of activePool) {
+          for (const odd of activePool) {
+            if (maj.name !== odd.name && maj.universe === odd.universe) {
+              validPairs.push({ maj, odd, priority: 1 });
+            }
+          }
+        }
+      }
+
+      if (validPairs.length === 0) {
+        // Ultimate safety fallback
+        validPairs.push({ maj: CHARACTER_DATABASE[0], odd: CHARACTER_DATABASE[1], priority: 1 });
+      }
+
+      const usedPairSet = new Set(Array.isArray(usedPairsHistory) ? usedPairsHistory : []);
+      const recentMajList = Array.isArray(recentMajorityHistory) ? recentMajorityHistory : [];
+
+      // Filter out any (majority|odd) pair that has ALREADY been used in previous rounds!
+      // Example: If Round 1 was Naruto -> Luffy, and Round 4 picks Naruto again, "Naruto Uzumaki|Monkey D. Luffy" is excluded!
+      let unusedPairs = validPairs.filter(p => !usedPairSet.has(`${p.maj.name}|${p.odd.name}`) && !usedPairSet.has(`${p.odd.name}|${p.maj.name}`));
+
+      // If every single combination in the pack has been exhausted, reset pair history
+      let resetHistory = false;
+      if (unusedPairs.length === 0) {
+        unusedPairs = validPairs;
+        resetHistory = true;
+      }
+
+      // Strongly prefer majority characters NOT used in the last 2 rounds so consecutive rounds feel super fresh,
+      // while still allowing a majority character to return on Round 4+ with a brand new Odd character!
+      const lastTwoMajorities = new Set(recentMajList.slice(-2));
+      const freshMajorityPairs = unusedPairs.filter(p => !lastTwoMajorities.has(p.maj.name));
+      const candidatePool = freshMajorityPairs.length > 0 ? freshMajorityPairs : unusedPairs;
+
+      const chosen = candidatePool[Math.floor(Math.random() * candidatePool.length)];
+      const pairKey = `${chosen.maj.name}|${chosen.odd.name}`;
+
+      return {
+        majorityChar: chosen.maj,
+        oddChar: chosen.odd,
+        nextUsedPairsHistory: resetHistory ? [pairKey] : [...usedPairSet, pairKey],
+        nextRecentMajorityHistory: [...recentMajList.slice(-5), chosen.maj.name]
+      };
+    }
+
+    // =========================================================================
+    // 10. START NEW ROUND (ALL 3 GAMES)
     // =========================================================================
     window.startNewRound = async function () {
       if (!currentRoomData || currentRoomData.hostId !== currentUser.uid) return;
-      const isMafia = currentRoomData.gameType === 'MAFIA';
-      const minPlayers = isMafia ? 4 : 3;
+      const gType = currentRoomData.gameType || 'ODD_ONE_OUT';
+      const minPlayers = gType === 'MAFIA' ? 4 : 3;
       const maxPlayers = Math.min(6, Math.max(minPlayers, Number(currentRoomData.maxPlayers) || 4));
 
       if (currentRoomData.players.length < maxPlayers) {
@@ -1519,9 +1997,11 @@
         return;
       }
 
+      pendingVoteTargetUid = null;
+      pendingGuessWinnerUid = null;
       const nextRound = (currentRoomData.round || 0) + 1;
 
-      if (isMafia) {
+      if (gType === 'MAFIA') {
         const shuffled = [...currentRoomData.players].sort(() => Math.random() - 0.5);
         const mafiaRoles = {};
         shuffled.forEach((p, idx) => {
@@ -1552,48 +2032,81 @@
           text: `Match ${nextRound} started! 1 Mafia, 1 Doctor, and ${maxPlayers - 2} Innocent Villagers. Night 1 begins...`,
           createdAt: Date.now()
         });
-      } else {
+      } else if (gType === 'GUESS_THE_NAME') {
         const activePack = currentRoomData.selectedPack || 'ALL';
-        const eligibleIndices = WORD_PAIRS
-          .map((item, idx) => ({ item, idx }))
-          .filter(({ item }) => activePack === 'ALL' || item.pack === activePack)
-          .map(({ idx }) => idx);
+        const pool = CHARACTER_DATABASE.filter(c => activePack === 'ALL' || c.pack === activePack);
+        const activePool = pool.length > 0 ? pool : CHARACTER_DATABASE;
 
-        const pool = eligibleIndices.length > 0 ? eligibleIndices : WORD_PAIRS.map((_, i) => i);
-        let used = currentRoomData.usedPairIndices || [];
-        let available = pool.filter(idx => !used.includes(idx));
+        const usedWords = new Set(currentRoomData.usedGuessWords || []);
+        let available = activePool.filter(c => !usedWords.has(c.name));
+        let resetUsed = false;
         if (available.length === 0) {
-          used = used.filter(idx => !pool.includes(idx));
-          available = pool;
+          available = activePool;
+          resetUsed = true;
         }
 
-        const pairIdx = available[Math.floor(Math.random() * available.length)];
-        const chosenPair = WORD_PAIRS[pairIdx];
-
-        const swapWords = Math.random() < 0.5;
-        const majorityWord = swapWords ? chosenPair.odd : chosenPair.majority;
-        const oddWord = swapWords ? chosenPair.majority : chosenPair.odd;
-
-        const imposterPlayer = currentRoomData.players[Math.floor(Math.random() * currentRoomData.players.length)];
-        const imposterKnows = currentRoomData.imposterKnows !== false;
+        const chosenChar = available[Math.floor(Math.random() * available.length)];
+        // Rotate Clue Giver cleanly across rounds
+        const clueGiverIdx = (nextRound - 1) % currentRoomData.players.length;
+        const clueGiver = currentRoomData.players[clueGiverIdx];
 
         await saveRoomPatch({
           status: 'discussion',
           round: nextRound,
-          activePairIdx: pairIdx,
-          category: chosenPair.category,
-          majorityWord,
-          oddWord,
+          clueGiverId: clueGiver.uid,
+          guessSecretWord: chosenChar.name,
+          guessSecretUniverse: chosenChar.universe,
+          activeClues: chosenChar.clues || [],
+          guessWinnerId: '',
+          usedGuessWords: resetUsed ? [chosenChar.name] : [...usedWords, chosenChar.name],
+          votes: {}
+        });
+
+        await appendChatMessage({
+          round: nextRound,
+          senderId: 'SYSTEM',
+          senderName: 'Charades Host',
+          text: `Round ${nextRound} (${chosenChar.universe})! ${clueGiver.name} is the Clue Giver. Type your guesses in chat — first one right wins!`,
+          createdAt: Date.now()
+        });
+      } else {
+        // ODD ONE OUT (Same-Universe OR Cross-Universe with Anti-Repeat Pairing)
+        const activePack = currentRoomData.selectedPack || 'ALL';
+        const isCrossServer = Boolean(currentRoomData.crossServerMode);
+        const imposterKnows = currentRoomData.imposterKnows !== false;
+
+        const pairResult = generateDynamicOddOneOutPair(
+          activePack,
+          isCrossServer,
+          currentRoomData.usedPairsHistory,
+          currentRoomData.recentMajorityHistory
+        );
+
+        const imposterPlayer = currentRoomData.players[Math.floor(Math.random() * currentRoomData.players.length)];
+        const categoryDisplay = isCrossServer
+          ? `🌌 Cross-Universe (${pairResult.majorityChar.pack === 'ANIME' ? 'Anime' : pairResult.majorityChar.pack === 'CARTOONS' ? 'Cartoons' : 'Pop Culture'})`
+          : pairResult.majorityChar.universe;
+
+        await saveRoomPatch({
+          status: 'discussion',
+          round: nextRound,
+          category: categoryDisplay,
+          majorityWord: pairResult.majorityChar.name,
+          majorityUniverse: pairResult.majorityChar.universe,
+          oddWord: pairResult.oddChar.name,
+          oddUniverse: pairResult.oddChar.universe,
+          activeClues: pairResult.majorityChar.clues || [],
           imposterId: imposterPlayer.uid,
-          votes: {},
-          usedPairIndices: [...used, pairIdx]
+          usedPairsHistory: pairResult.nextUsedPairsHistory,
+          recentMajorityHistory: pairResult.nextRecentMajorityHistory,
+          votes: {}
         });
 
         await appendChatMessage({
           round: nextRound,
           senderId: 'SYSTEM',
           senderName: 'Game Master',
-          text: `Round ${nextRound} (${chosenPair.category}) • ${maxPlayers} Players • ${imposterKnows ? 'Classic Mode' : 'Undercover Mode'}. Chat freely and vote below whenever ready!`,
+          text: `Round ${nextRound} • ${isCrossServer ? 'Cross-Universe' : 'Same-Universe'} • ${imposterKnows ? 'Classic Mode' : 'Undercover Mode'}. Chat freely and use 2-click voting below!`,
           createdAt: Date.now()
         });
       }
@@ -1601,27 +2114,128 @@
 
     window.returnToLobby = async function () {
       if (!currentRoomData || currentRoomData.hostId !== currentUser.uid) return;
+      pendingVoteTargetUid = null;
+      pendingGuessWinnerUid = null;
       await saveRoomPatch({ status: 'lobby' });
     };
 
     // =========================================================================
-    // 10. ODD ONE OUT GAMEPLAY
+    // 11. TWO-CLICK VOTING CONFIRMATION HELPERS (ODD ONE OUT & MAFIA)
+    // =========================================================================
+    window.selectPendingVote = function (targetUid) {
+      if (!currentRoomData) return;
+      const votes = currentRoomData.votes || {};
+      if (votes[currentUser.uid]) return; // Already locked in
+      pendingVoteTargetUid = targetUid;
+      renderRoomState(currentRoomData);
+    };
+
+    window.cancelPendingVote = function () {
+      pendingVoteTargetUid = null;
+      if (currentRoomData) renderRoomState(currentRoomData);
+    };
+
+    window.confirmPendingVote = async function (targetUid) {
+      if (!currentRoomData || (currentRoomData.status !== 'discussion' && currentRoomData.status !== 'voting')) return;
+      if (targetUid === currentUser.uid) return;
+
+      if (currentRoomData.gameType === 'MAFIA') {
+        const aliveIds = currentRoomData.alivePlayerIds || [];
+        if (!aliveIds.includes(currentUser.uid) || currentRoomData.mafiaPhase !== 'day') return;
+      }
+
+      const votes = { ...(currentRoomData.votes || {}) };
+      if (votes[currentUser.uid]) return;
+
+      pendingVoteTargetUid = null;
+      votes[currentUser.uid] = targetUid;
+      await saveRoomPatch({ votes });
+      showToast('Vote confirmed & locked in!', 'success');
+    };
+
+    function buildTwoClickVoteCardHtml(player, myVote, isDisabled, hasVotedIndicator) {
+      const isPending = !myVote && !isDisabled && pendingVoteTargetUid === player.uid;
+      const isSelected = myVote === player.uid;
+      const grad = AVATAR_COLORS[player.colorIdx % AVATAR_COLORS.length];
+      const initials = player.name.slice(0, 2).toUpperCase();
+
+      if (isPending) {
+        return `
+          <div class="col-span-1 sm:col-span-2 p-3 rounded-2xl bg-amber-500/15 border-2 border-amber-400 shadow-lg space-y-2 animate-pop-in">
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2 min-w-0">
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-br ${grad} flex items-center justify-center font-display font-extrabold text-white text-xs shrink-0">
+                  ${initials}
+                </div>
+                <div class="truncate">
+                  <div class="font-extrabold text-xs sm:text-sm text-amber-200">
+                    Are you sure you want to vote for ${escapeHtml(player.name)}?
+                  </div>
+                  <div class="text-[10px] text-amber-100/80">Tap Yes to lock in your vote, or No to pick someone else.</div>
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-2 pt-0.5">
+              <button type="button" onclick="window.confirmPendingVote('${player.uid}')"
+                class="py-2 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs transition active:scale-95">
+                ✅ Yes, Vote
+              </button>
+              <button type="button" onclick="window.cancelPendingVote()"
+                class="py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 font-extrabold text-xs transition active:scale-95">
+                ❌ No, Cancel
+              </button>
+            </div>
+          </div>
+        `;
+      }
+
+      return `
+        <button type="button" onclick="window.selectPendingVote('${player.uid}')" ${isDisabled || myVote ? 'disabled' : ''}
+          class="p-2.5 rounded-2xl border text-left transition flex items-center justify-between active:scale-[0.98] ${
+            isSelected
+              ? 'bg-rose-500/20 border-rose-500 shadow-lg shadow-rose-900/30'
+              : (isDisabled || myVote)
+                ? 'bg-slate-900/60 border-slate-800 opacity-65'
+                : 'bg-slate-900/95 hover:bg-slate-800 border-slate-700 hover:border-amber-400'
+          }">
+          <div class="flex items-center gap-2 min-w-0">
+            <div class="w-8 h-8 rounded-xl bg-gradient-to-br ${grad} flex items-center justify-center font-display font-extrabold text-white text-xs shrink-0">
+              ${initials}
+            </div>
+            <div class="truncate">
+              <div class="font-bold text-xs text-white truncate">${escapeHtml(player.name)}</div>
+              <div class="text-[10px] ${isSelected ? 'text-rose-300 font-bold' : 'text-slate-400'}">
+                ${isSelected ? '🎯 Your Confirmed Vote' : (hasVotedIndicator ? '✅ Already Voted' : (isDisabled ? 'Alive' : 'Tap to select'))}
+              </div>
+            </div>
+          </div>
+          <span class="text-sm ml-1">${isSelected ? '✅' : '🗳️'}</span>
+        </button>
+      `;
+    }
+
+    // =========================================================================
+    // 12. ODD ONE OUT GAMEPLAY RENDERER
     // =========================================================================
     function renderOddOneOutGame(data, isHost) {
       document.getElementById('odd-round-badge').textContent = `ROUND ${data.round}`;
 
       const amIImposter = data.imposterId === currentUser.uid;
       const imposterKnows = data.imposterKnows !== false;
+      const isCrossServer = Boolean(data.crossServerMode);
       const showImposterWarning = amIImposter && imposterKnows;
       const totalPlayers = data.players.length;
       const innocentCount = totalPlayers - 1;
 
-      document.getElementById('odd-mode-pill').textContent = imposterKnows
-        ? '🕵️ Classic Mode'
-        : '🎭 Undercover Mode';
+      document.getElementById('odd-mode-pill').textContent = imposterKnows ? '🕵️ Classic' : '🎭 Undercover';
+      document.getElementById('odd-universe-pill').textContent = isCrossServer ? '🌌 Cross-Universe' : '🏠 Same-Universe';
 
       const mySecretWord = amIImposter ? data.oddWord : data.majorityWord;
-      document.getElementById('odd-category-text').textContent = data.category;
+      const myUniverse = amIImposter ? (data.oddUniverse || data.category) : (data.majorityUniverse || data.category);
+
+      document.getElementById('odd-category-text').textContent = isCrossServer
+        ? `🌌 ${myUniverse}`
+        : data.category;
       document.getElementById('odd-secret-word').textContent = mySecretWord;
 
       const cardBox = document.getElementById('odd-card-box');
@@ -1631,12 +2245,14 @@
       if (showImposterWarning) {
         cardBox.className = 'w-full rounded-3xl bg-gradient-to-br from-rose-700 via-red-900 to-slate-950 border border-rose-400/50 p-4 flex flex-col items-center justify-center text-center shadow-2xl shadow-rose-900/50 transition-all';
         imposterBadge.classList.remove('hidden');
-        roleHint.textContent = "You have the odd character! Blend into the chat without getting caught.";
+        roleHint.textContent = isCrossServer
+          ? `Cross-Universe Mode: You got ${mySecretWord} (${myUniverse}) while the others share a similar character from another series!`
+          : "You have the odd character! Blend into the chat without getting caught.";
       } else {
         cardBox.className = 'w-full rounded-3xl bg-gradient-to-br from-violet-600 via-indigo-700 to-slate-900 border border-violet-400/40 p-4 flex flex-col items-center justify-center text-center shadow-2xl shadow-violet-900/40 transition-all';
         imposterBadge.classList.add('hidden');
         roleHint.textContent = imposterKnows
-          ? `${innocentCount} Innocents share this exact name. Chat freely and vote out the 1 Imposter below!`
+          ? `${innocentCount} Innocents share this exact name. Chat freely and use 2-click voting below!`
           : "Undercover Mode: You don't know if you're the Odd One Out! Chat freely and vote below when ready.";
       }
 
@@ -1647,7 +2263,9 @@
       document.getElementById('odd-voting-progress-pill').textContent = `🗳️ ${totalVotes} / ${totalPlayers} Voted`;
       document.getElementById('odd-voting-subtitle').textContent = myVote
         ? `Vote locked (${totalVotes}/${totalPlayers}) • Keep chatting!`
-        : `Tap a suspect (${totalVotes}/${totalPlayers} voted)`;
+        : pendingVoteTargetUid
+          ? 'Confirm Yes or No below'
+          : `Tap a suspect (${totalVotes}/${totalPlayers} voted)`;
 
       const grid = document.getElementById('odd-voting-grid');
       grid.innerHTML = '';
@@ -1655,34 +2273,7 @@
       data.players
         .filter(p => p.uid !== currentUser.uid)
         .forEach(player => {
-          const isSelected = myVote === player.uid;
-          const grad = AVATAR_COLORS[player.colorIdx % AVATAR_COLORS.length];
-          const initials = player.name.slice(0, 2).toUpperCase();
-          const hasVotedIndicator = Boolean(votes[player.uid]);
-
-          grid.innerHTML += `
-            <button type="button" onclick="window.castVote('${player.uid}')" ${myVote ? 'disabled' : ''}
-              class="p-2.5 rounded-2xl border text-left transition flex items-center justify-between active:scale-[0.98] ${
-                isSelected
-                  ? 'bg-rose-500/20 border-rose-500 shadow-lg shadow-rose-900/30'
-                  : myVote
-                    ? 'bg-slate-900/60 border-slate-800 opacity-65'
-                    : 'bg-slate-900/95 hover:bg-slate-800 border-slate-700 hover:border-amber-400'
-              }">
-              <div class="flex items-center gap-2 min-w-0">
-                <div class="w-8 h-8 rounded-xl bg-gradient-to-br ${grad} flex items-center justify-center font-display font-extrabold text-white text-xs shrink-0">
-                  ${initials}
-                </div>
-                <div class="truncate">
-                  <div class="font-bold text-xs text-white truncate">${escapeHtml(player.name)}</div>
-                  <div class="text-[10px] ${isSelected ? 'text-rose-300 font-bold' : 'text-slate-400'}">
-                    ${isSelected ? '🎯 Your Vote' : (hasVotedIndicator ? '✅ Voted' : 'Tap to vote')}
-                  </div>
-                </div>
-              </div>
-              <span class="text-sm ml-1">${isSelected ? '✅' : '🗳️'}</span>
-            </button>
-          `;
+          grid.innerHTML += buildTwoClickVoteCardHtml(player, myVote, false, Boolean(votes[player.uid]));
         });
 
       if (isHost && totalVotes >= totalPlayers) {
@@ -1731,7 +2322,7 @@
     }
 
     // =========================================================================
-    // 11. MAFIA GAMEPLAY (NIGHT KILL/SAVE + DAY CHAT & IN-CHAT VOTING)
+    // 13. MAFIA GAMEPLAY RENDERER (WITH 2-CLICK DAYTIME VOTING)
     // =========================================================================
     function renderMafiaGame(data, isHost) {
       const roles = data.mafiaRoles || {};
@@ -1941,7 +2532,7 @@
         round: data.round,
         senderId: 'SYSTEM',
         senderName: 'Morning News',
-        text: `☀️ Day ${data.mafiaTurnNumber || 1}: ${morningReport} Discuss freely and vote below!`,
+        text: `☀️ Day ${data.mafiaTurnNumber || 1}: ${morningReport} Discuss freely and use 2-click voting below!`,
         createdAt: Date.now()
       });
     }
@@ -1968,6 +2559,8 @@
         document.getElementById('mafia-voting-subtitle').textContent = 'You were eliminated (watching alive players vote)';
       } else if (myVote) {
         document.getElementById('mafia-voting-subtitle').textContent = `Vote locked (${totalVotes}/${aliveVotersCount}) • Keep chatting!`;
+      } else if (pendingVoteTargetUid) {
+        document.getElementById('mafia-voting-subtitle').textContent = 'Confirm Yes or No below';
       } else {
         document.getElementById('mafia-voting-subtitle').textContent = `Tap a suspect (${totalVotes}/${aliveVotersCount} voted)`;
       }
@@ -1978,34 +2571,7 @@
       data.players
         .filter(p => aliveIds.includes(p.uid) && p.uid !== currentUser.uid)
         .forEach(player => {
-          const isSelected = myVote === player.uid;
-          const disabled = !amIAlive || Boolean(myVote);
-          const grad = AVATAR_COLORS[player.colorIdx % AVATAR_COLORS.length];
-          const hasVotedIndicator = Boolean(votes[player.uid]);
-
-          grid.innerHTML += `
-            <button type="button" onclick="window.castVote('${player.uid}')" ${disabled ? 'disabled' : ''}
-              class="p-2.5 rounded-2xl border text-left transition flex items-center justify-between active:scale-[0.98] ${
-                isSelected
-                  ? 'bg-rose-500/20 border-rose-500 shadow-lg shadow-rose-900/30'
-                  : disabled
-                    ? 'bg-slate-900/60 border-slate-800 opacity-65'
-                    : 'bg-slate-900/95 hover:bg-slate-800 border-slate-700 hover:border-amber-400'
-              }">
-              <div class="flex items-center gap-2 min-w-0">
-                <div class="w-8 h-8 rounded-xl bg-gradient-to-br ${grad} flex items-center justify-center font-display font-extrabold text-white text-xs shrink-0">
-                  ${escapeHtml(player.name.slice(0, 2).toUpperCase())}
-                </div>
-                <div class="truncate">
-                  <div class="font-bold text-xs text-white truncate">${escapeHtml(player.name)}</div>
-                  <div class="text-[10px] ${isSelected ? 'text-rose-300 font-bold' : 'text-slate-400'}">
-                    ${isSelected ? '🎯 Your Vote' : (hasVotedIndicator ? '✅ Voted' : (amIAlive ? 'Tap to vote' : 'Alive'))}
-                  </div>
-                </div>
-              </div>
-              <span class="text-sm ml-1">${isSelected ? '✅' : '🗳️'}</span>
-            </button>
-          `;
+          grid.innerHTML += buildTwoClickVoteCardHtml(player, myVote, !amIAlive, Boolean(votes[player.uid]));
         });
 
       if (isHost && totalVotes >= aliveVotersCount) {
@@ -2107,7 +2673,241 @@
     }
 
     // =========================================================================
-    // 12. CHAT & VOTING HANDLERS
+    // 14. GUESS THE NAME (CHAT DUMB CHARADES) GAMEPLAY
+    // =========================================================================
+    function renderGuessTheNameGame(data, isHost) {
+      const amIClueGiver = data.clueGiverId === currentUser.uid;
+      const clueGiverPlayer = data.players.find(p => p.uid === data.clueGiverId);
+      const clueGiverName = clueGiverPlayer ? clueGiverPlayer.name : 'Player';
+
+      document.getElementById('guess-round-badge').textContent = `ROUND ${data.round}`;
+      document.getElementById('guess-category-pill').textContent = `📂 ${data.guessSecretUniverse || 'Mixed'}`;
+
+      const banner = document.getElementById('guess-role-banner');
+      const tag = document.getElementById('guess-banner-tag');
+      const secretDisplay = document.getElementById('guess-secret-display');
+      const bannerDesc = document.getElementById('guess-banner-desc');
+      const skipBtn = document.getElementById('btn-guess-skip-word');
+      const declareBox = document.getElementById('guess-declare-winner-box');
+      const chatInput = document.getElementById('guess-chat-input');
+
+      if (amIClueGiver) {
+        banner.className = 'w-full rounded-3xl bg-gradient-to-br from-amber-600 via-orange-700 to-slate-900 border border-amber-400/50 p-4 flex flex-col items-center justify-center text-center shadow-2xl shadow-amber-900/40';
+        tag.textContent = '🎭 YOU ARE THE CLUE GIVER (SECRET CHARACTER)';
+        secretDisplay.textContent = data.guessSecretWord || '---';
+        bannerDesc.textContent = `Describe "${data.guessSecretWord}" in chat without typing the name! Tap the first person who guesses it right below.`;
+        skipBtn.classList.remove('hidden');
+        declareBox.classList.remove('hidden');
+        chatInput.placeholder = 'Type hints in chat (do NOT say the secret name)...';
+        document.getElementById('guess-chat-sub').textContent = 'Give hints in chat, then declare the first correct guesser below!';
+
+        // Render 2-click Declare Winner buttons for the Clue Giver
+        const grid = document.getElementById('guess-players-grid');
+        grid.innerHTML = '';
+
+        data.players
+          .filter(p => p.uid !== currentUser.uid)
+          .forEach(player => {
+            const isPending = pendingGuessWinnerUid === player.uid;
+            const grad = AVATAR_COLORS[player.colorIdx % AVATAR_COLORS.length];
+            const initials = player.name.slice(0, 2).toUpperCase();
+
+            if (isPending) {
+              grid.innerHTML += `
+                <div class="col-span-1 sm:col-span-2 p-3 rounded-2xl bg-emerald-500/15 border-2 border-emerald-400 shadow-lg space-y-2 animate-pop-in">
+                  <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-xl bg-gradient-to-br ${grad} flex items-center justify-center font-display font-extrabold text-white text-xs shrink-0">
+                      ${initials}
+                    </div>
+                    <div>
+                      <div class="font-extrabold text-xs sm:text-sm text-emerald-200">
+                        Declare ${escapeHtml(player.name)} as the Winner?
+                      </div>
+                      <div class="text-[10px] text-emerald-100/80">
+                        ${escapeHtml(player.name)} gets +100 pts, you get +50 pts, and everyone else gets 0 pts.
+                      </div>
+                    </div>
+                  </div>
+                  <div class="grid grid-cols-2 gap-2">
+                    <button type="button" onclick="window.confirmGuessWinner('${player.uid}')"
+                      class="py-2 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs transition active:scale-95">
+                      🏆 Yes, Declare Winner
+                    </button>
+                    <button type="button" onclick="window.cancelPendingGuessWinner()"
+                      class="py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 font-extrabold text-xs transition active:scale-95">
+                      ❌ No, Cancel
+                    </button>
+                  </div>
+                </div>
+              `;
+            } else {
+              grid.innerHTML += `
+                <button type="button" onclick="window.selectPendingGuessWinner('${player.uid}')"
+                  class="p-2.5 rounded-2xl border bg-slate-900/95 hover:bg-slate-800 border-slate-700 hover:border-emerald-400 text-left transition flex items-center justify-between active:scale-[0.98]">
+                  <div class="flex items-center gap-2 min-w-0">
+                    <div class="w-8 h-8 rounded-xl bg-gradient-to-br ${grad} flex items-center justify-center font-display font-extrabold text-white text-xs shrink-0">
+                      ${initials}
+                    </div>
+                    <div class="truncate">
+                      <div class="font-bold text-xs text-white truncate">${escapeHtml(player.name)}</div>
+                      <div class="text-[10px] text-slate-400">Tap if they guessed right</div>
+                    </div>
+                  </div>
+                  <span class="text-sm ml-1">🏆</span>
+                </button>
+              `;
+            }
+          });
+      } else {
+        banner.className = 'w-full rounded-3xl bg-gradient-to-br from-cyan-700 via-indigo-800 to-slate-950 border border-cyan-400/40 p-4 flex flex-col items-center justify-center text-center shadow-2xl';
+        tag.textContent = '🔎 GUESS THE SECRET CHARACTER';
+        secretDisplay.textContent = `${clueGiverName} is giving hints!`;
+        bannerDesc.textContent = `Read ${clueGiverName}'s clues in chat and type your guesses fast — the first player to guess right wins +100 pts!`;
+        skipBtn.classList.add('hidden');
+        declareBox.classList.add('hidden');
+        chatInput.placeholder = 'Type your guess here (e.g. Naruto, Iron Man, Samosa)...';
+        document.getElementById('guess-chat-sub').textContent = 'Type your guesses fast — first right answer wins!';
+      }
+
+      // If Clue Giver is a Demo Bot, have it automatically drop hints in chat!
+      if (isHost && clueGiverPlayer && clueGiverPlayer.isBot) {
+        scheduleGuessClueGiverBot(data, clueGiverPlayer);
+      }
+    }
+
+    window.selectPendingGuessWinner = function (winnerUid) {
+      if (!currentRoomData || currentRoomData.clueGiverId !== currentUser.uid) return;
+      pendingGuessWinnerUid = winnerUid;
+      renderRoomState(currentRoomData);
+    };
+
+    window.cancelPendingGuessWinner = function () {
+      pendingGuessWinnerUid = null;
+      if (currentRoomData) renderRoomState(currentRoomData);
+    };
+
+    window.confirmGuessWinner = async function (winnerUid) {
+      if (!currentRoomData || currentRoomData.gameType !== 'GUESS_THE_NAME') return;
+      if (currentRoomData.clueGiverId !== currentUser.uid) return;
+
+      const updatedPlayers = currentRoomData.players.map(p => {
+        let bonus = 0;
+        if (p.uid === winnerUid) bonus = 100; // First correct guesser wins!
+        else if (p.uid === currentRoomData.clueGiverId) bonus = 50; // Clue giver gets 50 pts
+        // All other players get 0 pts!
+        return { ...p, score: (p.score || 0) + bonus };
+      });
+
+      pendingGuessWinnerUid = null;
+      await saveRoomPatch({
+        status: 'results',
+        guessWinnerId: winnerUid,
+        players: updatedPlayers,
+        lastRoundOutcome: {
+          mode: 'GUESS_THE_NAME',
+          winnerUid,
+          clueGiverId: currentRoomData.clueGiverId,
+          secretWord: currentRoomData.guessSecretWord,
+          secretUniverse: currentRoomData.guessSecretUniverse
+        }
+      });
+    };
+
+    window.skipGuessWord = async function () {
+      if (!currentRoomData || currentRoomData.gameType !== 'GUESS_THE_NAME') return;
+      if (currentRoomData.clueGiverId !== currentUser.uid) return;
+
+      const activePack = currentRoomData.selectedPack || 'ALL';
+      const pool = CHARACTER_DATABASE.filter(c => activePack === 'ALL' || c.pack === activePack);
+      const activePool = pool.length > 0 ? pool : CHARACTER_DATABASE;
+
+      const usedWords = new Set(currentRoomData.usedGuessWords || []);
+      let available = activePool.filter(c => !usedWords.has(c.name));
+      if (available.length === 0) available = activePool;
+
+      const chosenChar = available[Math.floor(Math.random() * available.length)];
+      pendingGuessWinnerUid = null;
+
+      await saveRoomPatch({
+        guessSecretWord: chosenChar.name,
+        guessSecretUniverse: chosenChar.universe,
+        activeClues: chosenChar.clues || [],
+        usedGuessWords: [...usedWords, chosenChar.name]
+      });
+
+      await appendChatMessage({
+        round: currentRoomData.round,
+        senderId: 'SYSTEM',
+        senderName: 'Charades Host',
+        text: `🔀 Clue Giver skipped to a new character (${chosenChar.universe})! Keep guessing!`,
+        createdAt: Date.now()
+      });
+
+      showToast('Switched to a fresh character!', 'info');
+    };
+
+    window.sendGuessChatMessage = async function (event) {
+      event.preventDefault();
+      if (!currentRoomCode || !currentRoomData || !currentUser) return;
+      const input = document.getElementById('guess-chat-input');
+      const text = (input.value || '').trim();
+      if (!text) return;
+
+      const me = (currentRoomData.players || []).find(p => p.uid === currentUser.uid);
+      if (!me) return;
+
+      // Prevent the Clue Giver from accidentally typing the exact secret character name!
+      if (currentRoomData.clueGiverId === currentUser.uid && currentRoomData.guessSecretWord) {
+        const secretLower = currentRoomData.guessSecretWord.toLowerCase().trim();
+        const firstWord = secretLower.split(' ')[0];
+        const msgLower = text.toLowerCase();
+        if (msgLower.includes(secretLower) || (firstWord.length >= 4 && msgLower.includes(firstWord))) {
+          showToast(`Careful! Don't type "${currentRoomData.guessSecretWord}" in your hint!`, 'warning');
+          return;
+        }
+      }
+
+      input.value = '';
+      await appendChatMessage({
+        round: currentRoomData.round,
+        senderId: currentUser.uid,
+        senderName: me.name,
+        colorIdx: me.colorIdx,
+        text,
+        createdAt: Date.now()
+      });
+
+      // If Clue Giver is a Demo Bot and a human typed the right answer, auto-award the human!
+      const clueGiver = currentRoomData.players.find(p => p.uid === currentRoomData.clueGiverId);
+      if (clueGiver && clueGiver.isBot && currentRoomData.hostId === currentUser.uid && currentRoomData.guessSecretWord) {
+        const secretLower = currentRoomData.guessSecretWord.toLowerCase().trim();
+        const firstWord = secretLower.split(' ')[0];
+        const guessLower = text.toLowerCase().trim();
+        if (guessLower.includes(secretLower) || (firstWord.length >= 4 && guessLower.includes(firstWord))) {
+          const updatedPlayers = currentRoomData.players.map(p => {
+            let bonus = 0;
+            if (p.uid === currentUser.uid) bonus = 100;
+            else if (p.uid === clueGiver.uid) bonus = 50;
+            return { ...p, score: (p.score || 0) + bonus };
+          });
+          await saveRoomPatch({
+            status: 'results',
+            guessWinnerId: currentUser.uid,
+            players: updatedPlayers,
+            lastRoundOutcome: {
+              mode: 'GUESS_THE_NAME',
+              winnerUid: currentUser.uid,
+              clueGiverId: clueGiver.uid,
+              secretWord: currentRoomData.guessSecretWord,
+              secretUniverse: currentRoomData.guessSecretUniverse
+            }
+          });
+        }
+      }
+    };
+
+    // =========================================================================
+    // 15. SHARED CHAT RENDERER
     // =========================================================================
     window.sendChatMessage = async function (event, inputId) {
       event.preventDefault();
@@ -2137,8 +2937,13 @@
 
     function renderChatMessages(allMessages) {
       if (!currentRoomData) return;
-      const isMafia = currentRoomData.gameType === 'MAFIA';
-      const list = document.getElementById(isMafia ? 'mafia-chat-list' : 'odd-chat-list');
+      const gType = currentRoomData.gameType || 'ODD_ONE_OUT';
+      const listId = gType === 'MAFIA'
+        ? 'mafia-chat-list'
+        : gType === 'GUESS_THE_NAME'
+          ? 'guess-chat-list'
+          : 'odd-chat-list';
+      const list = document.getElementById(listId);
       if (!list) return;
 
       const roundMessages = allMessages.filter(m => m.round === currentRoomData.round);
@@ -2157,13 +2962,19 @@
         }
 
         const isMe = msg.senderId === currentUser.uid;
+        const isClueGiverMsg = gType === 'GUESS_THE_NAME' && msg.senderId === currentRoomData.clueGiverId;
         const grad = AVATAR_COLORS[(msg.colorIdx || 0) % AVATAR_COLORS.length];
 
         if (isMe) {
+          const bubbleBg = gType === 'MAFIA'
+            ? 'bg-rose-600'
+            : gType === 'GUESS_THE_NAME'
+              ? 'bg-amber-500 text-slate-950 font-semibold'
+              : 'bg-violet-600 text-white';
           list.innerHTML += `
             <div class="flex flex-col items-end">
               <span class="text-[10px] font-bold text-slate-500 mb-0.5 mr-1">You</span>
-              <div class="max-w-[82%] px-3.5 py-2 rounded-2xl rounded-tr-sm ${isMafia ? 'bg-rose-600' : 'bg-violet-600'} text-white text-xs sm:text-sm font-medium shadow">
+              <div class="max-w-[82%] px-3.5 py-2 rounded-2xl rounded-tr-sm ${bubbleBg} text-xs sm:text-sm font-medium shadow">
                 ${escapeHtml(msg.text)}
               </div>
             </div>
@@ -2175,8 +2986,10 @@
                 ${escapeHtml((msg.senderName || '?').slice(0, 2).toUpperCase())}
               </div>
               <div class="flex flex-col items-start max-w-[80%]">
-                <span class="text-[10px] font-bold text-slate-400 mb-0.5 ml-1">${escapeHtml(msg.senderName)}</span>
-                <div class="px-3.5 py-2 rounded-2xl rounded-tl-sm bg-slate-800/95 border border-slate-700/70 text-slate-100 text-xs sm:text-sm font-medium">
+                <span class="text-[10px] font-bold ${isClueGiverMsg ? 'text-amber-300' : 'text-slate-400'} mb-0.5 ml-1">
+                  ${escapeHtml(msg.senderName)} ${isClueGiverMsg ? '🎭 (Clue Giver)' : ''}
+                </span>
+                <div class="px-3.5 py-2 rounded-2xl rounded-tl-sm ${isClueGiverMsg ? 'bg-amber-500/15 border border-amber-500/40 text-amber-100' : 'bg-slate-800/95 border border-slate-700/70 text-slate-100'} text-xs sm:text-sm font-medium">
                   ${escapeHtml(msg.text)}
                 </div>
               </div>
@@ -2188,29 +3001,12 @@
       list.scrollTop = list.scrollHeight;
     }
 
-    window.castVote = async function (targetUid) {
-      if (!currentRoomData || (currentRoomData.status !== 'discussion' && currentRoomData.status !== 'voting')) return;
-      if (targetUid === currentUser.uid) return;
-
-      if (currentRoomData.gameType === 'MAFIA') {
-        const aliveIds = currentRoomData.alivePlayerIds || [];
-        if (!aliveIds.includes(currentUser.uid) || currentRoomData.mafiaPhase !== 'day') return;
-      }
-
-      const votes = { ...(currentRoomData.votes || {}) };
-      if (votes[currentUser.uid]) return;
-
-      votes[currentUser.uid] = targetUid;
-      await saveRoomPatch({ votes });
-      showToast('Vote locked in! Keep chatting until everyone votes.', 'success');
-    };
-
     // =========================================================================
-    // 13. RESULTS & SCOREBOARD RENDERER
+    // 16. RESULTS & SCOREBOARD RENDERER
     // =========================================================================
     function renderResults(data, isHost) {
       const outcome = data.lastRoundOutcome || {};
-      const isMafia = data.gameType === 'MAFIA' || outcome.mode === 'MAFIA';
+      const gType = outcome.mode || data.gameType || 'ODD_ONE_OUT';
       const totalPlayers = data.players.length;
 
       const banner = document.getElementById('results-winner-banner');
@@ -2220,9 +3016,28 @@
 
       const oddCard = document.getElementById('results-odd-card');
       const mafiaCard = document.getElementById('results-mafia-card');
+      const guessCard = document.getElementById('results-guess-card');
 
-      if (isMafia) {
-        oddCard.classList.add('hidden');
+      oddCard.classList.add('hidden');
+      mafiaCard.classList.add('hidden');
+      guessCard.classList.add('hidden');
+
+      if (gType === 'GUESS_THE_NAME') {
+        guessCard.classList.remove('hidden');
+        const winnerPlayer = data.players.find(p => p.uid === outcome.winnerUid);
+        const clueGiverPlayer = data.players.find(p => p.uid === outcome.clueGiverId);
+        const winnerName = winnerPlayer ? winnerPlayer.name : 'Winner';
+        const clueGiverName = clueGiverPlayer ? clueGiverPlayer.name : 'Clue Giver';
+
+        banner.className = 'rounded-3xl p-5 text-center border shadow-2xl space-y-1.5 bg-gradient-to-br from-amber-900/70 via-slate-900 to-slate-950 border-amber-500/40';
+        emoji.textContent = '🏆';
+        title.textContent = `${winnerName.toUpperCase()} GUESSED IT FIRST!`;
+        subtitle.textContent = `${winnerName} earned +100 pts, ${clueGiverName} earned +50 pts, and all other players received 0 pts!`;
+
+        document.getElementById('reveal-guess-word').textContent = outcome.secretWord || data.guessSecretWord || '---';
+        document.getElementById('reveal-guess-universe').textContent = `Category: ${outcome.secretUniverse || data.guessSecretUniverse || 'Mixed'}`;
+        document.getElementById('reveal-guess-points-summary').textContent = `🥇 ${winnerName}: +100 pts • 🎭 ${clueGiverName}: +50 pts • Others: 0 pts`;
+      } else if (gType === 'MAFIA') {
         mafiaCard.classList.remove('hidden');
 
         const villagersWon = Boolean(outcome.villagersWon);
@@ -2262,12 +3077,12 @@
         });
       } else {
         oddCard.classList.remove('hidden');
-        mafiaCard.classList.add('hidden');
 
         const innocentsWon = Boolean(outcome.innocentsWon);
         const isTie = Boolean(outcome.isTie);
         const tally = outcome.tally || {};
         const innocentCount = totalPlayers - 1;
+        const isCrossServer = Boolean(data.crossServerMode);
 
         const imposterPlayer = data.players.find(p => p.uid === data.imposterId);
         const imposterName = imposterPlayer ? imposterPlayer.name : 'Unknown';
@@ -2287,13 +3102,13 @@
         }
 
         document.getElementById('reveal-category').textContent = data.category;
-        document.getElementById('reveal-mode-badge').textContent = data.imposterKnows !== false
-          ? '🕵️ Classic (Imposter Knew)'
-          : '🎭 Undercover (Imposter Blind)';
+        document.getElementById('reveal-mode-badge').textContent = `${isCrossServer ? '🌌 Cross-Universe' : '🏠 Same-Universe'} • ${data.imposterKnows !== false ? 'Classic' : 'Undercover'}`;
         document.getElementById('reveal-innocent-count-label').textContent = `${innocentCount} Innocents Had`;
         document.getElementById('reveal-innocent-word').textContent = data.majorityWord;
+        document.getElementById('reveal-innocent-universe').textContent = data.majorityUniverse ? `(${data.majorityUniverse})` : '';
         document.getElementById('reveal-imposter-name').textContent = imposterName;
         document.getElementById('reveal-imposter-word').textContent = data.oddWord;
+        document.getElementById('reveal-imposter-universe').textContent = data.oddUniverse ? `(${data.oddUniverse})` : '';
 
         const votesList = document.getElementById('reveal-votes-list');
         votesList.innerHTML = '';
@@ -2353,7 +3168,7 @@
     }
 
     // =========================================================================
-    // 14. DEMO BOT AI
+    // 17. DEMO BOT AI FOR ALL 3 GAMES
     // =========================================================================
     function scheduleOddOneOutBots(data) {
       const bots = data.players.filter(p => p.isBot);
@@ -2366,24 +3181,16 @@
       botActionTimeout = setTimeout(async () => {
         if (!currentRoomData || currentRoomData.gameType !== 'ODD_ONE_OUT' || currentRoomData.status !== 'discussion') return;
         const bot = unvotedBots[0];
-        const pairData = typeof data.activePairIdx === 'number' && data.activePairIdx >= 0
-          ? WORD_PAIRS[data.activePairIdx]
-          : null;
         const isBotImposter = bot.uid === data.imposterId;
         const imposterKnows = data.imposterKnows !== false;
+        const clues = Array.isArray(data.activeClues) && data.activeClues.length > 0
+          ? data.activeClues
+          : ['Super iconic character everyone recognizes!', 'Known for signature powers/style.', 'Classic fan favorite!'];
 
-        let cluePool = [
-          'Definitely an iconic character everyone knows!',
-          'Super recognizable from the main storyline.',
-          "Let's see what everyone else says 👀"
-        ];
-        if (pairData && Array.isArray(pairData.clues) && pairData.clues.length > 0) {
-          cluePool = (!isBotImposter || !imposterKnows)
-            ? pairData.clues
-            : ['Totally iconic in this series!', 'Everyone knows them right away.', pairData.clues[0]];
-        }
+        const clue = (!isBotImposter || !imposterKnows)
+          ? clues[Math.floor(Math.random() * clues.length)]
+          : 'Totally iconic! Everyone knows this one right away 👀';
 
-        const clue = cluePool[Math.floor(Math.random() * cluePool.length)];
         const candidates = data.players.filter(p => p.uid !== bot.uid);
         const impCandidate = candidates.find(c => c.uid === data.imposterId);
         const target = (impCandidate && Math.random() < 0.5)
@@ -2466,6 +3273,26 @@
           votes: { ...(currentRoomData.votes || {}), [bot.uid]: target }
         });
       }, 2200);
+    }
+
+    function scheduleGuessClueGiverBot(data, clueGiverBot) {
+      if (botActionTimeout) clearTimeout(botActionTimeout);
+      botActionTimeout = setTimeout(async () => {
+        if (!currentRoomData || currentRoomData.gameType !== 'GUESS_THE_NAME' || currentRoomData.status !== 'discussion') return;
+        const clues = Array.isArray(data.activeClues) && data.activeClues.length > 0
+          ? data.activeClues
+          : [`From ${data.guessSecretUniverse}!`, 'Super famous character/item!'];
+        const hint = clues[Math.floor(Math.random() * clues.length)];
+
+        await appendChatMessage({
+          round: currentRoomData.round,
+          senderId: clueGiverBot.uid,
+          senderName: clueGiverBot.name,
+          colorIdx: clueGiverBot.colorIdx,
+          text: `Hint: ${hint}`,
+          createdAt: Date.now()
+        });
+      }, 2600);
     }
 
     function escapeHtml(str) {
