@@ -79,44 +79,80 @@
   <!-- Sticky Top Navigation Bar -->
   <header class="w-full border-b border-slate-800/80 bg-slate-950/85 backdrop-blur-md sticky top-0 z-30">
     <div class="max-w-2xl mx-auto px-3.5 py-2.5 flex items-center justify-between gap-2">
-      <div class="flex items-center gap-2.5">
+      <div class="flex items-center gap-2.5 min-w-0">
         <div id="header-logo-badge" class="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-600 flex items-center justify-center shadow-lg shadow-violet-500/25 font-display font-extrabold text-white text-lg shrink-0">
           ?
         </div>
-        <div>
-          <h1 id="header-title" class="font-display font-extrabold text-base sm:text-lg tracking-tight text-white leading-none">
+        <div class="min-w-0">
+          <h1 id="header-title" class="font-display font-extrabold text-sm sm:text-lg tracking-tight text-white leading-none truncate">
             ODD ONE MAFIA
           </h1>
-          <span id="header-subtitle" class="text-[11px] text-slate-400 font-medium">4 Party Games • Friends & Voice</span>
+          <span id="header-subtitle" class="text-[11px] text-slate-400 font-medium block truncate">4 Party Games • Friends & Voice</span>
         </div>
       </div>
 
-      <!-- Profile Pill & Friends Button (When not in a room) -->
-      <div id="header-profile-controls" class="hidden flex items-center gap-1.5">
-        <button type="button" onclick="window.toggleFriendsModal(true)"
-          class="relative px-2.5 py-1.5 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-400/40 text-xs font-extrabold text-indigo-200 flex items-center gap-1.5 transition active:scale-95">
-          <span>👥 Friends</span>
-          <span id="header-friend-req-badge" class="hidden px-1.5 py-0.2 rounded-full bg-rose-500 text-white text-[10px] font-extrabold">0</span>
+      <div class="flex items-center gap-1.5 shrink-0">
+        <!-- Sound Effects Mute/Unmute Toggle -->
+        <button id="btn-sound-toggle" type="button" onclick="window.toggleSoundMute()"
+          class="w-8 h-8 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700 text-xs font-extrabold text-slate-200 flex items-center justify-center transition active:scale-95"
+          title="Toggle Sound Effects">
+          🔊
         </button>
-        <button type="button" onclick="window.openProfileSwitchModal()"
-          class="px-2.5 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700 text-xs font-extrabold text-emerald-300 flex items-center gap-1 transition active:scale-95">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-          <span id="header-username-label">@player</span>
-        </button>
-      </div>
 
-      <!-- Room Controls (When inside a room) -->
-      <div id="header-room-controls" class="hidden flex items-center gap-1.5">
-        <button type="button" onclick="window.copyRoomCode()" class="px-2.5 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700 text-xs font-extrabold text-violet-300 flex items-center gap-1.5 transition active:scale-95">
-          <span id="header-room-code">-----</span>
-          <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-        </button>
-        <button type="button" onclick="window.leaveRoom()" class="px-2.5 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-xs font-bold text-rose-300 transition active:scale-95">
-          Leave
-        </button>
+        <!-- Profile Pill & Friends Button (When not in a room) -->
+        <div id="header-profile-controls" class="hidden flex items-center gap-1.5">
+          <button type="button" onclick="window.toggleFriendsModal(true)"
+            class="relative px-2.5 py-1.5 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-400/40 text-xs font-extrabold text-indigo-200 flex items-center gap-1 transition active:scale-95">
+            <span>👥 Friends</span>
+            <span id="header-friend-req-badge" class="hidden px-1.5 py-0.2 rounded-full bg-rose-500 text-white text-[10px] font-extrabold">0</span>
+          </button>
+          <button type="button" onclick="window.openProfileSwitchModal()"
+            class="px-2.5 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700 text-xs font-extrabold text-emerald-300 flex items-center gap-1 transition active:scale-95">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            <span id="header-username-label">@player</span>
+          </button>
+        </div>
+
+        <!-- Room Controls (When inside a room) -->
+        <div id="header-room-controls" class="hidden flex items-center gap-1.5">
+          <button type="button" onclick="window.copyRoomCode()" class="px-2.5 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700 text-xs font-extrabold text-violet-300 flex items-center gap-1 transition active:scale-95">
+            <span id="header-room-code">-----</span>
+            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+          </button>
+          <button type="button" onclick="window.requestExitConfirmation()" class="px-2.5 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-xs font-bold text-rose-300 transition active:scale-95">
+            Leave
+          </button>
+        </div>
       </div>
     </div>
   </header>
+
+  <!-- ======================================================================= -->
+  <!-- MODAL: ACCIDENTAL BACK / EXIT GAME CONFIRMATION                         -->
+  <!-- ======================================================================= -->
+  <div id="exit-confirm-modal" class="hidden fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="w-full max-w-sm rounded-3xl bg-slate-900 border-2 border-rose-500/50 p-5 shadow-2xl space-y-4 text-center animate-pop-in">
+      <div class="w-12 h-12 mx-auto rounded-2xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-2xl">
+        🚪
+      </div>
+      <div class="space-y-1">
+        <h3 class="font-display text-xl font-extrabold text-white">Exit Current Game?</h3>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          You are currently inside room <span id="exit-modal-room-code" class="font-extrabold text-violet-300">-----</span>. If you leave now, host control will pass to another player.
+        </p>
+      </div>
+      <div class="grid grid-cols-2 gap-2.5 pt-1">
+        <button type="button" onclick="window.cancelExitConfirmation()"
+          class="py-3 px-4 rounded-2xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-extrabold text-xs transition active:scale-95">
+          🛡️ Cancel (Stay)
+        </button>
+        <button type="button" onclick="window.confirmExitRoom()"
+          class="py-3 px-4 rounded-2xl bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-xs shadow-lg shadow-rose-600/25 transition active:scale-95">
+          🚪 Exit Game
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- ======================================================================= -->
   <!-- MODAL: PERMANENT @USERNAME + 4-DIGIT PIN SETUP / LOGIN                  -->
@@ -133,7 +169,6 @@
         </p>
       </div>
 
-      <!-- Toggle Create vs Login -->
       <div class="grid grid-cols-2 gap-2 p-1 rounded-2xl bg-slate-950 border border-slate-800">
         <button id="auth-tab-register" type="button" onclick="window.switchAuthTab('register')"
           class="py-2 rounded-xl bg-violet-600 text-white text-xs font-extrabold transition">
@@ -204,7 +239,6 @@
         </button>
       </div>
 
-      <!-- Add Friend by @username -->
       <form onsubmit="window.sendFriendRequest(event)" class="flex gap-2">
         <div class="relative flex-1 flex items-center">
           <span class="absolute left-3 text-xs font-extrabold text-violet-400">@</span>
@@ -217,7 +251,6 @@
         </button>
       </form>
 
-      <!-- Incoming Friend Requests -->
       <div id="friend-requests-section" class="hidden space-y-2">
         <span class="block text-[10px] font-extrabold uppercase tracking-wider text-amber-300">
           🔔 Incoming Friend Requests
@@ -225,7 +258,6 @@
         <div id="friend-requests-list" class="space-y-1.5"></div>
       </div>
 
-      <!-- Saved Friends List -->
       <div class="flex-1 overflow-y-auto space-y-2 pr-1">
         <span class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
           Saved Friends (<span id="friends-count-label">0</span>)
@@ -266,7 +298,6 @@
 
       <!-- Setup Card -->
       <div class="rounded-3xl bg-slate-900/90 border border-slate-800 p-4 sm:p-5 shadow-xl space-y-4">
-        <!-- Step 1: Select Game Mode (4 Games) -->
         <div>
           <span class="block text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-2">
             1. Choose Game Mode
@@ -290,7 +321,7 @@
                 <span class="px-1.5 py-0.5 rounded-full bg-cyan-500/20 text-[9px] font-extrabold text-cyan-300 shrink-0">3–6P</span>
               </div>
               <p class="text-[11px] text-slate-400 mt-1 leading-snug">
-                1 Blender gets no word! Everyone draws 2 turns in unique colors & votes!
+                45s per turn, 1 stroke per turn! Tap "Now Draw" & catch The Blender!
               </p>
             </button>
 
@@ -318,7 +349,6 @@
           </div>
         </div>
 
-        <!-- Step 2: Display Name (Pre-filled from Permanent Profile) -->
         <div>
           <div class="flex items-center justify-between mb-1.5">
             <label for="player-name-input" class="text-xs font-extrabold uppercase tracking-wider text-slate-400">
@@ -330,7 +360,6 @@
             class="w-full px-4 py-3 rounded-2xl bg-slate-950 border border-slate-700/80 focus:border-violet-500 outline-none text-sm font-semibold text-white placeholder:text-slate-500" />
         </div>
 
-        <!-- Step 3: Player Count -->
         <div>
           <div class="flex items-center justify-between mb-1.5">
             <span class="text-xs font-extrabold uppercase tracking-wider text-slate-400">3. Number of Players</span>
@@ -339,7 +368,6 @@
           <div id="landing-size-buttons" class="grid grid-cols-4 gap-2"></div>
         </div>
 
-        <!-- Create Room CTA -->
         <button id="btn-create-room" type="button" onclick="window.createRoom()"
           class="w-full py-3.5 px-5 rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-extrabold text-sm sm:text-base shadow-lg shadow-violet-600/25 transition active:scale-[0.98]">
           ✨ Create Odd One Out Room
@@ -351,7 +379,6 @@
           <div class="flex-grow border-t border-slate-800"></div>
         </div>
 
-        <!-- Join Room Code Input -->
         <div class="flex gap-2">
           <input id="join-code-input" type="text" maxlength="5" placeholder="5-LETTER CODE"
             class="flex-1 min-w-0 px-4 py-3 rounded-2xl bg-slate-950 border border-slate-700/80 focus:border-cyan-400 outline-none text-sm font-display font-extrabold tracking-widest uppercase text-center text-white placeholder:text-slate-600 placeholder:font-sans placeholder:tracking-normal" />
@@ -367,7 +394,6 @@
     <!-- VIEW 2: MULTIPLAYER LOBBY                                             -->
     <!-- ===================================================================== -->
     <section id="view-lobby" class="hidden flex-1 flex flex-col space-y-3.5 animate-pop-in">
-      <!-- Room Code & Share Card -->
       <div class="rounded-3xl bg-gradient-to-br from-slate-900 to-indigo-950/60 border border-slate-800 p-4 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-3">
         <div class="text-center sm:text-left">
           <div class="flex items-center justify-center sm:justify-start gap-2">
@@ -407,14 +433,14 @@
         <div id="lobby-friends-invite-row" class="flex gap-2 overflow-x-auto pb-1"></div>
       </div>
 
-      <!-- Player Roster Card -->
+      <!-- Player Roster Card with Live Active/Away Dots & Host Kick -->
       <div class="rounded-3xl bg-slate-900/90 border border-slate-800 p-4 shadow-xl space-y-3">
         <div class="flex items-center justify-between gap-2">
           <div>
             <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-300">
               Players in Lobby (<span id="lobby-player-count" class="text-violet-300">1 / 4</span>)
             </h3>
-            <p class="text-[11px] text-slate-500">Invite friends above or add demo bots</p>
+            <p class="text-[11px] text-slate-500">🟢 Active • 🟡 Away • Host can kick AFK players</p>
           </div>
           <button id="btn-fill-bots" type="button" onclick="window.fillWithDemoBots()"
             class="hidden px-3 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-xs font-extrabold text-emerald-300 transition active:scale-95">
@@ -434,7 +460,6 @@
           </span>
         </div>
 
-        <!-- Switch Game Type (All 4 Games) -->
         <div>
           <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
             Game Mode
@@ -459,7 +484,6 @@
           </div>
         </div>
 
-        <!-- Room Capacity -->
         <div>
           <label id="lobby-capacity-label" class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
             Number of Players (3 to 6)
@@ -528,7 +552,7 @@
           </div>
         </div>
 
-        <!-- SHARED PACK SELECTOR (Odd One Out, Draw To Find, Guess The Name) -->
+        <!-- SHARED PACK SELECTOR -->
         <div id="lobby-pack-selector-wrapper">
           <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
             Character & Word Pack
@@ -550,6 +574,10 @@
               class="pack-btn px-3 py-2.5 rounded-xl border text-xs font-bold transition text-center">
               🇮🇳 Everyday & Pop Culture
             </button>
+            <button id="pack-btn-draw-things" type="button" onclick="window.updateLobbySettings({ selectedPack: 'DRAW_THINGS' })" data-pack="DRAW_THINGS"
+              class="hidden pack-btn col-span-2 px-3 py-2.5 rounded-xl border text-xs font-extrabold transition text-center">
+              🧱 Everyday Things to Draw (45 Objects: Burger, Plane, Door, Mountain, Metro, Laptop...)
+            </button>
           </div>
         </div>
 
@@ -557,7 +585,7 @@
         <div id="lobby-draw-settings" class="hidden rounded-2xl bg-cyan-950/25 border border-cyan-500/30 p-3.5 space-y-1.5">
           <span class="text-xs font-extrabold uppercase tracking-wider text-cyan-300">🎨 How Draw To Find Works</span>
           <p class="text-[11px] text-slate-300 leading-relaxed">
-            Innocents get the <span class="font-bold text-cyan-200">Secret Word</span> while 1 random player is <span class="font-bold text-rose-300">The Blender</span> (gets NO word). Each player gets a unique pen color (<span class="text-blue-400 font-bold">Blue</span>, <span class="text-rose-400 font-bold">Red</span>, <span class="text-emerald-400 font-bold">Green</span>, <span class="text-amber-400 font-bold">Yellow</span>) and draws <span class="font-bold text-white">2 turns</span> on the same shared page before voting out The Blender!
+            Innocents get the <span class="font-bold text-cyan-200">Secret Word</span> while 1 player is <span class="font-bold text-rose-300">The Blender</span> (NO word). On your turn, you have <span class="font-bold text-amber-300">45 seconds</span>: tap <span class="font-bold text-white">✏️ Now Draw</span> in the center, draw <span class="font-bold text-white">1 single stroke</span> (lifting your finger finishes your turn automatically!), and after 2 full cycles everyone votes out The Blender!
           </p>
         </div>
 
@@ -629,6 +657,9 @@
         </span>
       </div>
 
+      <!-- Live In-Game Roster Strip (Shows Active/Away status + Host Kick) -->
+      <div id="odd-live-roster" class="flex flex-wrap items-center gap-1.5"></div>
+
       <div id="odd-card-box" class="w-full rounded-3xl bg-gradient-to-br from-violet-600 via-indigo-700 to-slate-900 border border-violet-400/40 p-4 flex flex-col items-center justify-center text-center shadow-2xl shadow-violet-900/40 transition-all">
         <div class="flex flex-wrap items-center justify-center gap-1.5 mb-1">
           <span class="px-3 py-0.5 rounded-full bg-black/35 border border-white/15 text-[11px] font-bold uppercase tracking-widest text-violet-100">
@@ -657,9 +688,8 @@
           </span>
         </div>
 
-        <div id="odd-chat-list" class="flex-1 p-3.5 space-y-2.5 overflow-y-auto min-h-[180px] max-h-[250px] sm:max-h-[300px]"></div>
+        <div id="odd-chat-list" class="flex-1 p-3.5 space-y-2.5 overflow-y-auto min-h-[170px] max-h-[240px] sm:max-h-[290px]"></div>
 
-        <!-- Chat Input + Hold-to-Record 10s Mic Button -->
         <form onsubmit="window.sendChatMessage(event, 'odd-chat-input')" class="p-2.5 border-t border-slate-800 bg-slate-950/70 flex items-center gap-1.5">
           <input id="odd-chat-input" type="text" maxlength="200" placeholder="Type a clue or hold 🎙️..."
             class="flex-1 min-w-0 px-3.5 py-2.5 rounded-2xl bg-slate-900 border border-slate-700/80 focus:border-violet-500 outline-none text-sm text-white placeholder:text-slate-500" />
@@ -687,6 +717,8 @@
             </span>
           </div>
           <div id="odd-voting-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+          <!-- Host Force-End Vote Controls -->
+          <div id="odd-host-end-vote-box"></div>
         </div>
       </div>
     </section>
@@ -709,6 +741,9 @@
           Night Actions
         </span>
       </div>
+
+      <!-- Live In-Game Roster Strip -->
+      <div id="mafia-live-roster" class="flex flex-wrap items-center gap-1.5"></div>
 
       <div id="mafia-role-banner" class="w-full rounded-3xl bg-gradient-to-br from-sky-700 via-indigo-800 to-slate-950 border border-sky-400/40 p-4 flex flex-col items-center justify-center text-center shadow-2xl transition-all">
         <div class="flex flex-wrap items-center justify-center gap-1.5 mb-1">
@@ -767,7 +802,7 @@
           </span>
         </div>
 
-        <div id="mafia-chat-list" class="flex-1 p-3.5 space-y-2.5 overflow-y-auto min-h-[180px] max-h-[250px] sm:max-h-[300px]"></div>
+        <div id="mafia-chat-list" class="flex-1 p-3.5 space-y-2.5 overflow-y-auto min-h-[170px] max-h-[240px] sm:max-h-[290px]"></div>
 
         <form onsubmit="window.sendChatMessage(event, 'mafia-chat-input')" class="p-2.5 border-t border-slate-800 bg-slate-950/70 flex items-center gap-1.5">
           <input id="mafia-chat-input" type="text" maxlength="200" placeholder="Discuss who the Mafia is..."
@@ -796,6 +831,8 @@
             </span>
           </div>
           <div id="mafia-voting-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+          <!-- Host Force-End Vote Controls -->
+          <div id="mafia-host-end-vote-box"></div>
         </div>
       </div>
     </section>
@@ -818,6 +855,9 @@
           Chat Charades
         </span>
       </div>
+
+      <!-- Live In-Game Roster Strip -->
+      <div id="guess-live-roster" class="flex flex-wrap items-center gap-1.5"></div>
 
       <div id="guess-role-banner" class="w-full rounded-3xl bg-gradient-to-br from-amber-600 via-orange-700 to-slate-900 border border-amber-400/40 p-4 flex flex-col items-center justify-center text-center shadow-2xl shadow-amber-900/35">
         <div class="flex flex-wrap items-center justify-center gap-1.5 mb-1">
@@ -849,7 +889,7 @@
           </span>
         </div>
 
-        <div id="guess-chat-list" class="flex-1 p-3.5 space-y-2.5 overflow-y-auto min-h-[180px] max-h-[250px] sm:max-h-[300px]"></div>
+        <div id="guess-chat-list" class="flex-1 p-3.5 space-y-2.5 overflow-y-auto min-h-[170px] max-h-[240px] sm:max-h-[290px]"></div>
 
         <form onsubmit="window.sendGuessChatMessage(event)" class="p-2.5 border-t border-slate-800 bg-slate-950/70 flex items-center gap-1.5">
           <input id="guess-chat-input" type="text" maxlength="200" placeholder="Type a hint or your guess..."
@@ -883,10 +923,9 @@
     </section>
 
     <!-- ===================================================================== -->
-    <!-- VIEW 3D: DRAW TO FIND (4TH GAME — SHARED CANVAS + THE BLENDER)        -->
+    <!-- VIEW 3D: DRAW TO FIND (4TH GAME — 45s TIMER + NOW DRAW + 1 STROKE)    -->
     <!-- ===================================================================== -->
     <section id="view-game-draw" class="hidden flex-1 flex flex-col space-y-3 animate-pop-in">
-      <!-- Top Status Strip -->
       <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-900/90 border border-slate-800 rounded-2xl px-3.5 py-2">
         <div class="flex items-center gap-1.5">
           <span id="draw-round-badge" class="px-2.5 py-0.5 rounded-lg bg-cyan-500/20 border border-cyan-500/30 text-xs font-extrabold text-cyan-300">
@@ -896,13 +935,16 @@
             ✏️ Drawing Cycle 1 / 2
           </span>
         </div>
-        <span id="draw-phase-badge" class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-cyan-300">
-          <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-          Drawing Phase
-        </span>
+        <div class="flex items-center gap-1.5">
+          <span id="draw-timer-badge" class="px-2.5 py-0.5 rounded-lg bg-amber-500/20 border border-amber-400/40 text-xs font-display font-extrabold text-amber-300">
+            ⏱️ 45s
+          </span>
+          <span id="draw-phase-badge" class="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-cyan-300">
+            Turn 1/8
+          </span>
+        </div>
       </div>
 
-      <!-- Secret Word vs The Blender Banner -->
       <div id="draw-secret-banner" class="w-full rounded-3xl bg-gradient-to-br from-cyan-700 via-blue-800 to-slate-950 border border-cyan-400/40 p-3.5 flex flex-col items-center justify-center text-center shadow-2xl">
         <div class="flex flex-wrap items-center justify-center gap-1.5 mb-0.5">
           <span id="draw-category-tag" class="px-2.5 py-0.5 rounded-full bg-black/35 border border-white/15 text-[10px] font-bold uppercase tracking-widest text-cyan-100">
@@ -916,12 +958,12 @@
           ---
         </h3>
         <p id="draw-role-instruction" class="text-[11px] text-cyan-100/90 max-w-md mt-0.5 leading-snug">
-          Draw a subtle clue on your turn so fellow innocents know you know the word without giving it away to The Blender!
+          Tap "Now Draw" on your turn and draw 1 single line (lifting your finger finishes your turn!).
         </p>
       </div>
 
-      <!-- Player Pen Color Legend -->
-      <div id="draw-pen-legend" class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 bg-slate-900/90 border border-slate-800 rounded-2xl p-2.5"></div>
+      <!-- Player Pen Color Legend (Includes Live Active/Away Dot + Host Kick) -->
+      <div id="draw-pen-legend" class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 bg-slate-900/90 border border-slate-800 rounded-2xl p-2.5"></div>
 
       <!-- Shared Real-Time Drawing Canvas Card -->
       <div class="rounded-3xl bg-slate-900/90 border border-slate-800 p-3 shadow-xl space-y-2.5">
@@ -929,16 +971,26 @@
           <div id="draw-turn-status-text" class="text-xs font-extrabold text-white">
             Waiting for active artist...
           </div>
-          <button id="btn-finish-draw-turn" type="button" onclick="window.finishCurrentDrawTurn()"
-            class="hidden px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs shadow transition active:scale-95">
-            ✅ Done Turn
-          </button>
+          <span id="draw-stroke-rule-pill" class="text-[10px] font-bold text-slate-400 shrink-0">
+            1 stroke / 45s
+          </span>
         </div>
 
-        <!-- Crisp White Shared Sketch Pad -->
         <div class="relative w-full aspect-[4/3] max-h-[290px] rounded-2xl overflow-hidden border-2 border-slate-700 bg-white shadow-inner">
           <canvas id="draw-canvas" width="600" height="450" class="w-full h-full block"></canvas>
-          <div id="draw-canvas-lock-overlay" class="hidden absolute inset-0 bg-slate-950/15 pointer-events-none flex items-end justify-center pb-2">
+
+          <div id="draw-now-center-overlay" class="hidden absolute inset-0 bg-slate-950/35 backdrop-blur-[1px] flex flex-col items-center justify-center p-4 z-10">
+            <button type="button" onclick="window.activateNowDraw()"
+              class="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-display font-extrabold text-base sm:text-lg shadow-2xl shadow-emerald-950/60 border-2 border-white/80 flex items-center gap-2 transition transform hover:scale-105 active:scale-95">
+              <span>✏️</span>
+              <span>Now Draw</span>
+            </button>
+            <span class="mt-2 px-3 py-1 rounded-full bg-slate-950/90 text-[11px] font-bold text-white shadow">
+              Tap above, draw 1 continuous line, then lift finger!
+            </span>
+          </div>
+
+          <div id="draw-canvas-lock-overlay" class="hidden absolute inset-0 bg-slate-950/10 pointer-events-none flex items-end justify-center pb-2">
             <span class="px-3 py-1 rounded-full bg-slate-950/85 text-[11px] font-bold text-slate-200 shadow">
               👀 Watching live drawing...
             </span>
@@ -946,7 +998,7 @@
         </div>
       </div>
 
-      <!-- Chat & 2-Click Voting Panel (Voting unlocks after 2 full drawing cycles) -->
+      <!-- Chat & 2-Click Voting Panel -->
       <div class="flex-1 flex flex-col bg-slate-900/90 border border-slate-800 rounded-3xl overflow-hidden shadow-xl">
         <div class="px-4 py-2 border-b border-slate-800 flex items-center justify-between gap-2 bg-slate-950/50">
           <div>
@@ -977,7 +1029,6 @@
           </button>
         </form>
 
-        <!-- 2-Click Blender Voting Panel (Appears after Cycle 2 completes) -->
         <div id="draw-voting-panel" class="hidden p-3.5 border-t border-slate-800/90 bg-slate-950/90 space-y-2">
           <div class="flex items-center justify-between gap-2">
             <span class="text-[11px] font-extrabold uppercase tracking-wider text-amber-300 flex items-center gap-1">
@@ -988,6 +1039,8 @@
             </span>
           </div>
           <div id="draw-voting-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+          <!-- Host Force-End Vote Controls -->
+          <div id="draw-host-end-vote-box"></div>
         </div>
       </div>
     </section>
@@ -996,7 +1049,6 @@
     <!-- VIEW 4: DRAMATIC REVEAL & SCOREBOARD                                  -->
     <!-- ===================================================================== -->
     <section id="view-results" class="hidden flex-1 flex flex-col space-y-3.5 animate-pop-in">
-      <!-- Winner Banner -->
       <div id="results-winner-banner" class="rounded-3xl p-5 text-center border shadow-2xl space-y-1.5 bg-gradient-to-br from-emerald-900/70 via-slate-900 to-slate-950 border-emerald-500/40">
         <div id="results-winner-emoji" class="text-4xl mb-1">🎉</div>
         <h2 id="results-winner-title" class="font-display text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
@@ -1099,7 +1151,7 @@
 
   </main>
 
-  <!-- Floating Recording Indicator Pill (Appears while holding Mic button) -->
+  <!-- Floating Recording Indicator Pill -->
   <div id="voice-recording-overlay" class="hidden fixed bottom-24 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-rose-600 border-2 border-rose-300 text-white font-extrabold text-xs shadow-2xl flex items-center gap-2 animate-pulse pointer-events-none">
     <span class="w-2.5 h-2.5 rounded-full bg-white"></span>
     <span id="voice-recording-timer">Recording Voice Note... 0.0s / 10.0s</span>
@@ -1131,7 +1183,7 @@
       : USER_FIREBASE_CONFIG;
 
     // =========================================================================
-    // 2. COMPLETE CHARACTER & WORD DATABASE (14 Anime, 11 Cartoons, 12 Everyday)
+    // 2. COMPLETE CHARACTER & WORD DATABASE
     // =========================================================================
     const CHARACTER_DATABASE = [
       // ==================== 14 ANIME UNIVERSES ====================
@@ -1320,7 +1372,54 @@
       { name: "Monsoon Rain", universe: "Weather", pack: "EVERYDAY", archetype: "WEATHER_ITEM", clues: ["Heavy seasonal downpour accompanied by petrichor smell", "Requires umbrellas, raincoats, and chai-pakora", "Brings relief after scorching summer heat"] },
       { name: "Thunderstorm", universe: "Weather", pack: "EVERYDAY", archetype: "WEATHER_ITEM", clues: ["Dark storm clouds with bright lightning flashes and loud thunder", "Gusty winds and heavy rain", "Makes windows rattle"] },
       { name: "Snowfall", universe: "Weather", pack: "EVERYDAY", archetype: "WEATHER_ITEM", clues: ["Soft white ice flakes drifting down in freezing winter", "Blankets mountains like Manali and Kashmir", "Perfect for snowballs and snowmen"] },
-      { name: "Rainbow", universe: "Weather", pack: "EVERYDAY", archetype: "WEATHER_ITEM", clues: ["Seven-colored arch (VIBGYOR) appearing in the sky", "Forms when sunlight shines through raindrops", "Magical post-rain sight"] }
+      { name: "Rainbow", universe: "Weather", pack: "EVERYDAY", archetype: "WEATHER_ITEM", clues: ["Seven-colored arch (VIBGYOR) appearing in the sky", "Forms when sunlight shines through raindrops", "Magical post-rain sight"] },
+
+      // ==================== EXCLUSIVE DRAW TO FIND THINGS (45 OBJECTS) ====================
+      { name: "Burger", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Layered sandwich with buns, patty, cheese, and lettuce"] },
+      { name: "Plane", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Winged aircraft flying in the sky"] },
+      { name: "Door", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Rectangular entrance with a handle or doorknob"] },
+      { name: "Mountain", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Tall rocky peak often drawn with snow on top"] },
+      { name: "Metro", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Sleek city train running on tracks"] },
+      { name: "Laptop", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Folding portable computer with screen and keyboard"] },
+      { name: "Umbrella", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Curved canopy with a J-shaped handle for rain"] },
+      { name: "Bicycle", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Two wheels connected by a frame and handlebars"] },
+      { name: "Guitar", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Musical string instrument with a long neck and sound hole"] },
+      { name: "Camera", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Boxy device with a round lens in the center"] },
+      { name: "Clock", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Round face with hour and minute hands"] },
+      { name: "Bridge", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Arch or suspension road crossing over water"] },
+      { name: "Rocket", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Pointed space vehicle with fins and exhaust flames"] },
+      { name: "Lighthouse", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Tall striped coastal tower shining a light beam"] },
+      { name: "Crown", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Royal headpiece with pointed spikes and jewels"] },
+      { name: "Telescope", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Long tube on a tripod used to look at stars"] },
+      { name: "Cactus", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Spiky desert plant with raised arms in a pot"] },
+      { name: "Headphones", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Arch band with two padded ear cups"] },
+      { name: "Pizza", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Triangular slice or round pie with pepperoni circles"] },
+      { name: "Submarine", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Underwater vessel with a periscope on top"] },
+      { name: "Castle", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Fortress with stone towers, flags, and arched gate"] },
+      { name: "Helicopter", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Aircraft with spinning rotor blades on top"] },
+      { name: "Ice Cream", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Waffle cone topped with round scoops"] },
+      { name: "Hammer", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Wooden handle with a flat metal head for nails"] },
+      { name: "Key", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Round bow with a notched metal shaft for locks"] },
+      { name: "Backpack", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["School bag with zippers and two shoulder straps"] },
+      { name: "Skateboard", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Flat curved deck riding on four small wheels"] },
+      { name: "Trophy", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Winner's cup with two handles on a pedestal"] },
+      { name: "Treehouse", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Small wooden cabin built up in tree branches"] },
+      { name: "Anchor", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Heavy hooked ship weight with a top ring"] },
+      { name: "Volcano", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Mountain crater erupting lava and smoke"] },
+      { name: "Robot", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Square metal head with antenna and boxy body"] },
+      { name: "Windmill", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Tower with four giant X-shaped spinning blades"] },
+      { name: "Glasses", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Two lens frames connected by a nose bridge"] },
+      { name: "Lantern", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Hanging glass lamp with a glowing flame inside"] },
+      { name: "Tent", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Triangular camping shelter with front flaps"] },
+      { name: "Hot Air Balloon", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Giant round balloon carrying a small basket"] },
+      { name: "Sandwich", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Two square bread slices with fillings between"] },
+      { name: "Ferris Wheel", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Giant carnival wheel with hanging passenger cabins"] },
+      { name: "Diamond", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Faceted sparkling gem with a flat top and pointed bottom"] },
+      { name: "Paintbrush", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Artist handle with bristles dipped in paint"] },
+      { name: "Megaphone", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Cone-shaped loudspeaker with a handle"] },
+      { name: "Traffic Light", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Vertical pole box with three stacked signal circles"] },
+      { name: "Ladder", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Two long side rails joined by horizontal rungs"] },
+      { name: "Candle", universe: "Everyday Things", pack: "DRAW_THINGS", archetype: "DRAW_OBJ", clues: ["Wax cylinder with a teardrop flame on top"] }
     ];
 
     const AVATAR_COLORS = [
@@ -1332,7 +1431,6 @@
       "from-fuchsia-500 to-purple-600"
     ];
 
-    // Distinct Pen Colors for Draw To Find (Player 1 = Blue, Player 2 = Red, Player 3 = Green, Player 4 = Yellow, etc.)
     const DRAW_PEN_PALETTE = [
       { name: "Blue", hex: "#2563eb", badgeBg: "bg-blue-500/20 border-blue-400/50 text-blue-300" },
       { name: "Red", hex: "#dc2626", badgeBg: "bg-rose-500/20 border-rose-400/50 text-rose-300" },
@@ -1345,7 +1443,133 @@
     const BOT_NAMES = ["Bot Zuko", "Bot Levi", "Bot Nova", "Bot Kira", "Bot Ren"];
 
     // =========================================================================
-    // 3. FIREBASE REAL-TIME MULTIPLAYER & PERMANENT PROFILE STATE
+    // 3. WEB AUDIO API SOUND EFFECTS ENGINE (WITH MUTE TOGGLE)
+    // =========================================================================
+    let soundMuted = localStorage.getItem('odd_one_mafia_muted') === '1';
+    let sharedAudioCtx = null;
+
+    function updateSoundToggleUI() {
+      const btn = document.getElementById('btn-sound-toggle');
+      if (!btn) return;
+      btn.textContent = soundMuted ? '🔇' : '🔊';
+      btn.className = soundMuted
+        ? 'w-8 h-8 rounded-xl bg-slate-900 border border-slate-800 text-xs font-extrabold text-slate-500 flex items-center justify-center transition active:scale-95'
+        : 'w-8 h-8 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700 text-xs font-extrabold text-slate-200 flex items-center justify-center transition active:scale-95';
+    }
+    updateSoundToggleUI();
+
+    window.toggleSoundMute = function () {
+      soundMuted = !soundMuted;
+      localStorage.setItem('odd_one_mafia_muted', soundMuted ? '1' : '0');
+      updateSoundToggleUI();
+      if (!soundMuted) playSoundEffect('chime');
+    };
+
+    function playSoundEffect(type) {
+      if (soundMuted) return;
+      try {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return;
+        if (!sharedAudioCtx) sharedAudioCtx = new AudioContextClass();
+        if (sharedAudioCtx.state === 'suspended') sharedAudioCtx.resume();
+
+        const now = sharedAudioCtx.currentTime;
+        const osc = sharedAudioCtx.createOscillator();
+        const gain = sharedAudioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(sharedAudioCtx.destination);
+
+        if (type === 'turn') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(523.25, now);
+          osc.frequency.setValueAtTime(659.25, now + 0.1);
+          gain.gain.setValueAtTime(0.14, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
+          osc.start(now);
+          osc.stop(now + 0.32);
+        } else if (type === 'tick') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(880, now);
+          gain.gain.setValueAtTime(0.07, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+          osc.start(now);
+          osc.stop(now + 0.08);
+        } else if (type === 'invite') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(587.33, now);
+          osc.frequency.setValueAtTime(783.99, now + 0.12);
+          osc.frequency.setValueAtTime(1046.5, now + 0.24);
+          gain.gain.setValueAtTime(0.13, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+          osc.start(now);
+          osc.stop(now + 0.45);
+        } else if (type === 'reveal') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.setValueAtTime(554.37, now + 0.12);
+          osc.frequency.setValueAtTime(659.25, now + 0.24);
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+          osc.start(now);
+          osc.stop(now + 0.5);
+        } else {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(600, now);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+          osc.start(now);
+          osc.stop(now + 0.18);
+        }
+      } catch (e) {}
+    }
+
+    // =========================================================================
+    // 4. ACCIDENTAL BACK BUTTON & PAGE UNLOAD GUARD
+    // =========================================================================
+    let backGuardPushed = false;
+
+    function enableRoomBackGuard() {
+      if (!backGuardPushed) {
+        try {
+          window.history.pushState({ inGameRoom: true }, '', window.location.href);
+          backGuardPushed = true;
+        } catch (e) {}
+      }
+    }
+
+    window.addEventListener('popstate', () => {
+      if (currentRoomCode && currentRoomData) {
+        backGuardPushed = false;
+        enableRoomBackGuard();
+        window.requestExitConfirmation();
+      }
+    });
+
+    window.addEventListener('beforeunload', (e) => {
+      if (currentRoomCode && currentRoomData) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    });
+
+    window.requestExitConfirmation = function () {
+      if (!currentRoomCode) return;
+      document.getElementById('exit-modal-room-code').textContent = currentRoomCode;
+      document.getElementById('exit-confirm-modal').classList.remove('hidden');
+    };
+
+    window.cancelExitConfirmation = function () {
+      document.getElementById('exit-confirm-modal').classList.add('hidden');
+    };
+
+    window.confirmExitRoom = async function () {
+      document.getElementById('exit-confirm-modal').classList.add('hidden');
+      backGuardPushed = false;
+      await window.leaveRoom();
+    };
+
+    // =========================================================================
+    // 5. FIREBASE REAL-TIME MULTIPLAYER & PERMANENT PROFILE STATE
     // =========================================================================
     let auth = null;
     let db = null;
@@ -1353,9 +1577,10 @@
     let isLocalFallback = false;
 
     let currentUser = { uid: 'player_' + Math.random().toString(36).slice(2, 10) };
-    let userProfile = null; // { username, pin, displayName, friends: [], friendRequests: [], invites: [] }
+    let userProfile = null;
     let profileUnsubscribe = null;
     let heartbeatInterval = null;
+    let roomHeartbeatInterval = null;
     let authModalMode = 'register';
     let activeRoomInvite = null;
 
@@ -1372,11 +1597,18 @@
     // 2-Click Confirmation States
     let pendingVoteTargetUid = null;
     let pendingGuessWinnerUid = null;
+    let pendingForceEndVote = false;
+    let pendingKickPlayerUid = null;
 
-    // Draw To Find Canvas State
+    // Draw To Find Canvas, "Now Draw" Unlock & 45s Timer States
     let isDrawingStroke = false;
     let currentStrokePoints = [];
     let hasDrawnThisTurn = false;
+    let hasClickedNowDraw = false;
+    let drawCountdownInterval = null;
+    let timeoutAdvanceTriggeredForTurn = -1;
+    let lastAlertedTurnIndex = -1;
+    let lastTickSecond = -1;
 
     // 10-Second Hold-to-Record Voice Message State
     let mediaRecorder = null;
@@ -1386,7 +1618,6 @@
     let voiceTimerInterval = null;
     let voiceAutoStopTimeout = null;
 
-    // Check URL invite parameter (?room=XXXXX)
     const urlParams = new URLSearchParams(window.location.search);
     const invitedRoomParam = (urlParams.get('room') || '').toUpperCase().trim();
     if (invitedRoomParam && invitedRoomParam.length === 5) {
@@ -1422,7 +1653,7 @@
     }
 
     // =========================================================================
-    // 4. PERMANENT @USERNAME + 4-DIGIT PIN PROFILE SYSTEM
+    // 6. PERMANENT @USERNAME + 4-DIGIT PIN PROFILE SYSTEM
     // =========================================================================
     function sanitizeUsername(raw) {
       return String(raw || '').toLowerCase().replace(/^@+/, '').replace(/[^a-z0-9_]/g, '').slice(0, 16);
@@ -1449,7 +1680,6 @@
           console.warn('Session restore error:', e);
         }
       }
-      // First-time visitor: show permanent profile setup modal
       document.getElementById('auth-modal').classList.remove('hidden');
     }
 
@@ -1535,7 +1765,6 @@
             showToast(`Welcome back, @${username}!`, 'success');
           }
         } else {
-          // Local fallback profile
           const localProf = {
             username,
             pin,
@@ -1593,13 +1822,13 @@
         userProfile = snap.data();
         updateFriendsUI();
 
-        // Check for incoming room invites (within last 2 minutes)
         const invites = Array.isArray(userProfile.invites) ? userProfile.invites : [];
         const freshInvites = invites.filter(inv => Date.now() - (inv.createdAt || 0) < 120000);
         if (freshInvites.length > 0 && !currentRoomCode) {
           const latest = freshInvites[freshInvites.length - 1];
           if (!activeRoomInvite || activeRoomInvite.roomCode !== latest.roomCode || activeRoomInvite.createdAt !== latest.createdAt) {
             activeRoomInvite = latest;
+            playSoundEffect('invite');
             const gameLabel = latest.gameType === 'MAFIA'
               ? 'Mafia'
               : latest.gameType === 'DRAW_TO_FIND'
@@ -1613,16 +1842,15 @@
         }
       });
 
-      // Keep online status fresh every 25 seconds
       heartbeatInterval = setInterval(() => {
         if (firebaseReady && !isLocalFallback && db && userProfile) {
           updateDoc(userRef, { lastSeen: Date.now() }).catch(() => {});
         }
-      }, 25000);
+      }, 20000);
     }
 
     // =========================================================================
-    // 5. PERMANENT FRIENDS LIST & 1-TAP DIRECT ROOM INVITES
+    // 7. PERMANENT FRIENDS LIST & 1-TAP DIRECT ROOM INVITES
     // =========================================================================
     window.toggleFriendsModal = function (show) {
       const modal = document.getElementById('friends-modal');
@@ -1761,7 +1989,6 @@
         reqBadge.classList.add('hidden');
       }
 
-      // Render Incoming Friend Requests
       const reqSection = document.getElementById('friend-requests-section');
       const reqList = document.getElementById('friend-requests-list');
       if (requests.length > 0) {
@@ -1788,7 +2015,6 @@
         reqSection.classList.add('hidden');
       }
 
-      // Render Saved Friends in Modal & Lobby Invite Bar
       const listContainer = document.getElementById('friends-list-container');
       const lobbyInviteRow = document.getElementById('lobby-friends-invite-row');
       listContainer.innerHTML = '';
@@ -1851,7 +2077,191 @@
     }
 
     // =========================================================================
-    // 6. LANDING SCREEN CONTROLS
+    // 8. ROOM HEARTBEAT (ACTIVE vs AWAY) & HOST KICK / FORCE-END VOTE
+    // =========================================================================
+    function isPlayerActive(player) {
+      if (!player) return false;
+      if (player.isBot || player.uid === currentUser.uid) return true;
+      const lastSeen = Number(player.lastSeen) || Number(player.joinedAt) || 0;
+      return (Date.now() - lastSeen) < 25000;
+    }
+
+    function startRoomHeartbeat() {
+      if (roomHeartbeatInterval) clearInterval(roomHeartbeatInterval);
+      roomHeartbeatInterval = setInterval(async () => {
+        if (!currentRoomCode || !currentRoomData || !firebaseReady || isLocalFallback || !db) return;
+        const players = currentRoomData.players || [];
+        const meIdx = players.findIndex(p => p.uid === currentUser.uid);
+        if (meIdx === -1) return;
+
+        const updated = [...players];
+        updated[meIdx] = { ...updated[meIdx], lastSeen: Date.now() };
+        try {
+          await updateDoc(getRoomDocRef(currentRoomCode), { players: updated });
+        } catch (e) {}
+      }, 10000);
+    }
+
+    function stopRoomHeartbeat() {
+      if (roomHeartbeatInterval) {
+        clearInterval(roomHeartbeatInterval);
+        roomHeartbeatInterval = null;
+      }
+    }
+
+    // Host Kick Player (2-click confirmation)
+    window.selectPendingKick = function (targetUid) {
+      if (!currentRoomData || currentRoomData.hostId !== currentUser.uid) return;
+      if (targetUid === currentUser.uid) return;
+      pendingKickPlayerUid = targetUid;
+      renderRoomState(currentRoomData);
+    };
+
+    window.cancelPendingKick = function () {
+      pendingKickPlayerUid = null;
+      if (currentRoomData) renderRoomState(currentRoomData);
+    };
+
+    window.confirmKickPlayer = async function (targetUid) {
+      if (!currentRoomData || currentRoomData.hostId !== currentUser.uid) return;
+      if (targetUid === currentUser.uid) return;
+
+      const targetPlayer = (currentRoomData.players || []).find(p => p.uid === targetUid);
+      const updatedPlayers = (currentRoomData.players || []).filter(p => p.uid !== targetUid);
+      const nextMax = Math.max(
+        currentRoomData.gameType === 'MAFIA' ? 4 : 3,
+        Math.min(Number(currentRoomData.maxPlayers) || 4, updatedPlayers.length)
+      );
+
+      const updatedVotes = { ...(currentRoomData.votes || {}) };
+      delete updatedVotes[targetUid];
+      Object.keys(updatedVotes).forEach(voterUid => {
+        if (updatedVotes[voterUid] === targetUid) delete updatedVotes[voterUid];
+      });
+
+      const updatedAlive = (currentRoomData.alivePlayerIds || []).filter(id => id !== targetUid);
+      pendingKickPlayerUid = null;
+
+      await saveRoomPatch({
+        players: updatedPlayers,
+        maxPlayers: nextMax,
+        votes: updatedVotes,
+        alivePlayerIds: updatedAlive,
+        drawTurnStartedAt: Date.now()
+      });
+
+      if (targetPlayer) {
+        showToast(`👢 Removed ${targetPlayer.name} from the room.`, 'info');
+        await appendChatMessage({
+          round: currentRoomData.round,
+          senderId: 'SYSTEM',
+          senderName: 'Room Host',
+          text: `👢 ${targetPlayer.name} was removed from the room by the host.`,
+          createdAt: Date.now()
+        });
+      }
+    };
+
+    // Host Force-End Vote (2-click confirmation)
+    window.selectForceEndVote = function () {
+      if (!currentRoomData || currentRoomData.hostId !== currentUser.uid) return;
+      pendingForceEndVote = true;
+      renderRoomState(currentRoomData);
+    };
+
+    window.cancelForceEndVote = function () {
+      pendingForceEndVote = false;
+      if (currentRoomData) renderRoomState(currentRoomData);
+    };
+
+    window.confirmForceEndVote = async function () {
+      if (!currentRoomData || currentRoomData.hostId !== currentUser.uid) return;
+      pendingForceEndVote = false;
+      const gType = currentRoomData.gameType || 'ODD_ONE_OUT';
+
+      await appendChatMessage({
+        round: currentRoomData.round,
+        senderId: 'SYSTEM',
+        senderName: 'Room Host',
+        text: '🛑 Host ended the vote early! Tallying current votes now...',
+        createdAt: Date.now()
+      });
+
+      if (gType === 'MAFIA') {
+        const aliveIds = currentRoomData.alivePlayerIds || currentRoomData.players.map(p => p.uid);
+        await resolveMafiaDayVote(currentRoomData, aliveIds);
+      } else if (gType === 'DRAW_TO_FIND') {
+        await finalizeDrawToFindResults(currentRoomData);
+      } else {
+        await finalizeOddOneOutResults(currentRoomData);
+      }
+    };
+
+    function buildHostEndVoteHtml(isHost) {
+      if (!isHost) return '';
+      if (pendingForceEndVote) {
+        return `
+          <div class="mt-2 p-2.5 rounded-2xl bg-rose-500/15 border border-rose-500/50 space-y-2 animate-pop-in">
+            <div class="text-[11px] font-extrabold text-rose-200 text-center">
+              🛑 End voting right now and tally current votes?
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <button type="button" onclick="window.confirmForceEndVote()"
+                class="py-2 px-3 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-[11px] transition active:scale-95">
+                ✅ Yes, End Vote Now
+              </button>
+              <button type="button" onclick="window.cancelForceEndVote()"
+                class="py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-[11px] transition active:scale-95">
+                Cancel
+              </button>
+            </div>
+          </div>
+        `;
+      }
+      return `
+        <div class="pt-1 flex justify-end">
+          <button type="button" onclick="window.selectForceEndVote()"
+            class="px-3 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/40 text-[11px] font-extrabold text-rose-300 transition active:scale-95">
+            🛑 Host: End Vote Now
+          </button>
+        </div>
+      `;
+    }
+
+    function renderLiveRosterStrip(containerId, data, isHost) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      container.innerHTML = '';
+      const players = data.players || [];
+
+      players.forEach(p => {
+        const active = isPlayerActive(p);
+        const isMe = p.uid === currentUser.uid;
+        const canKick = isHost && !isMe;
+        const isPendingKick = pendingKickPlayerUid === p.uid;
+
+        if (isPendingKick) {
+          container.innerHTML += `
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-rose-500/20 border border-rose-400 text-[11px] font-extrabold text-rose-200">
+              <span>Kick ${escapeHtml(p.name)}?</span>
+              <button type="button" onclick="window.confirmKickPlayer('${p.uid}')" class="px-1.5 py-0.5 rounded bg-rose-600 text-white">Yes</button>
+              <button type="button" onclick="window.cancelPendingKick()" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">No</button>
+            </div>
+          `;
+        } else {
+          container.innerHTML += `
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-900/90 border border-slate-800 text-[11px] font-bold text-slate-200">
+              <span class="w-2 h-2 rounded-full ${active ? 'bg-emerald-400' : 'bg-amber-400 animate-pulse'}" title="${active ? 'Active' : 'Away / Offline'}"></span>
+              <span>${escapeHtml(p.name)}</span>
+              ${canKick ? `<button type="button" onclick="window.selectPendingKick('${p.uid}')" class="ml-0.5 text-[10px] font-extrabold text-rose-400 hover:text-rose-300" title="Kick Player">✕</button>` : ''}
+            </div>
+          `;
+        }
+      });
+    }
+
+    // =========================================================================
+    // 9. LANDING SCREEN CONTROLS
     // =========================================================================
     window.selectLandingGameType = function (type) {
       landingGameType = ['ODD_ONE_OUT', 'DRAW_TO_FIND', 'MAFIA', 'GUESS_THE_NAME'].includes(type) ? type : 'ODD_ONE_OUT';
@@ -1931,7 +2341,7 @@
     initFirebaseConnection();
 
     // =========================================================================
-    // 7. UI & FIRESTORE HELPERS
+    // 10. UI & FIRESTORE HELPERS
     // =========================================================================
     function showToast(message, type = 'info') {
       const container = document.getElementById('toast-container');
@@ -1959,6 +2369,11 @@
       });
       const target = document.getElementById(viewId);
       if (target) target.classList.remove('hidden');
+
+      if (viewId !== 'view-game-draw' && drawCountdownInterval) {
+        clearInterval(drawCountdownInterval);
+        drawCountdownInterval = null;
+      }
 
       const headerControls = document.getElementById('header-room-controls');
       const profileControls = document.getElementById('header-profile-controls');
@@ -2052,7 +2467,7 @@
     }
 
     // =========================================================================
-    // 8. HOLD-TO-RECORD VOICE NOTES (MAX 10 SECONDS)
+    // 11. HOLD-TO-RECORD VOICE NOTES (MAX 10 SECONDS)
     // =========================================================================
     window.startVoiceRecording = async function (event) {
       if (event) event.preventDefault();
@@ -2137,7 +2552,6 @@
 
         mediaRecorder.start();
 
-        // Automatically stop & send at 10.0 seconds max
         voiceAutoStopTimeout = setTimeout(() => {
           if (isRecordingVoice) {
             window.stopVoiceRecording();
@@ -2172,7 +2586,7 @@
     };
 
     // =========================================================================
-    // 9. CREATE & JOIN ROOMS
+    // 12. CREATE, JOIN & AUTOMATIC HOST TRANSFER ON LEAVE
     // =========================================================================
     window.createRoom = async function () {
       const nickname = getPlayerNickname();
@@ -2203,6 +2617,7 @@
           colorIdx: 0,
           score: 0,
           isBot: false,
+          lastSeen: Date.now(),
           joinedAt: Date.now()
         };
 
@@ -2214,7 +2629,6 @@
           round: 0,
           maxPlayers: landingMaxPlayers,
           players: [initialPlayer],
-          // Odd One Out settings
           imposterKnows: true,
           crossServerMode: false,
           selectedPack: 'ALL',
@@ -2227,14 +2641,13 @@
           imposterId: '',
           usedPairsHistory: [],
           recentMajorityHistory: [],
-          // Draw To Find state
           drawWord: '',
           drawUniverse: '',
           blenderId: '',
-          drawPhase: 'drawing', // 'drawing' or 'voting'
-          drawTurnIndex: 0,     // 0 to (maxPlayers * 2 - 1) across 2 cycles
-          drawStrokes: [],      // [{ playerId, color, points: [{x, y}] }]
-          // Mafia state
+          drawPhase: 'drawing',
+          drawTurnIndex: 0,
+          drawTurnStartedAt: 0,
+          drawStrokes: [],
           mafiaPhase: 'night',
           mafiaTurnNumber: 1,
           mafiaRoles: {},
@@ -2242,13 +2655,11 @@
           nightKillTarget: null,
           nightSaveTarget: null,
           morningReport: '',
-          // Guess The Name state
           clueGiverId: '',
           guessSecretWord: '',
           guessSecretUniverse: '',
           guessWinnerId: '',
           usedGuessWords: [],
-          // Shared voting
           votes: {},
           createdAt: Date.now()
         };
@@ -2263,6 +2674,9 @@
           document.getElementById('header-room-code').textContent = code;
           renderRoomState(currentRoomData);
         }
+
+        enableRoomBackGuard();
+        startRoomHeartbeat();
 
         const label = landingGameType === 'MAFIA'
           ? 'Mafia'
@@ -2320,8 +2734,11 @@
 
         if (existingIdx !== -1) {
           players[existingIdx].name = nickname;
+          players[existingIdx].lastSeen = Date.now();
           await updateDoc(ref, { players });
           subscribeToRoom(code);
+          enableRoomBackGuard();
+          startRoomHeartbeat();
           return;
         }
 
@@ -2335,10 +2752,13 @@
               colorIdx: players[botIdx].colorIdx,
               score: 0,
               isBot: false,
+              lastSeen: Date.now(),
               joinedAt: Date.now()
             };
             await updateDoc(ref, { players });
             subscribeToRoom(code);
+            enableRoomBackGuard();
+            startRoomHeartbeat();
             showToast(`Joined room ${code}!`, 'success');
             return;
           }
@@ -2367,11 +2787,14 @@
           colorIdx: assignedColor,
           score: 0,
           isBot: false,
+          lastSeen: Date.now(),
           joinedAt: Date.now()
         });
 
         await updateDoc(ref, { players });
         subscribeToRoom(code);
+        enableRoomBackGuard();
+        startRoomHeartbeat();
         showToast(`Joined room ${code}!`, 'success');
       } catch (err) {
         console.error('Join room error:', err);
@@ -2391,6 +2814,11 @@
         chatUnsubscribe = null;
       }
       if (botActionTimeout) clearTimeout(botActionTimeout);
+      if (drawCountdownInterval) {
+        clearInterval(drawCountdownInterval);
+        drawCountdownInterval = null;
+      }
+      stopRoomHeartbeat();
 
       const leavingCode = currentRoomCode;
       const leavingData = currentRoomData;
@@ -2399,14 +2827,18 @@
       localChatMessages = [];
       pendingVoteTargetUid = null;
       pendingGuessWinnerUid = null;
+      pendingForceEndVote = false;
+      pendingKickPlayerUid = null;
       hasDrawnThisTurn = false;
+      hasClickedNowDraw = false;
 
+      // Automatic Host Transfer if the room maker leaves
       if (firebaseReady && !isLocalFallback && db && leavingCode && leavingData && currentUser) {
         try {
-          const remainingHumans = (leavingData.players || []).filter(p => p.uid !== currentUser.uid && !p.isBot);
+          const updatedPlayers = (leavingData.players || []).filter(p => p.uid !== currentUser.uid);
+          const remainingHumans = updatedPlayers.filter(p => !p.isBot);
           if (remainingHumans.length > 0) {
             const nextHostId = leavingData.hostId === currentUser.uid ? remainingHumans[0].uid : leavingData.hostId;
-            const updatedPlayers = (leavingData.players || []).filter(p => p.uid !== currentUser.uid);
             await updateDoc(getRoomDocRef(leavingCode), {
               players: updatedPlayers,
               hostId: nextHostId
@@ -2429,7 +2861,11 @@
       if (targetType === 'MAFIA' && maxPlayers < 4) {
         maxPlayers = 4;
       }
-      await saveRoomPatch({ gameType: targetType, maxPlayers });
+      let nextPack = currentRoomData.selectedPack || 'ALL';
+      if (targetType !== 'DRAW_TO_FIND' && nextPack === 'DRAW_THINGS') {
+        nextPack = 'ALL';
+      }
+      await saveRoomPatch({ gameType: targetType, maxPlayers, selectedPack: nextPack });
     };
 
     window.setMaxPlayers = async function (newCount) {
@@ -2487,6 +2923,7 @@
           colorIdx,
           score: 0,
           isBot: true,
+          lastSeen: Date.now(),
           joinedAt: Date.now() + botCounter
         });
         botCounter++;
@@ -2497,7 +2934,7 @@
     };
 
     // =========================================================================
-    // 10. REAL-TIME SUBSCRIPTIONS & STATE ROUTING
+    // 13. REAL-TIME SUBSCRIPTIONS & STATE ROUTING
     // =========================================================================
     function subscribeToRoom(code) {
       currentRoomCode = code;
@@ -2514,17 +2951,45 @@
             window.leaveRoom();
             return;
           }
+          const incoming = snapshot.data();
+
+          // Check if current user was kicked by the room maker
+          const stillInRoom = (incoming.players || []).some(p => p.uid === currentUser.uid);
+          if (!stillInRoom) {
+            showToast('👢 You were removed from the room by the host.', 'warning');
+            window.leaveRoom();
+            return;
+          }
+
+          const prevStatus = currentRoomData ? currentRoomData.status : '';
           const prevRound = currentRoomData ? currentRoomData.round : -1;
           const prevPhase = currentRoomData ? (currentRoomData.mafiaPhase || currentRoomData.drawPhase) : '';
           const prevTurn = currentRoomData ? currentRoomData.drawTurnIndex : -1;
-          currentRoomData = snapshot.data();
+          const prevHostId = currentRoomData ? currentRoomData.hostId : '';
+
+          currentRoomData = incoming;
+
+          // Notify if host privileges transferred automatically to this player
+          if (prevHostId && prevHostId !== currentUser.uid && currentRoomData.hostId === currentUser.uid) {
+            showToast('👑 Previous host left — you are now the Room Host!', 'info');
+          }
+
+          // Sound chime when results reveal
+          if (prevStatus && prevStatus !== 'results' && currentRoomData.status === 'results') {
+            playSoundEffect('reveal');
+          }
 
           if (currentRoomData.round !== prevRound || (currentRoomData.mafiaPhase || currentRoomData.drawPhase) !== prevPhase) {
             pendingVoteTargetUid = null;
             pendingGuessWinnerUid = null;
+            pendingForceEndVote = false;
+            pendingKickPlayerUid = null;
           }
           if (currentRoomData.drawTurnIndex !== prevTurn) {
             hasDrawnThisTurn = false;
+            hasClickedNowDraw = false;
+            isDrawingStroke = false;
+            currentStrokePoints = [];
           }
 
           renderRoomState(currentRoomData);
@@ -2594,7 +3059,7 @@
     }
 
     // =========================================================================
-    // 11. LOBBY RENDERER
+    // 14. LOBBY RENDERER (WITH ACTIVE/AWAY HEARTBEAT & HOST KICK)
     // =========================================================================
     function renderLobby(data, isHost, maxPlayers) {
       const gType = data.gameType || 'ODD_ONE_OUT';
@@ -2641,28 +3106,55 @@
         if (player) {
           const isMe = player.uid === currentUser.uid;
           const isRoomHost = player.uid === data.hostId;
+          const active = isPlayerActive(player);
+          const canKick = isHost && !isMe;
+          const isPendingKick = pendingKickPlayerUid === player.uid;
           const grad = AVATAR_COLORS[player.colorIdx % AVATAR_COLORS.length];
           const initials = player.name.slice(0, 2).toUpperCase();
 
-          slotsContainer.innerHTML += `
-            <div class="flex items-center justify-between p-2.5 rounded-2xl bg-slate-950/80 border ${isMe ? 'border-violet-500/50' : 'border-slate-800'}">
-              <div class="flex items-center gap-2.5 min-w-0">
-                <div class="w-9 h-9 rounded-xl bg-gradient-to-br ${grad} flex items-center justify-center font-display font-extrabold text-white text-xs shrink-0 shadow">
-                  ${initials}
-                </div>
-                <div class="truncate">
-                  <div class="flex items-center gap-1">
-                    <span class="font-bold text-xs sm:text-sm text-white truncate">${escapeHtml(player.name)}</span>
-                    ${isMe ? '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-violet-500/20 text-violet-300">YOU</span>' : ''}
-                  </div>
-                  <span class="text-[10px] text-slate-400">
-                    ${isRoomHost ? '👑 Host' : (player.isBot ? '🤖 Demo Bot' : (player.username ? '@' + escapeHtml(player.username) : '✅ Ready'))}
-                  </span>
+          if (isPendingKick) {
+            slotsContainer.innerHTML += `
+              <div class="flex items-center justify-between p-2.5 rounded-2xl bg-rose-500/15 border-2 border-rose-400">
+                <span class="text-xs font-extrabold text-rose-200 truncate">Kick ${escapeHtml(player.name)}?</span>
+                <div class="flex items-center gap-1.5 shrink-0">
+                  <button type="button" onclick="window.confirmKickPlayer('${player.uid}')"
+                    class="px-2.5 py-1 rounded-lg bg-rose-600 text-white font-extrabold text-[11px]">
+                    Yes, Kick
+                  </button>
+                  <button type="button" onclick="window.cancelPendingKick()"
+                    class="px-2 py-1 rounded-lg bg-slate-800 text-slate-300 font-bold text-[11px]">
+                    No
+                  </button>
                 </div>
               </div>
-              <span class="text-[11px] font-bold text-emerald-400">In</span>
-            </div>
-          `;
+            `;
+          } else {
+            slotsContainer.innerHTML += `
+              <div class="flex items-center justify-between p-2.5 rounded-2xl bg-slate-950/80 border ${isMe ? 'border-violet-500/50' : 'border-slate-800'}">
+                <div class="flex items-center gap-2.5 min-w-0">
+                  <div class="relative w-9 h-9 rounded-xl bg-gradient-to-br ${grad} flex items-center justify-center font-display font-extrabold text-white text-xs shrink-0 shadow">
+                    ${initials}
+                    <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-slate-950 ${active ? 'bg-emerald-400' : 'bg-amber-400'}"></span>
+                  </div>
+                  <div class="truncate">
+                    <div class="flex items-center gap-1">
+                      <span class="font-bold text-xs sm:text-sm text-white truncate">${escapeHtml(player.name)}</span>
+                      ${isMe ? '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-violet-500/20 text-violet-300">YOU</span>' : ''}
+                    </div>
+                    <span class="text-[10px] ${active ? 'text-slate-400' : 'text-amber-300 font-semibold'}">
+                      ${isRoomHost ? '👑 Host' : (player.isBot ? '🤖 Demo Bot' : (active ? '🟢 Active' : '🟡 Away'))}
+                    </span>
+                  </div>
+                </div>
+                ${canKick ? `
+                  <button type="button" onclick="window.selectPendingKick('${player.uid}')"
+                    class="px-2 py-1 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-[10px] font-extrabold text-rose-300 shrink-0 transition">
+                    Kick
+                  </button>
+                ` : `<span class="text-[11px] font-bold text-emerald-400">In</span>`}
+              </div>
+            `;
+          }
         } else {
           slotsContainer.innerHTML += `
             <div class="flex items-center justify-between p-2.5 rounded-2xl bg-slate-950/35 border border-dashed border-slate-800">
@@ -2681,7 +3173,6 @@
         }
       }
 
-      // Game Mode Switch Buttons (All 4 Games)
       const switchOdd = document.getElementById('lobby-switch-odd');
       const switchDraw = document.getElementById('lobby-switch-draw');
       const switchMafia = document.getElementById('lobby-switch-mafia');
@@ -2701,7 +3192,6 @@
         isGuess ? 'border-amber-500 bg-amber-500/20 text-white' : 'border-slate-800 bg-slate-950/60 text-slate-400'
       }`;
 
-      // Room Capacity Buttons
       const capLabel = document.getElementById('lobby-capacity-label');
       const capContainer = document.getElementById('lobby-capacity-buttons');
       const allowedSizes = isMafia ? [4, 5, 6] : [3, 4, 5, 6];
@@ -2733,11 +3223,18 @@
       const mafiaSettingsEl = document.getElementById('lobby-mafia-settings');
       const guessSettingsEl = document.getElementById('lobby-guess-settings');
       const packWrapperEl = document.getElementById('lobby-pack-selector-wrapper');
+      const drawThingsPackBtn = document.getElementById('pack-btn-draw-things');
 
       oddSettingsEl.classList.add('hidden');
       drawSettingsEl.classList.add('hidden');
       mafiaSettingsEl.classList.add('hidden');
       guessSettingsEl.classList.add('hidden');
+
+      if (isDraw) {
+        drawThingsPackBtn.classList.remove('hidden');
+      } else {
+        drawThingsPackBtn.classList.add('hidden');
+      }
 
       if (isMafia) {
         mafiaSettingsEl.classList.remove('hidden');
@@ -2807,8 +3304,10 @@
         const selectedPack = data.selectedPack || 'ALL';
         document.querySelectorAll('.pack-btn').forEach(btn => {
           btn.disabled = !isHost;
-          const isSelected = btn.getAttribute('data-pack') === selectedPack;
-          btn.className = `pack-btn px-3 py-2.5 rounded-xl border text-xs font-bold transition text-center ${
+          const packKey = btn.getAttribute('data-pack');
+          const isSelected = packKey === selectedPack;
+          const spanClass = packKey === 'DRAW_THINGS' ? 'col-span-2 ' : '';
+          btn.className = `${spanClass}pack-btn px-3 py-2.5 rounded-xl border text-xs font-bold transition text-center ${
             isSelected
               ? 'border-cyan-400 bg-cyan-500/20 text-cyan-200 shadow-sm'
               : 'border-slate-800 bg-slate-950/60 text-slate-400 hover:bg-slate-800/70'
@@ -2842,11 +3341,12 @@
     }
 
     // =========================================================================
-    // 12. ANTI-REPEAT CROSS-UNIVERSE PAIRING ENGINE
+    // 15. ANTI-REPEAT CROSS-UNIVERSE PAIRING ENGINE
     // =========================================================================
     function generateDynamicOddOneOutPair(selectedPack, isCrossServer, usedPairsHistory, recentMajorityHistory) {
-      const pool = CHARACTER_DATABASE.filter(c => selectedPack === 'ALL' || c.pack === selectedPack);
-      const activePool = pool.length >= 2 ? pool : CHARACTER_DATABASE;
+      const basePool = CHARACTER_DATABASE.filter(c => c.pack !== 'DRAW_THINGS');
+      const pool = basePool.filter(c => selectedPack === 'ALL' || c.pack === selectedPack);
+      const activePool = pool.length >= 2 ? pool : basePool;
 
       let validPairs = [];
 
@@ -2879,7 +3379,7 @@
       }
 
       if (validPairs.length === 0) {
-        validPairs.push({ maj: CHARACTER_DATABASE[0], odd: CHARACTER_DATABASE[1], priority: 1 });
+        validPairs.push({ maj: basePool[0], odd: basePool[1], priority: 1 });
       }
 
       const usedPairSet = new Set(Array.isArray(usedPairsHistory) ? usedPairsHistory : []);
@@ -2909,7 +3409,7 @@
     }
 
     // =========================================================================
-    // 13. START NEW ROUND (ALL 4 GAMES)
+    // 16. START NEW ROUND (ALL 4 GAMES)
     // =========================================================================
     window.startNewRound = async function () {
       if (!currentRoomData || currentRoomData.hostId !== currentUser.uid) return;
@@ -2917,14 +3417,20 @@
       const minPlayers = gType === 'MAFIA' ? 4 : 3;
       const maxPlayers = Math.min(6, Math.max(minPlayers, Number(currentRoomData.maxPlayers) || 4));
 
-      if (currentRoomData.players.length < maxPlayers) {
-        showToast(`Need ${maxPlayers} players to start!`, 'warning');
+      if (currentRoomData.players.length < minPlayers) {
+        showToast(`Need at least ${minPlayers} players to start!`, 'warning');
         return;
       }
 
       pendingVoteTargetUid = null;
       pendingGuessWinnerUid = null;
+      pendingForceEndVote = false;
+      pendingKickPlayerUid = null;
       hasDrawnThisTurn = false;
+      hasClickedNowDraw = false;
+      timeoutAdvanceTriggeredForTurn = -1;
+      lastAlertedTurnIndex = -1;
+      lastTickSecond = -1;
       const nextRound = (currentRoomData.round || 0) + 1;
 
       if (gType === 'MAFIA') {
@@ -2955,12 +3461,14 @@
           round: nextRound,
           senderId: 'SYSTEM',
           senderName: 'Narrator',
-          text: `Match ${nextRound} started! 1 Mafia, 1 Doctor, and ${maxPlayers - 2} Innocent Villagers. Night 1 begins...`,
+          text: `Match ${nextRound} started! 1 Mafia, 1 Doctor, and ${currentRoomData.players.length - 2} Innocent Villagers. Night 1 begins...`,
           createdAt: Date.now()
         });
       } else if (gType === 'DRAW_TO_FIND') {
         const activePack = currentRoomData.selectedPack || 'ALL';
-        const pool = CHARACTER_DATABASE.filter(c => activePack === 'ALL' || c.pack === activePack);
+        const pool = activePack === 'ALL'
+          ? CHARACTER_DATABASE
+          : CHARACTER_DATABASE.filter(c => c.pack === activePack);
         const activePool = pool.length > 0 ? pool : CHARACTER_DATABASE;
         const chosenChar = activePool[Math.floor(Math.random() * activePool.length)];
         const blenderPlayer = currentRoomData.players[Math.floor(Math.random() * currentRoomData.players.length)];
@@ -2973,6 +3481,7 @@
           blenderId: blenderPlayer.uid,
           drawPhase: 'drawing',
           drawTurnIndex: 0,
+          drawTurnStartedAt: Date.now(),
           drawStrokes: [],
           votes: {}
         });
@@ -2981,13 +3490,14 @@
           round: nextRound,
           senderId: 'SYSTEM',
           senderName: 'Art Master',
-          text: `Round ${nextRound} (${chosenChar.universe})! Everyone draws 2 turns on the shared canvas. Watch closely for The Blender!`,
+          text: `Round ${nextRound} (${chosenChar.universe})! Each player gets 45s per turn to tap "Now Draw" and draw 1 continuous line!`,
           createdAt: Date.now()
         });
       } else if (gType === 'GUESS_THE_NAME') {
+        const basePool = CHARACTER_DATABASE.filter(c => c.pack !== 'DRAW_THINGS');
         const activePack = currentRoomData.selectedPack || 'ALL';
-        const pool = CHARACTER_DATABASE.filter(c => activePack === 'ALL' || c.pack === activePack);
-        const activePool = pool.length > 0 ? pool : CHARACTER_DATABASE;
+        const pool = basePool.filter(c => activePack === 'ALL' || c.pack === activePack);
+        const activePool = pool.length > 0 ? pool : basePool;
 
         const usedWords = new Set(currentRoomData.usedGuessWords || []);
         let available = activePool.filter(c => !usedWords.has(c.name));
@@ -3066,11 +3576,13 @@
       if (!currentRoomData || currentRoomData.hostId !== currentUser.uid) return;
       pendingVoteTargetUid = null;
       pendingGuessWinnerUid = null;
+      pendingForceEndVote = false;
+      pendingKickPlayerUid = null;
       await saveRoomPatch({ status: 'lobby' });
     };
 
     // =========================================================================
-    // 14. TWO-CLICK VOTING CONFIRMATION (ODD ONE OUT, MAFIA & DRAW TO FIND)
+    // 17. TWO-CLICK VOTING CONFIRMATION (ODD ONE OUT, MAFIA & DRAW TO FIND)
     // =========================================================================
     window.selectPendingVote = function (targetUid) {
       if (!currentRoomData) return;
@@ -3110,6 +3622,7 @@
     function buildTwoClickVoteCardHtml(player, myVote, isDisabled, hasVotedIndicator) {
       const isPending = !myVote && !isDisabled && pendingVoteTargetUid === player.uid;
       const isSelected = myVote === player.uid;
+      const active = isPlayerActive(player);
       const grad = AVATAR_COLORS[player.colorIdx % AVATAR_COLORS.length];
       const initials = player.name.slice(0, 2).toUpperCase();
 
@@ -3151,13 +3664,14 @@
                 : 'bg-slate-900/95 hover:bg-slate-800 border-slate-700 hover:border-amber-400'
           }">
           <div class="flex items-center gap-2 min-w-0">
-            <div class="w-8 h-8 rounded-xl bg-gradient-to-br ${grad} flex items-center justify-center font-display font-extrabold text-white text-xs shrink-0">
+            <div class="relative w-8 h-8 rounded-xl bg-gradient-to-br ${grad} flex items-center justify-center font-display font-extrabold text-white text-xs shrink-0">
               ${initials}
+              <span class="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-slate-950 ${active ? 'bg-emerald-400' : 'bg-amber-400'}"></span>
             </div>
             <div class="truncate">
               <div class="font-bold text-xs text-white truncate">${escapeHtml(player.name)}</div>
               <div class="text-[10px] ${isSelected ? 'text-rose-300 font-bold' : 'text-slate-400'}">
-                ${isSelected ? '🎯 Your Confirmed Vote' : (hasVotedIndicator ? '✅ Already Voted' : (isDisabled ? 'Alive' : 'Tap to select'))}
+                ${isSelected ? '🎯 Your Confirmed Vote' : (hasVotedIndicator ? '✅ Already Voted' : (!active ? '🟡 Away • Tap to vote' : (isDisabled ? 'Alive' : 'Tap to select')))}
               </div>
             </div>
           </div>
@@ -3167,7 +3681,7 @@
     }
 
     // =========================================================================
-    // 15. DRAW TO FIND (4TH GAME — SHARED CANVAS + 2-CYCLE TURN SYSTEM)
+    // 18. DRAW TO FIND (45s TIMER + CENTER "NOW DRAW" + 1 STROKE PER TURN)
     // =========================================================================
     const drawCanvas = document.getElementById('draw-canvas');
     const drawCtx = drawCanvas.getContext('2d');
@@ -3186,7 +3700,6 @@
       drawCtx.fillStyle = '#ffffff';
       drawCtx.fillRect(0, 0, 600, 450);
 
-      // Subtle ruled notebook grid lines
       drawCtx.strokeStyle = '#f1f5f9';
       drawCtx.lineWidth = 1;
       for (let x = 50; x < 600; x += 50) {
@@ -3236,8 +3749,15 @@
       return Boolean(activePlayer && activePlayer.uid === currentUser.uid);
     }
 
-    drawCanvas.addEventListener('pointerdown', (e) => {
+    window.activateNowDraw = function () {
       if (!isMyDrawTurn() || hasDrawnThisTurn) return;
+      hasClickedNowDraw = true;
+      document.getElementById('draw-now-center-overlay').classList.add('hidden');
+      showToast('Canvas unlocked! Draw 1 line and lift your finger.', 'info');
+    };
+
+    drawCanvas.addEventListener('pointerdown', (e) => {
+      if (!isMyDrawTurn() || hasDrawnThisTurn || !hasClickedNowDraw) return;
       e.preventDefault();
       isDrawingStroke = true;
       currentStrokePoints = [getCanvasCoords(e)];
@@ -3265,11 +3785,11 @@
       if (currentStrokePoints.length === 0 || !currentRoomData) return;
 
       hasDrawnThisTurn = true;
+      hasClickedNowDraw = false;
       const players = currentRoomData.players || [];
       const myIdx = players.findIndex(p => p.uid === currentUser.uid);
       const myPen = DRAW_PEN_PALETTE[Math.max(0, myIdx) % DRAW_PEN_PALETTE.length];
 
-      // Downsample points slightly if stroke is super long so Firestore doc stays lightweight
       let savedPoints = currentStrokePoints;
       if (savedPoints.length > 140) {
         const step = Math.ceil(savedPoints.length / 140);
@@ -3287,12 +3807,13 @@
 
       currentStrokePoints = [];
       const nextTurnIndex = (Number(currentRoomData.drawTurnIndex) || 0) + 1;
-      const totalTurnsNeeded = players.length * 2; // 2 full drawing cycles!
+      const totalTurnsNeeded = players.length * 2;
 
       if (nextTurnIndex >= totalTurnsNeeded) {
         await saveRoomPatch({
           drawStrokes: updatedStrokes,
           drawTurnIndex: nextTurnIndex,
+          drawTurnStartedAt: Date.now(),
           drawPhase: 'voting',
           votes: {}
         });
@@ -3306,7 +3827,8 @@
       } else {
         await saveRoomPatch({
           drawStrokes: updatedStrokes,
-          drawTurnIndex: nextTurnIndex
+          drawTurnIndex: nextTurnIndex,
+          drawTurnStartedAt: Date.now()
         });
       }
     }
@@ -3314,22 +3836,80 @@
     drawCanvas.addEventListener('pointerup', commitCurrentStrokeAndAdvance);
     drawCanvas.addEventListener('pointercancel', commitCurrentStrokeAndAdvance);
 
-    window.finishCurrentDrawTurn = async function () {
-      if (!isMyDrawTurn() || !currentRoomData) return;
-      const players = currentRoomData.players || [];
-      const nextTurnIndex = (Number(currentRoomData.drawTurnIndex) || 0) + 1;
-      const totalTurnsNeeded = players.length * 2;
-
-      if (nextTurnIndex >= totalTurnsNeeded) {
-        await saveRoomPatch({
-          drawTurnIndex: nextTurnIndex,
-          drawPhase: 'voting',
-          votes: {}
-        });
-      } else {
-        await saveRoomPatch({ drawTurnIndex: nextTurnIndex });
+    function startOrUpdateDrawTimer(data, isHost, turnIndex, totalTurnsNeeded, isVotingPhase) {
+      if (drawCountdownInterval) {
+        clearInterval(drawCountdownInterval);
+        drawCountdownInterval = null;
       }
-    };
+
+      const timerBadge = document.getElementById('draw-timer-badge');
+      if (isVotingPhase) {
+        timerBadge.textContent = '🗳️ Vote';
+        timerBadge.className = 'px-2.5 py-0.5 rounded-lg bg-emerald-500/20 border border-emerald-400/40 text-xs font-display font-extrabold text-emerald-300';
+        return;
+      }
+
+      const turnStartedAt = Number(data.drawTurnStartedAt) || Date.now();
+      const players = data.players || [];
+      const activePlayer = players[turnIndex % players.length];
+
+      const tick = async () => {
+        const elapsedSec = Math.floor((Date.now() - turnStartedAt) / 1000);
+        const remaining = Math.max(0, 45 - elapsedSec);
+        timerBadge.textContent = `⏱️ ${remaining}s`;
+
+        if (remaining <= 10 && remaining > 0) {
+          timerBadge.className = 'px-2.5 py-0.5 rounded-lg bg-rose-500/25 border border-rose-400/60 text-xs font-display font-extrabold text-rose-200 animate-pulse';
+          if (activePlayer && activePlayer.uid === currentUser.uid && lastTickSecond !== remaining) {
+            lastTickSecond = remaining;
+            playSoundEffect('tick');
+          }
+        } else {
+          timerBadge.className = 'px-2.5 py-0.5 rounded-lg bg-amber-500/20 border border-amber-400/40 text-xs font-display font-extrabold text-amber-300';
+        }
+
+        const canAdvanceOnTimeout = (activePlayer && activePlayer.uid === currentUser.uid) || isHost;
+        if (remaining === 0 && canAdvanceOnTimeout && timeoutAdvanceTriggeredForTurn !== turnIndex) {
+          timeoutAdvanceTriggeredForTurn = turnIndex;
+          isDrawingStroke = false;
+          currentStrokePoints = [];
+          hasClickedNowDraw = false;
+          hasDrawnThisTurn = false;
+
+          const nextTurnIndex = turnIndex + 1;
+          if (nextTurnIndex >= totalTurnsNeeded) {
+            await saveRoomPatch({
+              drawTurnIndex: nextTurnIndex,
+              drawTurnStartedAt: Date.now(),
+              drawPhase: 'voting',
+              votes: {}
+            });
+            await appendChatMessage({
+              round: data.round,
+              senderId: 'SYSTEM',
+              senderName: 'Art Master',
+              text: `⏰ Time's up for ${activePlayer ? activePlayer.name : 'player'}! Both drawing cycles are done — vote out The Blender!`,
+              createdAt: Date.now()
+            });
+          } else {
+            await saveRoomPatch({
+              drawTurnIndex: nextTurnIndex,
+              drawTurnStartedAt: Date.now()
+            });
+            await appendChatMessage({
+              round: data.round,
+              senderId: 'SYSTEM',
+              senderName: 'Art Master',
+              text: `⏰ 45s time expired for ${activePlayer ? activePlayer.name : 'player'}! Moving to the next artist.`,
+              createdAt: Date.now()
+            });
+          }
+        }
+      };
+
+      tick();
+      drawCountdownInterval = setInterval(tick, 500);
+    }
 
     function renderDrawToFindGame(data, isHost) {
       const players = data.players || [];
@@ -3342,12 +3922,13 @@
       document.getElementById('draw-round-badge').textContent = `ROUND ${data.round}`;
       document.getElementById('draw-cycle-pill').textContent = isVotingPhase
         ? '✅ 2 / 2 Cycles Done'
-        : `✏️ Drawing Cycle ${cycleNumber} / 2`;
-      document.getElementById('draw-phase-badge').innerHTML = isVotingPhase
-        ? `<span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> Voting Phase`
-        : `<span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span> Turn ${turnIndex + 1} of ${totalTurnsNeeded}`;
+        : `✏️ Cycle ${cycleNumber} / 2`;
+      document.getElementById('draw-phase-badge').textContent = isVotingPhase
+        ? 'Voting'
+        : `Turn ${turnIndex + 1}/${totalTurnsNeeded}`;
 
-      // Secret Word vs The Blender
+      startOrUpdateDrawTimer(data, isHost, turnIndex, totalTurnsNeeded, isVotingPhase);
+
       const amIBlender = data.blenderId === currentUser.uid;
       const banner = document.getElementById('draw-secret-banner');
       const blenderBadge = document.getElementById('draw-blender-badge');
@@ -3364,10 +3945,10 @@
         banner.className = 'w-full rounded-3xl bg-gradient-to-br from-cyan-700 via-blue-800 to-slate-950 border border-cyan-400/40 p-3.5 flex flex-col items-center justify-center text-center shadow-2xl';
         blenderBadge.classList.add('hidden');
         secretText.textContent = data.drawWord || '---';
-        roleInst.textContent = 'Draw 1 stroke per turn (2 turns total on the same page) to prove you know the word without making it obvious to The Blender!';
+        roleInst.textContent = 'Tap "Now Draw" on your turn, draw 1 continuous line, and lift your finger to pass the turn!';
       }
 
-      // Render Pen Color Legend
+      // Render Pen Color Legend with Active/Away Dot + Host Kick
       const legend = document.getElementById('draw-pen-legend');
       legend.innerHTML = '';
       const activePlayer = !isVotingPhase ? players[turnIndex % totalPlayers] : null;
@@ -3375,46 +3956,71 @@
       players.forEach((p, idx) => {
         const pen = DRAW_PEN_PALETTE[idx % DRAW_PEN_PALETTE.length];
         const isCurrentArtist = activePlayer && activePlayer.uid === p.uid;
-        legend.innerHTML += `
-          <div class="flex items-center justify-between px-2.5 py-1.5 rounded-xl border ${isCurrentArtist ? 'border-white bg-slate-800 shadow' : 'border-slate-800 bg-slate-950/70'}">
-            <div class="flex items-center gap-1.5 min-w-0">
-              <span class="w-3 h-3 rounded-full shrink-0 border border-white/40" style="background-color: ${pen.hex}"></span>
-              <span class="text-[11px] font-bold text-white truncate">${escapeHtml(p.name)}</span>
+        const active = isPlayerActive(p);
+        const canKick = isHost && p.uid !== currentUser.uid;
+        const isPendingKick = pendingKickPlayerUid === p.uid;
+
+        if (isPendingKick) {
+          legend.innerHTML += `
+            <div class="flex items-center justify-between px-2.5 py-1.5 rounded-xl border border-rose-400 bg-rose-500/20">
+              <span class="text-[11px] font-extrabold text-rose-200 truncate">Kick ${escapeHtml(p.name)}?</span>
+              <div class="flex items-center gap-1">
+                <button type="button" onclick="window.confirmKickPlayer('${p.uid}')" class="px-2 py-0.5 rounded bg-rose-600 text-white text-[10px] font-extrabold">Yes</button>
+                <button type="button" onclick="window.cancelPendingKick()" class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] font-bold">No</button>
+              </div>
             </div>
-            <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded border ${pen.badgeBg} shrink-0">
-              ${isCurrentArtist ? '✏️ Drawing' : pen.name}
-            </span>
-          </div>
-        `;
+          `;
+        } else {
+          legend.innerHTML += `
+            <div class="flex items-center justify-between px-2.5 py-1.5 rounded-xl border ${isCurrentArtist ? 'border-white bg-slate-800 shadow' : 'border-slate-800 bg-slate-950/70'}">
+              <div class="flex items-center gap-1.5 min-w-0">
+                <span class="w-3 h-3 rounded-full shrink-0 border border-white/40" style="background-color: ${pen.hex}"></span>
+                <span class="w-1.5 h-1.5 rounded-full shrink-0 ${active ? 'bg-emerald-400' : 'bg-amber-400'}"></span>
+                <span class="text-[11px] font-bold text-white truncate">${escapeHtml(p.name)}</span>
+              </div>
+              <div class="flex items-center gap-1 shrink-0">
+                <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded border ${pen.badgeBg}">
+                  ${isCurrentArtist ? '✏️ Active' : pen.name}
+                </span>
+                ${canKick ? `<button type="button" onclick="window.selectPendingKick('${p.uid}')" class="text-[10px] font-extrabold text-rose-400 hover:text-rose-300 px-1" title="Kick Player">✕</button>` : ''}
+              </div>
+            </div>
+          `;
+        }
       });
 
-      // Redraw Shared Canvas
       if (!isDrawingStroke) {
         redrawAllStrokes(data.drawStrokes || []);
       }
 
-      // Turn Status & Lock Overlay
       const turnStatusText = document.getElementById('draw-turn-status-text');
+      const nowDrawOverlay = document.getElementById('draw-now-center-overlay');
       const lockOverlay = document.getElementById('draw-canvas-lock-overlay');
-      const doneBtn = document.getElementById('btn-finish-draw-turn');
 
       if (isVotingPhase) {
         turnStatusText.textContent = '🎨 Final Drawing Complete — Vote Out The Blender Below!';
+        nowDrawOverlay.classList.add('hidden');
         lockOverlay.classList.add('hidden');
-        doneBtn.classList.add('hidden');
       } else if (activePlayer && activePlayer.uid === currentUser.uid) {
+        if (lastAlertedTurnIndex !== turnIndex) {
+          lastAlertedTurnIndex = turnIndex;
+          playSoundEffect('turn');
+        }
         const myIdx = players.findIndex(p => p.uid === currentUser.uid);
         const myPen = DRAW_PEN_PALETTE[Math.max(0, myIdx) % DRAW_PEN_PALETTE.length];
-        turnStatusText.innerHTML = `<span class="text-emerald-300">✏️ YOUR TURN (Cycle ${cycleNumber}/2)!</span> Draw 1 line with your <span style="color:${myPen.hex}">${myPen.name}</span> pen`;
+        turnStatusText.innerHTML = `<span class="text-emerald-300">✏️ YOUR TURN (Cycle ${cycleNumber}/2)!</span> <span style="color:${myPen.hex}">${myPen.name}</span> Pen`;
         lockOverlay.classList.add('hidden');
-        doneBtn.classList.remove('hidden');
+        if (!hasClickedNowDraw && !hasDrawnThisTurn) {
+          nowDrawOverlay.classList.remove('hidden');
+        } else {
+          nowDrawOverlay.classList.add('hidden');
+        }
       } else if (activePlayer) {
         turnStatusText.textContent = `⏳ ${activePlayer.name} is drawing (Cycle ${cycleNumber}/2)...`;
+        nowDrawOverlay.classList.add('hidden');
         lockOverlay.classList.remove('hidden');
-        doneBtn.classList.add('hidden');
       }
 
-      // Voting Panel
       const votes = data.votes || {};
       const totalVotes = Object.keys(votes).length;
       const myVote = votes[currentUser.uid];
@@ -3439,6 +4045,8 @@
           .forEach(player => {
             grid.innerHTML += buildTwoClickVoteCardHtml(player, myVote, false, Boolean(votes[player.uid]));
           });
+
+        document.getElementById('draw-host-end-vote-box').innerHTML = buildHostEndVoteHtml(isHost);
 
         if (isHost && totalVotes >= totalPlayers) {
           finalizeDrawToFindResults(data);
@@ -3495,10 +4103,11 @@
     }
 
     // =========================================================================
-    // 16. ODD ONE OUT GAMEPLAY RENDERER
+    // 19. ODD ONE OUT GAMEPLAY RENDERER
     // =========================================================================
     function renderOddOneOutGame(data, isHost) {
       document.getElementById('odd-round-badge').textContent = `ROUND ${data.round}`;
+      renderLiveRosterStrip('odd-live-roster', data, isHost);
 
       const amIImposter = data.imposterId === currentUser.uid;
       const imposterKnows = data.imposterKnows !== false;
@@ -3556,6 +4165,8 @@
           grid.innerHTML += buildTwoClickVoteCardHtml(player, myVote, false, Boolean(votes[player.uid]));
         });
 
+      document.getElementById('odd-host-end-vote-box').innerHTML = buildHostEndVoteHtml(isHost);
+
       if (isHost && totalVotes >= totalPlayers) {
         finalizeOddOneOutResults(data);
       } else if (isHost) {
@@ -3602,9 +4213,11 @@
     }
 
     // =========================================================================
-    // 17. MAFIA GAMEPLAY RENDERER
+    // 20. MAFIA GAMEPLAY RENDERER
     // =========================================================================
     function renderMafiaGame(data, isHost) {
+      renderLiveRosterStrip('mafia-live-roster', data, isHost);
+
       const roles = data.mafiaRoles || {};
       const myRole = roles[currentUser.uid] || 'VILLAGER';
       const aliveIds = Array.isArray(data.alivePlayerIds) ? data.alivePlayerIds : data.players.map(p => p.uid);
@@ -3856,6 +4469,8 @@
           grid.innerHTML += buildTwoClickVoteCardHtml(player, myVote, !amIAlive, Boolean(votes[player.uid]));
         });
 
+      document.getElementById('mafia-host-end-vote-box').innerHTML = buildHostEndVoteHtml(isHost);
+
       if (isHost && totalVotes >= aliveVotersCount) {
         resolveMafiaDayVote(data, aliveIds);
       } else if (isHost) {
@@ -3955,9 +4570,11 @@
     }
 
     // =========================================================================
-    // 18. GUESS THE NAME GAMEPLAY RENDERER
+    // 21. GUESS THE NAME GAMEPLAY RENDERER
     // =========================================================================
     function renderGuessTheNameGame(data, isHost) {
+      renderLiveRosterStrip('guess-live-roster', data, isHost);
+
       const amIClueGiver = data.clueGiverId === currentUser.uid;
       const clueGiverPlayer = data.players.find(p => p.uid === data.clueGiverId);
       const clueGiverName = clueGiverPlayer ? clueGiverPlayer.name : 'Player';
@@ -4096,9 +4713,10 @@
       if (!currentRoomData || currentRoomData.gameType !== 'GUESS_THE_NAME') return;
       if (currentRoomData.clueGiverId !== currentUser.uid) return;
 
+      const basePool = CHARACTER_DATABASE.filter(c => c.pack !== 'DRAW_THINGS');
       const activePack = currentRoomData.selectedPack || 'ALL';
-      const pool = CHARACTER_DATABASE.filter(c => activePack === 'ALL' || c.pack === activePack);
-      const activePool = pool.length > 0 ? pool : CHARACTER_DATABASE;
+      const pool = basePool.filter(c => activePack === 'ALL' || c.pack === activePack);
+      const activePool = pool.length > 0 ? pool : basePool;
 
       const usedWords = new Set(currentRoomData.usedGuessWords || []);
       let available = activePool.filter(c => !usedWords.has(c.name));
@@ -4184,7 +4802,7 @@
     };
 
     // =========================================================================
-    // 19. SHARED CHAT & VOICE NOTE BUBBLE RENDERER
+    // 22. SHARED CHAT & VOICE NOTE BUBBLE RENDERER
     // =========================================================================
     window.sendChatMessage = async function (event, inputId) {
       event.preventDefault();
@@ -4290,7 +4908,7 @@
     }
 
     // =========================================================================
-    // 20. RESULTS & SCOREBOARD RENDERER
+    // 23. RESULTS & SCOREBOARD RENDERER
     // =========================================================================
     function renderResults(data, isHost) {
       const outcome = data.lastRoundOutcome || {};
@@ -4505,7 +5123,7 @@
     }
 
     // =========================================================================
-    // 21. DEMO BOT AI FOR ALL 4 GAMES
+    // 24. DEMO BOT AI FOR ALL 4 GAMES
     // =========================================================================
     function scheduleDrawArtistBot(data, botPlayer, turnIndex, totalTurnsNeeded) {
       if (botActionTimeout) clearTimeout(botActionTimeout);
@@ -4517,7 +5135,6 @@
         const botIdx = players.findIndex(p => p.uid === botPlayer.uid);
         const pen = DRAW_PEN_PALETTE[Math.max(0, botIdx) % DRAW_PEN_PALETTE.length];
 
-        // Generate a neat geometric sketch stroke in the bot's pen color
         const cx = 180 + Math.floor(Math.random() * 240);
         const cy = 140 + Math.floor(Math.random() * 170);
         const r = 35 + Math.floor(Math.random() * 35);
@@ -4539,13 +5156,15 @@
           await saveRoomPatch({
             drawStrokes: updatedStrokes,
             drawTurnIndex: nextTurnIndex,
+            drawTurnStartedAt: Date.now(),
             drawPhase: 'voting',
             votes: {}
           });
         } else {
           await saveRoomPatch({
             drawStrokes: updatedStrokes,
-            drawTurnIndex: nextTurnIndex
+            drawTurnIndex: nextTurnIndex,
+            drawTurnStartedAt: Date.now()
           });
         }
       }, 1600);
