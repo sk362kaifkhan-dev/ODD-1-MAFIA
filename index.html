@@ -43,12 +43,38 @@
     .animate-pop-in {
       animation: popIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
+    #draw-canvas {
+      touch-action: none;
+      cursor: crosshair;
+    }
   </style>
 </head>
 <body class="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-950/75 via-slate-950 to-slate-950 flex flex-col">
 
   <!-- Non-blocking Toast Banner Container -->
   <div id="toast-container" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 w-[92%] max-w-md pointer-events-none"></div>
+
+  <!-- Live Direct Room Invite Banner (Popups when a friend invites you) -->
+  <div id="live-invite-banner" class="hidden fixed top-16 left-1/2 -translate-x-1/2 z-50 w-[94%] max-w-md animate-pop-in">
+    <div class="rounded-2xl bg-gradient-to-r from-indigo-900 via-violet-900 to-fuchsia-900 border-2 border-violet-400 p-3.5 shadow-2xl flex items-center justify-between gap-2.5">
+      <div class="min-w-0">
+        <div class="text-[10px] font-extrabold uppercase tracking-wider text-violet-200">📨 Direct Room Invite</div>
+        <div id="live-invite-text" class="text-xs sm:text-sm font-extrabold text-white truncate">
+          @friend invited you to Odd One Out!
+        </div>
+      </div>
+      <div class="flex items-center gap-1.5 shrink-0">
+        <button type="button" onclick="window.acceptRoomInvite()"
+          class="px-3 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs transition active:scale-95">
+          Join Now
+        </button>
+        <button type="button" onclick="window.dismissRoomInvite()"
+          class="px-2.5 py-2 rounded-xl bg-slate-950/60 hover:bg-slate-900 text-slate-300 font-bold text-xs transition">
+          ✕
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Sticky Top Navigation Bar -->
   <header class="w-full border-b border-slate-800/80 bg-slate-950/85 backdrop-blur-md sticky top-0 z-30">
@@ -61,10 +87,25 @@
           <h1 id="header-title" class="font-display font-extrabold text-base sm:text-lg tracking-tight text-white leading-none">
             ODD ONE MAFIA
           </h1>
-          <span id="header-subtitle" class="text-[11px] text-slate-400 font-medium">Odd One Out • Mafia • Guess The Name</span>
+          <span id="header-subtitle" class="text-[11px] text-slate-400 font-medium">4 Party Games • Friends & Voice</span>
         </div>
       </div>
 
+      <!-- Profile Pill & Friends Button (When not in a room) -->
+      <div id="header-profile-controls" class="hidden flex items-center gap-1.5">
+        <button type="button" onclick="window.toggleFriendsModal(true)"
+          class="relative px-2.5 py-1.5 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-400/40 text-xs font-extrabold text-indigo-200 flex items-center gap-1.5 transition active:scale-95">
+          <span>👥 Friends</span>
+          <span id="header-friend-req-badge" class="hidden px-1.5 py-0.2 rounded-full bg-rose-500 text-white text-[10px] font-extrabold">0</span>
+        </button>
+        <button type="button" onclick="window.openProfileSwitchModal()"
+          class="px-2.5 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700 text-xs font-extrabold text-emerald-300 flex items-center gap-1 transition active:scale-95">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          <span id="header-username-label">@player</span>
+        </button>
+      </div>
+
+      <!-- Room Controls (When inside a room) -->
       <div id="header-room-controls" class="hidden flex items-center gap-1.5">
         <button type="button" onclick="window.copyRoomCode()" class="px-2.5 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700 text-xs font-extrabold text-violet-300 flex items-center gap-1.5 transition active:scale-95">
           <span id="header-room-code">-----</span>
@@ -77,6 +118,123 @@
     </div>
   </header>
 
+  <!-- ======================================================================= -->
+  <!-- MODAL: PERMANENT @USERNAME + 4-DIGIT PIN SETUP / LOGIN                  -->
+  <!-- ======================================================================= -->
+  <div id="auth-modal" class="hidden fixed inset-0 z-40 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="w-full max-w-md rounded-3xl bg-slate-900 border border-slate-800 p-5 shadow-2xl space-y-4 animate-pop-in">
+      <div class="text-center space-y-1">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-500/15 border border-violet-500/30 text-[11px] font-bold text-violet-300">
+          🔐 Permanent Cloud Profile
+        </div>
+        <h2 class="font-display text-2xl font-extrabold text-white">Create Your @Username</h2>
+        <p class="text-xs text-slate-400">
+          Saved permanently so friends can add you & invite you directly! Auto-logs you in every time you open the link.
+        </p>
+      </div>
+
+      <!-- Toggle Create vs Login -->
+      <div class="grid grid-cols-2 gap-2 p-1 rounded-2xl bg-slate-950 border border-slate-800">
+        <button id="auth-tab-register" type="button" onclick="window.switchAuthTab('register')"
+          class="py-2 rounded-xl bg-violet-600 text-white text-xs font-extrabold transition">
+          ✨ New Profile
+        </button>
+        <button id="auth-tab-login" type="button" onclick="window.switchAuthTab('login')"
+          class="py-2 rounded-xl text-slate-400 text-xs font-extrabold transition">
+          🔑 Existing @Username
+        </button>
+      </div>
+
+      <form onsubmit="window.submitProfileAuth(event)" class="space-y-3">
+        <div>
+          <label class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">
+            Unique @Username (letters & numbers)
+          </label>
+          <div class="relative flex items-center">
+            <span class="absolute left-3.5 text-sm font-extrabold text-violet-400">@</span>
+            <input id="auth-username-input" type="text" maxlength="16" placeholder="kaif"
+              class="w-full pl-8 pr-4 py-3 rounded-2xl bg-slate-950 border border-slate-700/80 focus:border-violet-500 outline-none text-sm font-bold text-white lowercase placeholder:text-slate-600" />
+          </div>
+        </div>
+
+        <div id="auth-displayname-group">
+          <label class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">
+            Display Name (Shown in Games)
+          </label>
+          <input id="auth-displayname-input" type="text" maxlength="18" placeholder="e.g. Kaif, Sasuke, Gojo..."
+            class="w-full px-4 py-3 rounded-2xl bg-slate-950 border border-slate-700/80 focus:border-violet-500 outline-none text-sm font-semibold text-white placeholder:text-slate-600" />
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">
+            4-Digit Secret PIN (For Backup Login)
+          </label>
+          <input id="auth-pin-input" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••"
+            class="w-full px-4 py-3 rounded-2xl bg-slate-950 border border-slate-700/80 focus:border-violet-500 outline-none text-center font-display text-lg font-extrabold tracking-[0.5em] text-white placeholder:text-slate-600 placeholder:tracking-normal" />
+        </div>
+
+        <button id="auth-submit-btn" type="submit"
+          class="w-full py-3.5 px-5 rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-extrabold text-sm shadow-lg shadow-violet-600/25 transition active:scale-[0.98]">
+          🚀 Save Permanent Profile & Enter
+        </button>
+      </form>
+
+      <div id="auth-switch-cancel-wrap" class="hidden text-center">
+        <button type="button" onclick="document.getElementById('auth-modal').classList.add('hidden')"
+          class="text-xs font-bold text-slate-400 hover:text-white underline">
+          Cancel & Stay Signed In
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- MODAL: PERMANENT FRIENDS LIST & ADD BY @USERNAME                        -->
+  <!-- ======================================================================= -->
+  <div id="friends-modal" class="hidden fixed inset-0 z-40 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="w-full max-w-md rounded-3xl bg-slate-900 border border-slate-800 p-5 shadow-2xl space-y-4 animate-pop-in max-h-[88vh] flex flex-col">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div>
+          <h3 class="font-display text-lg font-extrabold text-white">👥 Permanent Friends List</h3>
+          <p class="text-[11px] text-slate-400">Your @username: <span id="friends-modal-my-tag" class="font-extrabold text-violet-300">@player</span></p>
+        </div>
+        <button type="button" onclick="window.toggleFriendsModal(false)"
+          class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-sm flex items-center justify-center">
+          ✕
+        </button>
+      </div>
+
+      <!-- Add Friend by @username -->
+      <form onsubmit="window.sendFriendRequest(event)" class="flex gap-2">
+        <div class="relative flex-1 flex items-center">
+          <span class="absolute left-3 text-xs font-extrabold text-violet-400">@</span>
+          <input id="add-friend-username-input" type="text" maxlength="16" placeholder="friend_username"
+            class="w-full pl-7 pr-3 py-2.5 rounded-xl bg-slate-950 border border-slate-700 focus:border-violet-500 outline-none text-xs font-bold text-white lowercase placeholder:text-slate-600" />
+        </div>
+        <button type="submit"
+          class="px-4 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-extrabold text-xs transition active:scale-95 shrink-0">
+          + Add Friend
+        </button>
+      </form>
+
+      <!-- Incoming Friend Requests -->
+      <div id="friend-requests-section" class="hidden space-y-2">
+        <span class="block text-[10px] font-extrabold uppercase tracking-wider text-amber-300">
+          🔔 Incoming Friend Requests
+        </span>
+        <div id="friend-requests-list" class="space-y-1.5"></div>
+      </div>
+
+      <!-- Saved Friends List -->
+      <div class="flex-1 overflow-y-auto space-y-2 pr-1">
+        <span class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+          Saved Friends (<span id="friends-count-label">0</span>)
+        </span>
+        <div id="friends-list-container" class="space-y-2"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- Main Content Container -->
   <main class="flex-1 w-full max-w-2xl mx-auto px-3.5 py-4 flex flex-col">
 
@@ -86,28 +244,34 @@
     <section id="view-landing" class="flex-1 flex flex-col justify-center space-y-4 animate-pop-in">
       <div class="rounded-3xl bg-gradient-to-br from-slate-900/95 via-indigo-950/55 to-slate-900/95 border border-slate-800 p-4 sm:p-5 text-center shadow-2xl space-y-2">
         <div class="inline-flex flex-wrap items-center justify-center gap-1.5 px-3 py-1 rounded-full bg-violet-500/15 border border-violet-500/30 text-[11px] font-bold text-violet-300 uppercase tracking-wider">
-          <span>⚔️ 14 Anime</span> • <span>📺 11 Cartoons</span> • <span>🇮🇳 Pop Culture</span>
+          <span>⚔️ 14 Anime</span> • <span>📺 11 Cartoons</span> • <span>🎨 Draw To Find</span>
         </div>
         <h2 class="font-display text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
           ODD ONE MAFIA
         </h2>
         <p class="text-xs sm:text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
-          3 multiplayer party games in one room! Play <span class="text-violet-300 font-bold">Odd One Out</span> (with Cross-Universe mode), <span class="text-rose-400 font-bold">Mafia</span>, or <span class="text-amber-300 font-bold">Guess The Name</span>!
+          4 online party games with permanent friends, direct invites & 10s voice notes!
         </p>
-        <div id="connection-status-pill" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-950/80 border border-slate-800 text-[10px] font-semibold text-amber-300">
-          <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
-          Connecting to Firebase...
+        <div class="flex flex-wrap items-center justify-center gap-2 pt-0.5">
+          <div id="connection-status-pill" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-950/80 border border-slate-800 text-[10px] font-semibold text-amber-300">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+            Connecting to Firebase...
+          </div>
+          <button type="button" onclick="window.toggleFriendsModal(true)"
+            class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-400/40 text-[10px] font-extrabold text-indigo-200 hover:bg-indigo-500/30 transition">
+            👥 Manage Friends (<span id="landing-friends-count">0</span>)
+          </button>
         </div>
       </div>
 
       <!-- Setup Card -->
       <div class="rounded-3xl bg-slate-900/90 border border-slate-800 p-4 sm:p-5 shadow-xl space-y-4">
-        <!-- Step 1: Select Game Mode -->
+        <!-- Step 1: Select Game Mode (4 Games) -->
         <div>
           <span class="block text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-2">
             1. Choose Game Mode
           </span>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <div class="grid grid-cols-2 gap-2">
             <button id="landing-game-odd" type="button" onclick="window.selectLandingGameType('ODD_ONE_OUT')"
               class="p-3 rounded-2xl border-2 border-violet-500 bg-violet-500/15 text-left transition active:scale-[0.98] shadow-lg shadow-violet-950/30">
               <div class="flex items-center justify-between gap-1">
@@ -115,7 +279,18 @@
                 <span class="px-1.5 py-0.5 rounded-full bg-violet-500/30 text-[9px] font-extrabold text-violet-200 shrink-0">3–6P</span>
               </div>
               <p class="text-[11px] text-slate-300 mt-1 leading-snug">
-                Same-Universe or Cross-Universe character pairs. Chat & 2-click vote!
+                Same-Universe or Cross-Universe pairs. Chat & 2-click vote!
+              </p>
+            </button>
+
+            <button id="landing-game-draw" type="button" onclick="window.selectLandingGameType('DRAW_TO_FIND')"
+              class="p-3 rounded-2xl border-2 border-slate-800 bg-slate-950/70 text-left transition active:scale-[0.98]">
+              <div class="flex items-center justify-between gap-1">
+                <span class="font-display font-extrabold text-xs sm:text-sm text-white">🎨 Draw To Find</span>
+                <span class="px-1.5 py-0.5 rounded-full bg-cyan-500/20 text-[9px] font-extrabold text-cyan-300 shrink-0">3–6P</span>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-1 leading-snug">
+                1 Blender gets no word! Everyone draws 2 turns in unique colors & votes!
               </p>
             </button>
 
@@ -137,18 +312,21 @@
                 <span class="px-1.5 py-0.5 rounded-full bg-amber-500/20 text-[9px] font-extrabold text-amber-300 shrink-0">3–6P</span>
               </div>
               <p class="text-[11px] text-slate-400 mt-1 leading-snug">
-                1 player gets a character & gives chat hints. First guesser wins!
+                1 Clue Giver gives chat/voice hints. First correct guesser wins!
               </p>
             </button>
           </div>
         </div>
 
-        <!-- Step 2: Nickname -->
+        <!-- Step 2: Display Name (Pre-filled from Permanent Profile) -->
         <div>
-          <label for="player-name-input" class="block text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
-            2. Your Player Nickname
-          </label>
-          <input id="player-name-input" type="text" maxlength="16" placeholder="e.g. Sasuke, Gojo, Bheem..."
+          <div class="flex items-center justify-between mb-1.5">
+            <label for="player-name-input" class="text-xs font-extrabold uppercase tracking-wider text-slate-400">
+              2. Display Name
+            </label>
+            <span id="landing-profile-tag" class="text-[11px] font-extrabold text-violet-300">@player</span>
+          </div>
+          <input id="player-name-input" type="text" maxlength="16" placeholder="Your display name..."
             class="w-full px-4 py-3 rounded-2xl bg-slate-950 border border-slate-700/80 focus:border-violet-500 outline-none text-sm font-semibold text-white placeholder:text-slate-500" />
         </div>
 
@@ -169,7 +347,7 @@
 
         <div class="relative flex py-0.5 items-center">
           <div class="flex-grow border-t border-slate-800"></div>
-          <span class="flex-shrink mx-3 text-[11px] font-bold uppercase tracking-wider text-slate-500">Or Join Friend's Room</span>
+          <span class="flex-shrink mx-3 text-[11px] font-bold uppercase tracking-wider text-slate-500">Or Join by Room Code</span>
           <div class="flex-grow border-t border-slate-800"></div>
         </div>
 
@@ -215,6 +393,20 @@
         </div>
       </div>
 
+      <!-- Direct Invite Friends Bar inside Lobby -->
+      <div class="rounded-3xl bg-indigo-950/35 border border-indigo-500/30 p-3.5 shadow-lg space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-extrabold uppercase tracking-wider text-indigo-200">
+            📨 Direct Invite Saved Friends
+          </span>
+          <button type="button" onclick="window.toggleFriendsModal(true)"
+            class="text-[11px] font-extrabold text-violet-300 hover:text-white underline">
+            + Add Friend
+          </button>
+        </div>
+        <div id="lobby-friends-invite-row" class="flex gap-2 overflow-x-auto pb-1"></div>
+      </div>
+
       <!-- Player Roster Card -->
       <div class="rounded-3xl bg-slate-900/90 border border-slate-800 p-4 shadow-xl space-y-3">
         <div class="flex items-center justify-between gap-2">
@@ -222,11 +414,11 @@
             <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-300">
               Players in Lobby (<span id="lobby-player-count" class="text-violet-300">1 / 4</span>)
             </h3>
-            <p class="text-[11px] text-slate-500">Share the room code with friends or add bots</p>
+            <p class="text-[11px] text-slate-500">Invite friends above or add demo bots</p>
           </div>
           <button id="btn-fill-bots" type="button" onclick="window.fillWithDemoBots()"
             class="hidden px-3 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-xs font-extrabold text-emerald-300 transition active:scale-95">
-            🤖 Fill Empty Slots with Bots
+            🤖 Fill Empty Slots
           </button>
         </div>
 
@@ -242,22 +434,26 @@
           </span>
         </div>
 
-        <!-- Switch Game Type (3 Games) -->
+        <!-- Switch Game Type (All 4 Games) -->
         <div>
           <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
             Game Mode
           </label>
-          <div class="grid grid-cols-3 gap-1.5">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
             <button id="lobby-switch-odd" type="button" onclick="window.switchLobbyGameType('ODD_ONE_OUT')"
-              class="py-2 px-2 rounded-xl border text-[11px] sm:text-xs font-extrabold transition">
+              class="py-2 px-2 rounded-xl border text-[11px] font-extrabold transition">
               ❓ Odd One Out
             </button>
+            <button id="lobby-switch-draw" type="button" onclick="window.switchLobbyGameType('DRAW_TO_FIND')"
+              class="py-2 px-2 rounded-xl border text-[11px] font-extrabold transition">
+              🎨 Draw To Find
+            </button>
             <button id="lobby-switch-mafia" type="button" onclick="window.switchLobbyGameType('MAFIA')"
-              class="py-2 px-2 rounded-xl border text-[11px] sm:text-xs font-extrabold transition">
+              class="py-2 px-2 rounded-xl border text-[11px] font-extrabold transition">
               🔫 Mafia
             </button>
             <button id="lobby-switch-guess" type="button" onclick="window.switchLobbyGameType('GUESS_THE_NAME')"
-              class="py-2 px-2 rounded-xl border text-[11px] sm:text-xs font-extrabold transition">
+              class="py-2 px-2 rounded-xl border text-[11px] font-extrabold transition">
               🎭 Guess Name
             </button>
           </div>
@@ -273,7 +469,6 @@
 
         <!-- ODD ONE OUT SPECIFIC SETTINGS -->
         <div id="lobby-odd-settings" class="space-y-3.5">
-          <!-- Universe Pairing Mode (Same Universe vs Cross-Universe) -->
           <div>
             <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
               Character Pairing Style
@@ -303,7 +498,6 @@
             </div>
           </div>
 
-          <!-- Imposter Awareness Mode -->
           <div>
             <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
               Imposter Awareness Mode
@@ -334,7 +528,7 @@
           </div>
         </div>
 
-        <!-- SHARED PACK SELECTOR (Shown for Odd One Out AND Guess The Name) -->
+        <!-- SHARED PACK SELECTOR (Odd One Out, Draw To Find, Guess The Name) -->
         <div id="lobby-pack-selector-wrapper">
           <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
             Character & Word Pack
@@ -357,6 +551,14 @@
               🇮🇳 Everyday & Pop Culture
             </button>
           </div>
+        </div>
+
+        <!-- DRAW TO FIND RULES CARD -->
+        <div id="lobby-draw-settings" class="hidden rounded-2xl bg-cyan-950/25 border border-cyan-500/30 p-3.5 space-y-1.5">
+          <span class="text-xs font-extrabold uppercase tracking-wider text-cyan-300">🎨 How Draw To Find Works</span>
+          <p class="text-[11px] text-slate-300 leading-relaxed">
+            Innocents get the <span class="font-bold text-cyan-200">Secret Word</span> while 1 random player is <span class="font-bold text-rose-300">The Blender</span> (gets NO word). Each player gets a unique pen color (<span class="text-blue-400 font-bold">Blue</span>, <span class="text-rose-400 font-bold">Red</span>, <span class="text-emerald-400 font-bold">Green</span>, <span class="text-amber-400 font-bold">Yellow</span>) and draws <span class="font-bold text-white">2 turns</span> on the same shared page before voting out The Blender!
+          </p>
         </div>
 
         <!-- MAFIA ROLE BREAKDOWN -->
@@ -388,7 +590,7 @@
         <div id="lobby-guess-settings" class="hidden rounded-2xl bg-amber-950/25 border border-amber-500/30 p-3.5 space-y-1.5">
           <span class="text-xs font-extrabold uppercase tracking-wider text-amber-300">🎭 How Guess The Name Works</span>
           <p class="text-[11px] text-slate-300 leading-relaxed">
-            Each round, 1 player becomes the <span class="font-bold text-amber-200">Clue Giver</span> and receives a secret character or item. They describe it in chat without saying the name! The Clue Giver taps the first player who guesses right to award <span class="font-bold text-emerald-300">+100 pts</span> to the winner (<span class="font-bold text-amber-300">+50 pts</span> to Clue Giver, 0 to others).
+            Each round, 1 player becomes the <span class="font-bold text-amber-200">Clue Giver</span> and describes their secret word in chat or via voice notes! The Clue Giver taps the first player who guesses right to award <span class="font-bold text-emerald-300">+100 pts</span> to the winner (<span class="font-bold text-amber-300">+50 pts</span> to Clue Giver, 0 to others).
           </p>
         </div>
       </div>
@@ -409,7 +611,6 @@
     <!-- VIEW 3A: ODD ONE OUT ACTIVE ROUND                                     -->
     <!-- ===================================================================== -->
     <section id="view-game-odd" class="hidden flex-1 flex flex-col space-y-3 animate-pop-in">
-      <!-- Round & Mode Strip -->
       <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-900/90 border border-slate-800 rounded-2xl px-3.5 py-2">
         <div class="flex items-center gap-1.5">
           <span id="odd-round-badge" class="px-2.5 py-0.5 rounded-lg bg-violet-500/20 border border-violet-500/30 text-xs font-extrabold text-violet-300">
@@ -424,11 +625,10 @@
         </div>
         <span class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-emerald-300">
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          Open Chat & Vote
+          Chat, Voice & Vote
         </span>
       </div>
 
-      <!-- Direct Immediate Secret Character Banner -->
       <div id="odd-card-box" class="w-full rounded-3xl bg-gradient-to-br from-violet-600 via-indigo-700 to-slate-900 border border-violet-400/40 p-4 flex flex-col items-center justify-center text-center shadow-2xl shadow-violet-900/40 transition-all">
         <div class="flex flex-wrap items-center justify-center gap-1.5 mb-1">
           <span class="px-3 py-0.5 rounded-full bg-black/35 border border-white/15 text-[11px] font-bold uppercase tracking-widest text-violet-100">
@@ -442,34 +642,41 @@
           ---
         </h3>
         <p id="odd-role-hint" class="text-[11px] text-violet-100/90 max-w-md mt-0.5 leading-snug">
-          Chat freely for as long as you want and vote below whenever you're ready!
+          Chat or hold 🎙️ to send voice notes, then use 2-click voting below!
         </p>
       </div>
 
-      <!-- Unlimited Open Chat & 2-Click Voting Panel -->
       <div class="flex-1 flex flex-col bg-slate-900/90 border border-slate-800 rounded-3xl overflow-hidden shadow-xl">
         <div class="px-4 py-2.5 border-b border-slate-800 flex items-center justify-between gap-2 bg-slate-950/50">
           <div>
             <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-200">Live Discussion & 2-Step Voting</h4>
-            <p class="text-[10px] text-slate-400">Chat freely! Tap a name below, then confirm Yes/No to vote</p>
+            <p class="text-[10px] text-slate-400">Hold 🎙️ for up to 10s voice notes • Tap a name to vote</p>
           </div>
           <span id="odd-voting-progress-pill" class="px-2.5 py-1 rounded-xl bg-amber-500/20 border border-amber-500/40 text-xs font-extrabold text-amber-300 shrink-0">
             🗳️ 0 / 4 Voted
           </span>
         </div>
 
-        <div id="odd-chat-list" class="flex-1 p-3.5 space-y-2.5 overflow-y-auto min-h-[190px] max-h-[260px] sm:max-h-[310px]"></div>
+        <div id="odd-chat-list" class="flex-1 p-3.5 space-y-2.5 overflow-y-auto min-h-[180px] max-h-[250px] sm:max-h-[300px]"></div>
 
-        <form onsubmit="window.sendChatMessage(event, 'odd-chat-input')" class="p-2.5 border-t border-slate-800 bg-slate-950/70 flex gap-2">
-          <input id="odd-chat-input" type="text" maxlength="200" placeholder="Type any clue, question, or accusation..."
+        <!-- Chat Input + Hold-to-Record 10s Mic Button -->
+        <form onsubmit="window.sendChatMessage(event, 'odd-chat-input')" class="p-2.5 border-t border-slate-800 bg-slate-950/70 flex items-center gap-1.5">
+          <input id="odd-chat-input" type="text" maxlength="200" placeholder="Type a clue or hold 🎙️..."
             class="flex-1 min-w-0 px-3.5 py-2.5 rounded-2xl bg-slate-900 border border-slate-700/80 focus:border-violet-500 outline-none text-sm text-white placeholder:text-slate-500" />
+          <button type="button"
+            onpointerdown="window.startVoiceRecording(event)"
+            onpointerup="window.stopVoiceRecording(event)"
+            onpointercancel="window.cancelVoiceRecording(event)"
+            class="mic-hold-btn w-11 h-11 rounded-2xl bg-slate-800 hover:bg-rose-500/25 border border-slate-700 text-white flex items-center justify-center text-base shrink-0 select-none transition active:scale-95"
+            title="Hold to record up to 10s voice note">
+            🎙️
+          </button>
           <button type="submit"
             class="px-4 py-2.5 rounded-2xl bg-violet-600 hover:bg-violet-500 text-white font-extrabold text-sm transition active:scale-95 shrink-0">
             Send
           </button>
         </form>
 
-        <!-- 2-Click Voting Panel -->
         <div class="p-3.5 border-t border-slate-800/90 bg-slate-950/90 space-y-2">
           <div class="flex items-center justify-between gap-2">
             <span class="text-[11px] font-extrabold uppercase tracking-wider text-amber-300 flex items-center gap-1">
@@ -503,7 +710,6 @@
         </span>
       </div>
 
-      <!-- Secret Mafia Role Banner -->
       <div id="mafia-role-banner" class="w-full rounded-3xl bg-gradient-to-br from-sky-700 via-indigo-800 to-slate-950 border border-sky-400/40 p-4 flex flex-col items-center justify-center text-center shadow-2xl transition-all">
         <div class="flex flex-wrap items-center justify-center gap-1.5 mb-1">
           <span class="px-3 py-0.5 rounded-full bg-black/35 border border-white/15 text-[11px] font-bold uppercase tracking-widest text-white/90">
@@ -521,7 +727,6 @@
         </p>
       </div>
 
-      <!-- Night Phase Action Panel -->
       <div id="mafia-night-panel" class="rounded-3xl bg-gradient-to-b from-indigo-950/90 to-slate-900/95 border border-indigo-500/40 p-4 shadow-2xl space-y-3">
         <div class="flex items-center justify-between gap-2">
           <div>
@@ -546,7 +751,6 @@
         </div>
       </div>
 
-      <!-- Day Phase: Morning Report + Chat + 2-Click Voting -->
       <div id="mafia-day-panel" class="hidden flex-1 flex flex-col bg-slate-900/90 border border-slate-800 rounded-3xl overflow-hidden shadow-xl">
         <div id="mafia-morning-banner" class="px-4 py-2.5 bg-amber-500/15 border-b border-amber-500/30 text-xs font-bold text-amber-200 flex items-center gap-2">
           <span>☀️</span>
@@ -556,7 +760,7 @@
         <div class="px-4 py-2 border-b border-slate-800 flex items-center justify-between gap-2 bg-slate-950/50">
           <div>
             <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-200">Village Chat & 2-Step Voting</h4>
-            <p class="text-[10px] text-slate-400">Tap a suspect below, then confirm Yes/No to vote</p>
+            <p class="text-[10px] text-slate-400">Hold 🎙️ for 10s voice notes • Tap a suspect to vote</p>
           </div>
           <span id="mafia-voting-progress-pill" class="px-2.5 py-1 rounded-xl bg-amber-500/20 border border-amber-500/40 text-xs font-extrabold text-amber-300 shrink-0">
             🗳️ 0 / 4 Voted
@@ -565,9 +769,17 @@
 
         <div id="mafia-chat-list" class="flex-1 p-3.5 space-y-2.5 overflow-y-auto min-h-[180px] max-h-[250px] sm:max-h-[300px]"></div>
 
-        <form onsubmit="window.sendChatMessage(event, 'mafia-chat-input')" class="p-2.5 border-t border-slate-800 bg-slate-950/70 flex gap-2">
+        <form onsubmit="window.sendChatMessage(event, 'mafia-chat-input')" class="p-2.5 border-t border-slate-800 bg-slate-950/70 flex items-center gap-1.5">
           <input id="mafia-chat-input" type="text" maxlength="200" placeholder="Discuss who the Mafia is..."
             class="flex-1 min-w-0 px-3.5 py-2.5 rounded-2xl bg-slate-900 border border-slate-700/80 focus:border-rose-500 outline-none text-sm text-white placeholder:text-slate-500" />
+          <button type="button" id="mafia-mic-btn"
+            onpointerdown="window.startVoiceRecording(event)"
+            onpointerup="window.stopVoiceRecording(event)"
+            onpointercancel="window.cancelVoiceRecording(event)"
+            class="mic-hold-btn w-11 h-11 rounded-2xl bg-slate-800 hover:bg-rose-500/25 border border-slate-700 text-white flex items-center justify-center text-base shrink-0 select-none transition active:scale-95"
+            title="Hold to record up to 10s voice note">
+            🎙️
+          </button>
           <button type="submit" id="mafia-chat-send-btn"
             class="px-4 py-2.5 rounded-2xl bg-rose-600 hover:bg-rose-500 disabled:bg-slate-800 disabled:text-slate-500 text-white font-extrabold text-sm transition active:scale-95 shrink-0">
             Send
@@ -592,7 +804,6 @@
     <!-- VIEW 3C: GUESS THE NAME (DUMB CHARADES IN CHAT)                       -->
     <!-- ===================================================================== -->
     <section id="view-game-guess" class="hidden flex-1 flex flex-col space-y-3 animate-pop-in">
-      <!-- Top Status Strip -->
       <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-900/90 border border-slate-800 rounded-2xl px-3.5 py-2">
         <div class="flex items-center gap-1.5">
           <span id="guess-round-badge" class="px-2.5 py-0.5 rounded-lg bg-amber-500/20 border border-amber-500/30 text-xs font-extrabold text-amber-300">
@@ -608,7 +819,6 @@
         </span>
       </div>
 
-      <!-- Secret Character Banner (Only Clue Giver Sees Secret Name; Guessers See Clue Giver Info) -->
       <div id="guess-role-banner" class="w-full rounded-3xl bg-gradient-to-br from-amber-600 via-orange-700 to-slate-900 border border-amber-400/40 p-4 flex flex-col items-center justify-center text-center shadow-2xl shadow-amber-900/35">
         <div class="flex flex-wrap items-center justify-center gap-1.5 mb-1">
           <span id="guess-banner-tag" class="px-3 py-0.5 rounded-full bg-black/35 border border-white/15 text-[11px] font-bold uppercase tracking-widest text-amber-100">
@@ -619,40 +829,45 @@
           ---
         </h3>
         <p id="guess-banner-desc" class="text-[11px] text-amber-100/90 max-w-md mt-0.5 leading-snug">
-          Describe this character in chat without saying their name! Tap the first correct guesser below to declare them the winner.
+          Describe this character in chat or via voice notes without saying their name!
         </p>
 
-        <!-- Clue Giver Skip / New Word Button -->
         <button id="btn-guess-skip-word" type="button" onclick="window.skipGuessWord()"
           class="hidden mt-2.5 px-3.5 py-1.5 rounded-xl bg-black/35 hover:bg-black/50 border border-white/20 text-[11px] font-extrabold text-amber-100 transition active:scale-95">
           🔀 Don't Know This One? Get New Word
         </button>
       </div>
 
-      <!-- Live Guessing Chat & Clue Giver Winner Declaration Panel -->
       <div class="flex-1 flex flex-col bg-slate-900/90 border border-slate-800 rounded-3xl overflow-hidden shadow-xl">
         <div class="px-4 py-2.5 border-b border-slate-800 flex items-center justify-between gap-2 bg-slate-950/50">
           <div>
             <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-200">Live Hints & Guessing Chat</h4>
-            <p id="guess-chat-sub" class="text-[10px] text-slate-400">Type your guesses fast — first right answer wins!</p>
+            <p id="guess-chat-sub" class="text-[10px] text-slate-400">Type guesses or hold 🎙️ for voice clues!</p>
           </div>
           <span class="px-2.5 py-1 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-[11px] font-extrabold text-emerald-300 shrink-0">
             🏆 Winner: +100 pts
           </span>
         </div>
 
-        <div id="guess-chat-list" class="flex-1 p-3.5 space-y-2.5 overflow-y-auto min-h-[190px] max-h-[260px] sm:max-h-[310px]"></div>
+        <div id="guess-chat-list" class="flex-1 p-3.5 space-y-2.5 overflow-y-auto min-h-[180px] max-h-[250px] sm:max-h-[300px]"></div>
 
-        <form onsubmit="window.sendGuessChatMessage(event)" class="p-2.5 border-t border-slate-800 bg-slate-950/70 flex gap-2">
+        <form onsubmit="window.sendGuessChatMessage(event)" class="p-2.5 border-t border-slate-800 bg-slate-950/70 flex items-center gap-1.5">
           <input id="guess-chat-input" type="text" maxlength="200" placeholder="Type a hint or your guess..."
             class="flex-1 min-w-0 px-3.5 py-2.5 rounded-2xl bg-slate-900 border border-slate-700/80 focus:border-amber-400 outline-none text-sm text-white placeholder:text-slate-500" />
+          <button type="button"
+            onpointerdown="window.startVoiceRecording(event)"
+            onpointerup="window.stopVoiceRecording(event)"
+            onpointercancel="window.cancelVoiceRecording(event)"
+            class="mic-hold-btn w-11 h-11 rounded-2xl bg-slate-800 hover:bg-rose-500/25 border border-slate-700 text-white flex items-center justify-center text-base shrink-0 select-none transition active:scale-95"
+            title="Hold to record up to 10s voice note">
+            🎙️
+          </button>
           <button type="submit"
             class="px-4 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-sm transition active:scale-95 shrink-0">
             Send
           </button>
         </form>
 
-        <!-- Clue Giver Winner Declaration Panel -->
         <div id="guess-declare-winner-box" class="hidden p-3.5 border-t border-slate-800/90 bg-slate-950/90 space-y-2">
           <div class="flex items-center justify-between gap-2">
             <span class="text-[11px] font-extrabold uppercase tracking-wider text-emerald-300 flex items-center gap-1">
@@ -663,6 +878,116 @@
             </span>
           </div>
           <div id="guess-players-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- VIEW 3D: DRAW TO FIND (4TH GAME — SHARED CANVAS + THE BLENDER)        -->
+    <!-- ===================================================================== -->
+    <section id="view-game-draw" class="hidden flex-1 flex flex-col space-y-3 animate-pop-in">
+      <!-- Top Status Strip -->
+      <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-900/90 border border-slate-800 rounded-2xl px-3.5 py-2">
+        <div class="flex items-center gap-1.5">
+          <span id="draw-round-badge" class="px-2.5 py-0.5 rounded-lg bg-cyan-500/20 border border-cyan-500/30 text-xs font-extrabold text-cyan-300">
+            ROUND 1
+          </span>
+          <span id="draw-cycle-pill" class="px-2.5 py-0.5 rounded-lg bg-slate-800 border border-slate-700 text-[11px] font-bold text-slate-300">
+            ✏️ Drawing Cycle 1 / 2
+          </span>
+        </div>
+        <span id="draw-phase-badge" class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-cyan-300">
+          <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+          Drawing Phase
+        </span>
+      </div>
+
+      <!-- Secret Word vs The Blender Banner -->
+      <div id="draw-secret-banner" class="w-full rounded-3xl bg-gradient-to-br from-cyan-700 via-blue-800 to-slate-950 border border-cyan-400/40 p-3.5 flex flex-col items-center justify-center text-center shadow-2xl">
+        <div class="flex flex-wrap items-center justify-center gap-1.5 mb-0.5">
+          <span id="draw-category-tag" class="px-2.5 py-0.5 rounded-full bg-black/35 border border-white/15 text-[10px] font-bold uppercase tracking-widest text-cyan-100">
+            CATEGORY
+          </span>
+          <span id="draw-blender-badge" class="hidden px-2.5 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-extrabold uppercase tracking-wider animate-pulse">
+            🎭 YOU ARE THE BLENDER (NO WORD!)
+          </span>
+        </div>
+        <h3 id="draw-secret-word-text" class="font-display text-2xl sm:text-3xl font-extrabold text-white tracking-tight drop-shadow">
+          ---
+        </h3>
+        <p id="draw-role-instruction" class="text-[11px] text-cyan-100/90 max-w-md mt-0.5 leading-snug">
+          Draw a subtle clue on your turn so fellow innocents know you know the word without giving it away to The Blender!
+        </p>
+      </div>
+
+      <!-- Player Pen Color Legend -->
+      <div id="draw-pen-legend" class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 bg-slate-900/90 border border-slate-800 rounded-2xl p-2.5"></div>
+
+      <!-- Shared Real-Time Drawing Canvas Card -->
+      <div class="rounded-3xl bg-slate-900/90 border border-slate-800 p-3 shadow-xl space-y-2.5">
+        <div class="flex items-center justify-between gap-2 px-1">
+          <div id="draw-turn-status-text" class="text-xs font-extrabold text-white">
+            Waiting for active artist...
+          </div>
+          <button id="btn-finish-draw-turn" type="button" onclick="window.finishCurrentDrawTurn()"
+            class="hidden px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs shadow transition active:scale-95">
+            ✅ Done Turn
+          </button>
+        </div>
+
+        <!-- Crisp White Shared Sketch Pad -->
+        <div class="relative w-full aspect-[4/3] max-h-[290px] rounded-2xl overflow-hidden border-2 border-slate-700 bg-white shadow-inner">
+          <canvas id="draw-canvas" width="600" height="450" class="w-full h-full block"></canvas>
+          <div id="draw-canvas-lock-overlay" class="hidden absolute inset-0 bg-slate-950/15 pointer-events-none flex items-end justify-center pb-2">
+            <span class="px-3 py-1 rounded-full bg-slate-950/85 text-[11px] font-bold text-slate-200 shadow">
+              👀 Watching live drawing...
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat & 2-Click Voting Panel (Voting unlocks after 2 full drawing cycles) -->
+      <div class="flex-1 flex flex-col bg-slate-900/90 border border-slate-800 rounded-3xl overflow-hidden shadow-xl">
+        <div class="px-4 py-2 border-b border-slate-800 flex items-center justify-between gap-2 bg-slate-950/50">
+          <div>
+            <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-200">Table Chat & Voice Notes</h4>
+            <p class="text-[10px] text-slate-400">Hold 🎙️ for 10s voice notes • Voting unlocks after Cycle 2</p>
+          </div>
+          <span id="draw-voting-progress-pill" class="px-2.5 py-1 rounded-xl bg-slate-800 border border-slate-700 text-xs font-extrabold text-slate-300 shrink-0">
+            ✏️ Drawing...
+          </span>
+        </div>
+
+        <div id="draw-chat-list" class="flex-1 p-3 space-y-2 overflow-y-auto min-h-[130px] max-h-[200px]"></div>
+
+        <form onsubmit="window.sendChatMessage(event, 'draw-chat-input')" class="p-2.5 border-t border-slate-800 bg-slate-950/70 flex items-center gap-1.5">
+          <input id="draw-chat-input" type="text" maxlength="200" placeholder="Discuss who The Blender is..."
+            class="flex-1 min-w-0 px-3.5 py-2.5 rounded-2xl bg-slate-900 border border-slate-700/80 focus:border-cyan-400 outline-none text-sm text-white placeholder:text-slate-500" />
+          <button type="button"
+            onpointerdown="window.startVoiceRecording(event)"
+            onpointerup="window.stopVoiceRecording(event)"
+            onpointercancel="window.cancelVoiceRecording(event)"
+            class="mic-hold-btn w-11 h-11 rounded-2xl bg-slate-800 hover:bg-rose-500/25 border border-slate-700 text-white flex items-center justify-center text-base shrink-0 select-none transition active:scale-95"
+            title="Hold to record up to 10s voice note">
+            🎙️
+          </button>
+          <button type="submit"
+            class="px-4 py-2.5 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-extrabold text-sm transition active:scale-95 shrink-0">
+            Send
+          </button>
+        </form>
+
+        <!-- 2-Click Blender Voting Panel (Appears after Cycle 2 completes) -->
+        <div id="draw-voting-panel" class="hidden p-3.5 border-t border-slate-800/90 bg-slate-950/90 space-y-2">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-[11px] font-extrabold uppercase tracking-wider text-amber-300 flex items-center gap-1">
+              <span>🗳️</span> Both Cycles Done! Vote Out The Blender:
+            </span>
+            <span id="draw-voting-subtitle" class="text-[11px] font-semibold text-slate-400">
+              Tap a player to select
+            </span>
+          </div>
+          <div id="draw-voting-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
         </div>
       </div>
     </section>
@@ -716,6 +1041,26 @@
         </div>
       </div>
 
+      <!-- Draw To Find Reveal Card -->
+      <div id="results-draw-card" class="hidden bg-slate-900/90 border border-slate-800 rounded-3xl p-4 shadow-xl space-y-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-center">
+          <div class="p-3 rounded-2xl bg-cyan-500/10 border border-cyan-500/30">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-cyan-300">Secret Word Was</span>
+            <div id="reveal-draw-word" class="font-display text-xl font-extrabold text-white mt-0.5">---</div>
+            <span id="reveal-draw-universe" class="text-[11px] text-cyan-200/80">---</span>
+          </div>
+          <div class="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/30">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-rose-300">🎭 The Blender Was</span>
+            <div id="reveal-draw-blender-name" class="font-display text-xl font-extrabold text-rose-200 mt-0.5">---</div>
+            <span class="text-[11px] text-rose-300/80">Had NO word!</span>
+          </div>
+        </div>
+        <div>
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Vote Breakdown</h4>
+          <div id="reveal-draw-votes-list" class="space-y-1.5"></div>
+        </div>
+      </div>
+
       <!-- Mafia Roles Reveal Card -->
       <div id="results-mafia-card" class="hidden bg-slate-900/90 border border-slate-800 rounded-3xl p-4 shadow-xl space-y-3">
         <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-300">Final Mafia Role Reveal</h4>
@@ -754,13 +1099,19 @@
 
   </main>
 
+  <!-- Floating Recording Indicator Pill (Appears while holding Mic button) -->
+  <div id="voice-recording-overlay" class="hidden fixed bottom-24 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-rose-600 border-2 border-rose-300 text-white font-extrabold text-xs shadow-2xl flex items-center gap-2 animate-pulse pointer-events-none">
+    <span class="w-2.5 h-2.5 rounded-full bg-white"></span>
+    <span id="voice-recording-timer">Recording Voice Note... 0.0s / 10.0s</span>
+  </div>
+
   <!-- ======================================================================= -->
   <!-- COMPLETE GAME ENGINE WITH FIREBASE REAL-TIME SYNC                       -->
   <!-- ======================================================================= -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection, addDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // =========================================================================
     // 1. LIVE FIREBASE CONFIGURATION (odd-one-mafia)
@@ -780,15 +1131,10 @@
       : USER_FIREBASE_CONFIG;
 
     // =========================================================================
-    // 2. COMPLETE CHARACTER & WORD DATABASE
-    //    - 14 Anime Series
-    //    - 11 Cartoons
-    //    - 12 Everyday Things & Pop Culture Categories
-    //    - Archetype tags enable smart Cross-Universe similarity matching!
+    // 2. COMPLETE CHARACTER & WORD DATABASE (14 Anime, 11 Cartoons, 12 Everyday)
     // =========================================================================
     const CHARACTER_DATABASE = [
       // ==================== 14 ANIME UNIVERSES ====================
-      // 1. Dragon Ball Z
       { name: "Goku", universe: "Dragon Ball Z", pack: "ANIME", archetype: "SHONEN_HERO", clues: ["Pure-blooded Saiyan who loves fighting strong opponents", "Transforms into Super Saiyan with golden hair", "Uses the Kamehameha wave"] },
       { name: "Vegeta", universe: "Dragon Ball Z", pack: "ANIME", archetype: "RIVAL_ANTIHERO", clues: ["Proud Prince of all Saiyans", "Started as a ruthless rival before becoming an ally", "Always determined to surpass the main hero"] },
       { name: "Gohan", universe: "Dragon Ball Z", pack: "ANIME", archetype: "YOUNG_PRODIGY", clues: ["Half-Saiyan son who unleashed massive hidden rage", "Defeated Cell with a one-handed Kamehameha", "Balances studying with martial arts"] },
@@ -796,7 +1142,6 @@
       { name: "Frieza", universe: "Dragon Ball Z", pack: "ANIME", archetype: "ICONIC_VILLAIN", clues: ["Galactic tyrant who destroyed Planet Vegeta", "Has multiple sleek transformations including a golden form", "Iconic Dragon Ball Z villain"] },
       { name: "Future Trunks", universe: "Dragon Ball Z", pack: "ANIME", archetype: "FIERCE_SWORDSMAN", clues: ["Time-traveling Saiyan warrior carrying a sword", "Son of Vegeta and Bulma", "Sliced Mecha Frieza into pieces"] },
 
-      // 2. Naruto
       { name: "Naruto Uzumaki", universe: "Naruto", pack: "ANIME", archetype: "SHONEN_HERO", clues: ["Orange-clad ninja who dreams of becoming Hokage", "Seals the Nine-Tails Fox inside himself", "Uses Shadow Clones and Rasengan"] },
       { name: "Sasuke Uchiha", universe: "Naruto", pack: "ANIME", archetype: "RIVAL_ANTIHERO", clues: ["Last surviving Uchiha in Konoha seeking revenge", "Wields the Sharingan and Rinnegan", "Team 7 rival who left the village for power"] },
       { name: "Kakashi Hatake", universe: "Naruto", pack: "ANIME", archetype: "OP_MENTOR", clues: ["Mask-wearing silver-haired Team 7 sensei", "Known as the Copy Ninja with one Sharingan eye", "Creator of the Chidori"] },
@@ -804,14 +1149,12 @@
       { name: "Madara Uchiha", universe: "Naruto", pack: "ANIME", archetype: "ICONIC_VILLAIN", clues: ["Legendary co-founder of Konoha and rival of Hashirama", "Dropped two meteors on the Shinobi Alliance", "Master of the Susanoo"] },
       { name: "Sakura Haruno", universe: "Naruto", pack: "ANIME", archetype: "HEROINE_FIGHTER", clues: ["Pink-haired kunoichi of Team 7", "Trained under Tsunade in medical ninjutsu and monster strength", "Married Sasuke Uchiha"] },
 
-      // 3. Attack on Titan
       { name: "Eren Yeager", universe: "Attack on Titan", pack: "ANIME", archetype: "SHONEN_HERO", clues: ["Vowed to wipe out every Titan after Wall Maria fell", "Inherits the Attack Titan and Founding Titan", "Obsessed with freedom beyond the walls"] },
       { name: "Levi Ackerman", universe: "Attack on Titan", pack: "ANIME", archetype: "OP_MENTOR", clues: ["Humanity's Strongest Soldier in the Survey Corps", "Spin-attacks Titans with dual ODM blades", "Obsessed with cleanliness and tea"] },
       { name: "Mikasa Ackerman", universe: "Attack on Titan", pack: "ANIME", archetype: "HEROINE_FIGHTER", clues: ["Always wears the red scarf Eren wrapped around her", "Elite Ackerman warrior with unmatched ODM agility", "Fiercely protective of Eren"] },
       { name: "Armin Arlert", universe: "Attack on Titan", pack: "ANIME", archetype: "GENIUS_STRATEGIST", clues: ["Brilliant tactician who dreams of seeing the ocean", "Inherits the Colossal Titan", "Best friend of Eren and Mikasa"] },
       { name: "Erwin Smith", universe: "Attack on Titan", pack: "ANIME", archetype: "CAPTAIN_LEADER", clues: ["Fearless Commander of the Survey Corps", "Led the final charge against the Beast Titan", "Lost his right arm to a Titan"] },
 
-      // 4. Demon Slayer
       { name: "Tanjiro Kamado", universe: "Demon Slayer", pack: "ANIME", archetype: "SHONEN_HERO", clues: ["Kind-hearted demon slayer with a checkered haori", "Carries his sister inside a wooden box on his back", "Uses Water and Sun Breathing"] },
       { name: "Nezuko Kamado", universe: "Demon Slayer", pack: "ANIME", archetype: "SUPERNATURAL_ALLY", clues: ["Turned into a demon yet refuses to eat humans", "Wears a bamboo muzzle and shrinks or grows in size", "Uses Blood Demon Art flames"] },
       { name: "Zenitsu Agatsuma", universe: "Demon Slayer", pack: "ANIME", archetype: "COMIC_POWERHOUSE", clues: ["Yellow-haired slayer who panics when awake", "Becomes lightning-fast when asleep", "Masters Thunder Breathing First Form"] },
@@ -820,14 +1163,12 @@
       { name: "Giyu Tomioka", universe: "Demon Slayer", pack: "ANIME", archetype: "FIERCE_SWORDSMAN", clues: ["Stoic Water Hashira with a two-toned haori", "Spared Nezuko in the snow in Episode 1", "Created the Eleventh Form: Dead Calm"] },
       { name: "Muzan Kibutsuji", universe: "Demon Slayer", pack: "ANIME", archetype: "ICONIC_VILLAIN", clues: ["The Demon King and progenitor of all demons", "Searches endlessly for the Blue Spider Lily", "Commands the Twelve Kizuki"] },
 
-      // 5. One Piece
       { name: "Monkey D. Luffy", universe: "One Piece", pack: "ANIME", archetype: "SHONEN_HERO", clues: ["Straw-hat pirate captain made of rubber", "Ate the Gum-Gum Fruit and aims to be King of the Pirates", "Loves meat and adventures"] },
       { name: "Roronoa Zoro", universe: "One Piece", pack: "ANIME", archetype: "FIERCE_SWORDSMAN", clues: ["Green-haired pirate who fights with Three-Sword Style", "Has zero sense of direction and always gets lost", "Aims to become the World's Greatest Swordsman"] },
       { name: "Sanji", universe: "One Piece", pack: "ANIME", archetype: "RIVAL_ANTIHERO", clues: ["Straw Hat cook who only fights with powerful kicks", "Never hits a woman and loves cooking", "Constantly bickers with Zoro"] },
       { name: "Portgas D. Ace", universe: "One Piece", pack: "ANIME", archetype: "TRAGIC_GENIUS", clues: ["Luffy's sworn older brother with freckles and a cowboy hat", "Wielded the Flame-Flame Devil Fruit", "Second Division Commander of the Whitebeard Pirates"] },
       { name: "Shanks", universe: "One Piece", pack: "ANIME", archetype: "OP_MENTOR", clues: ["Red-haired Yonko captain who gave Luffy his straw hat", "Lost his left arm saving young Luffy", "Master of Conqueror's Haki"] },
 
-      // 6. Jujutsu Kaisen
       { name: "Yuji Itadori", universe: "Jujutsu Kaisen", pack: "ANIME", archetype: "SHONEN_HERO", clues: ["Athletic teenager who swallowed a cursed finger", "Vessel of Ryomen Sukuna", "Lands consecutive Black Flashes in close combat"] },
       { name: "Satoru Gojo", universe: "Jujutsu Kaisen", pack: "ANIME", archetype: "OP_MENTOR", clues: ["Blindfolded teacher and the strongest jujutsu sorcerer", "Possesses the Six Eyes and Limitless", "Uses Hollow Purple and Infinite Void"] },
       { name: "Megumi Fushiguro", universe: "Jujutsu Kaisen", pack: "ANIME", archetype: "RIVAL_ANTIHERO", clues: ["Calm dark-haired first-year sorcerer", "Summons shadow shikigami with the Ten Shadows Technique", "Partnered with Yuji and Nobara"] },
@@ -835,108 +1176,88 @@
       { name: "Ryomen Sukuna", universe: "Jujutsu Kaisen", pack: "ANIME", archetype: "ICONIC_VILLAIN", clues: ["The undisputed King of Curses from the Heian Era", "Uses Dismantle, Cleave, and Malevolent Shrine", "Takes over Yuji's body"] },
       { name: "Kento Nanami", universe: "Jujutsu Kaisen", pack: "ANIME", archetype: "CAPTAIN_LEADER", clues: ["Former salaryman turned Grade 1 sorcerer", "Wields a wrapped blunt blade with Ratio Technique", "Hates working overtime"] },
 
-      // 7. Death Note
       { name: "Light Yagami", universe: "Death Note", pack: "ANIME", archetype: "GENIUS_STRATEGIST", clues: ["Top honor student who finds a Shinigami notebook", "Eliminates criminals under the alias Kira", "Plays a deadly mind game against L"] },
       { name: "L Lawliet", universe: "Death Note", pack: "ANIME", archetype: "GENIUS_STRATEGIST", clues: ["World's greatest detective who sits crouched in chairs", "Obsessed with sweets and cake", "Hunts down Kira without showing his real face"] },
       { name: "Ryuk", universe: "Death Note", pack: "ANIME", archetype: "SUPERNATURAL_ALLY", clues: ["Bored Shinigami who dropped his Death Note into the human world", "Addicted to eating juicy red apples", "Follows Light Yagami everywhere"] },
 
-      // 8. Black Clover
       { name: "Asta", universe: "Black Clover", pack: "ANIME", archetype: "SHONEN_HERO", clues: ["Loud, muscular orphan born with zero magic", "Wields Anti-Magic swords from a five-leaf grimoire", "Aims to become the Wizard King"] },
       { name: "Yuno", universe: "Black Clover", pack: "ANIME", archetype: "RIVAL_ANTIHERO", clues: ["Calm, handsome wind-magic prodigy raised beside Asta", "Chosen by the four-leaf clover grimoire", "Member of the Golden Dawn"] },
       { name: "Yami Sukehiro", universe: "Black Clover", pack: "ANIME", archetype: "OP_MENTOR", clues: ["Katana-wielding Captain of the Black Bulls", "Uses Dark Magic and tells his squad to surpass their limits", "Always smoking or in the bathroom"] },
 
-      // 9. Chainsaw Man
       { name: "Denji", universe: "Chainsaw Man", pack: "ANIME", archetype: "SHONEN_HERO", clues: ["Pulls a starter cord on his chest to sprout chainsaws", "Fused with his devil dog Pochita", "Dreams of simple things like toast with jam"] },
       { name: "Power", universe: "Chainsaw Man", pack: "ANIME", archetype: "WILD_FIGHTER", clues: ["Chaotic Blood Fiend with red horns", "Loves her cat Meowy and hates vegetables", "Public Safety Devil Hunter alongside Denji"] },
       { name: "Aki Hayakawa", universe: "Chainsaw Man", pack: "ANIME", archetype: "RIVAL_ANTIHERO", clues: ["Serious topknot-wearing Devil Hunter", "Makes contracts with the Fox and Curse Devils", "Takes care of Denji and Power"] },
       { name: "Makima", universe: "Chainsaw Man", pack: "ANIME", archetype: "ICONIC_VILLAIN", clues: ["Mysterious high-ranking Public Safety leader with ringed eyes", "Controls people and devils effortlessly", "Denji's manipulative boss"] },
 
-      // 10. One Punch Man
       { name: "Saitama", universe: "One Punch Man", pack: "ANIME", archetype: "OP_MENTOR", clues: ["Bald hero who defeats every monster with a single punch", "Did 100 push-ups, sit-ups, and squats daily", "Always hunting supermarket bargain sales"] },
       { name: "Genos", universe: "One Punch Man", pack: "ANIME", archetype: "YOUNG_PRODIGY", clues: ["Blonde cyborg hero who insists on being Saitama's disciple", "Takes notes on everything Saitama says", "Uses Incineration Cannons"] },
       { name: "Garou", universe: "One Punch Man", pack: "ANIME", archetype: "RIVAL_ANTIHERO", clues: ["Martial arts prodigy known as the Hero Hunter", "Former top student of Bang (Silver Fang)", "Evolves mid-battle against heroes"] },
 
-      // 11. My Hero Academia
       { name: "Izuku Midoriya", universe: "My Hero Academia", pack: "ANIME", archetype: "SHONEN_HERO", clues: ["Born Quirkless before inheriting One For All from All Might", "Mutters hero analysis notes constantly", "Hero name is Deku"] },
       { name: "Katsuki Bakugo", universe: "My Hero Academia", pack: "ANIME", archetype: "RIVAL_ANTIHERO", clues: ["Explosive hot-headed childhood rival of Deku", "Sweats nitroglycerin to launch massive blasts", "Determined to be the #1 Hero"] },
       { name: "Shoto Todoroki", universe: "My Hero Academia", pack: "ANIME", archetype: "TRAGIC_GENIUS", clues: ["Half-Cold Half-Hot hero with red-and-white hair", "Has a burn scar over his left eye", "Son of the Flame Hero Endeavor"] },
       { name: "All Might", universe: "My Hero Academia", pack: "ANIME", archetype: "OP_MENTOR", clues: ["Former #1 Hero and Symbol of Peace", "Shouts 'I am here!' with a giant smile", "Passed One For All to Deku"] },
 
-      // 12. Spy x Family
       { name: "Loid Forger", universe: "Spy x Family", pack: "ANIME", archetype: "GENIUS_STRATEGIST", clues: ["Master spy codenamed Twilight", "Created a fake family for Operation Strix", "Works undercover as a psychiatrist"] },
       { name: "Yor Forger", universe: "Spy x Family", pack: "ANIME", archetype: "HEROINE_FIGHTER", clues: ["Sweet city hall clerk who is secretly an assassin called Thorn Princess", "Terrible at cooking but superhumanly strong", "Adoptive mother of Anya"] },
       { name: "Anya Forger", universe: "Spy x Family", pack: "ANIME", archetype: "COMIC_POWERHOUSE", clues: ["Pink-haired telepathic little girl who reads minds", "Loves peanuts and Spy Wars cartoons", "Attends Eden Academy"] },
 
-      // 13. Haikyuu!!
       { name: "Shoyo Hinata", universe: "Haikyuu!!", pack: "ANIME", archetype: "SHONEN_HERO", clues: ["Short orange-haired volleyball middle blocker with insane vertical jump", "Inspired by the Little Giant", "Plays for Karasuno High"] },
       { name: "Tobio Kageyama", universe: "Haikyuu!!", pack: "ANIME", archetype: "RIVAL_ANTIHERO", clues: ["Genius volleyball setter nicknamed King of the Court", "Delivers pinpoint freak quick sets to Hinata", "Obsessed with milk and volleyball"] },
       { name: "Kenma Kozume", universe: "Haikyuu!!", pack: "ANIME", archetype: "GENIUS_STRATEGIST", clues: ["Quiet gaming-obsessed setter for Nekoma High", "The tactical brain of his volleyball team", "Best friend of Kuroo"] },
 
-      // 14. Bleach
       { name: "Ichigo Kurosaki", universe: "Bleach", pack: "ANIME", archetype: "SHONEN_HERO", clues: ["Orange-haired teenager who becomes a Substitute Soul Reaper", "Wields the giant zanpakuto Zangetsu", "Fires Getsuga Tensho"] },
       { name: "Rukia Kuchiki", universe: "Bleach", pack: "ANIME", archetype: "HEROINE_FIGHTER", clues: ["Soul Reaper who transferred her powers to Ichigo", "Wields the ice zanpakuto Sode no Shirayuki", "Loves bunny drawings"] },
       { name: "Sosuke Aizen", universe: "Bleach", pack: "ANIME", archetype: "ICONIC_VILLAIN", clues: ["Former 5th Division Captain who orchestrated everything", "Wields Kyoka Suigetsu's complete hypnosis", "Iconic Bleach mastermind"] },
       { name: "Kenpachi Zaraki", universe: "Bleach", pack: "ANIME", archetype: "WILD_FIGHTER", clues: ["Battle-loving Captain of Squad 11", "Wears an eyepatch that seals his spiritual pressure", "Never uses fancy kido, just pure sword strength"] },
 
       // ==================== 11 CARTOON UNIVERSES ====================
-      // 1. Doraemon
       { name: "Doraemon", universe: "Doraemon", pack: "CARTOONS", archetype: "ICONIC_MASCOT", clues: ["Blue robotic cat from the 22nd century", "Pulls futuristic gadgets from his 4D pocket", "Terrified of mice and loves dorayaki"] },
       { name: "Nobita Nobi", universe: "Doraemon", pack: "CARTOONS", archetype: "LAZY_KID_HERO", clues: ["Glasses-wearing boy who always gets zero on tests", "Runs crying to Doraemon for gadgets", "Expert at sleeping fast and cat's cradle"] },
       { name: "Shizuka Minamoto", universe: "Doraemon", pack: "CARTOONS", archetype: "HEROINE_FIGHTER", clues: ["Kind classmate whom Nobita wants to marry", "Loves taking baths and playing the violin", "Smartest friend in Nobita's group"] },
       { name: "Gian (Takeshi)", universe: "Doraemon", pack: "CARTOONS", archetype: "STRONG_BULLY_PAL", clues: ["Big neighborhood bully who forces everyone to attend his terrible concerts", "Actually fiercely protective of his friends in movies", "Best friend of Suneo"] },
 
-      // 2. Ben 10
       { name: "Ben Tennyson", universe: "Ben 10", pack: "CARTOONS", archetype: "SHONEN_HERO", clues: ["10-year-old boy who found the Omnitrix watch", "Slams the watch dial to transform into aliens", "Travels in the Rustbucket RV"] },
       { name: "Gwen Tennyson", universe: "Ben 10", pack: "CARTOONS", archetype: "HEROINE_FIGHTER", clues: ["Ben's smart red-haired cousin", "Uses pink Anodite energy shields and spellbooks", "Voice of reason on summer road trips"] },
       { name: "Kevin Levin", universe: "Ben 10", pack: "CARTOONS", archetype: "RIVAL_ANTIHERO", clues: ["Absorbs metal, stone, and energy with his hands", "Started as Ben's rival before joining his team", "Loves his green muscle car"] },
       { name: "Four Arms", universe: "Ben 10", pack: "CARTOONS", archetype: "STRONG_BULLY_PAL", clues: ["Red-skinned Tetramand alien with four muscular arms", "Ben's go-to heavy hitter in Season 1", "Creates shockwaves by clapping all four hands"] },
 
-      // 3. Shinchan
       { name: "Shinchan Nohara", universe: "Shinchan", pack: "CARTOONS", archetype: "LAZY_KID_HERO", clues: ["5-year-old troublemaker in a red shirt and yellow shorts", "Loves Action Kamen and Chocobi snacks", "Annoys his mom Misae constantly"] },
       { name: "Shiro", universe: "Shinchan", pack: "CARTOONS", archetype: "ANIMAL_SIDEKICK", clues: ["Fluffy white dog adopted by Shinchan", "Smarter and more responsible than Shinchan", "Does the cotton-ball trick"] },
       { name: "Kazama", universe: "Shinchan", pack: "CARTOONS", archetype: "RIVAL_ANTIHERO", clues: ["Polite, studious friend of Shinchan in Futaba Kindergarten", "Secretly loves magical girl anime", "Always gets teased when Shinchan whispers in his ear"] },
 
-      // 4. Pokémon
       { name: "Pikachu", universe: "Pokémon", pack: "CARTOONS", archetype: "ICONIC_MASCOT", clues: ["Yellow Electric-type mouse Pokémon with red cheeks", "Rides on Ash's shoulder and refuses a Poké Ball", "Famous for Thunderbolt"] },
       { name: "Ash Ketchum", universe: "Pokémon", pack: "CARTOONS", archetype: "SHONEN_HERO", clues: ["Trainer from Pallet Town who turns his cap backward", "Travels across regions to become a Pokémon Master", "Best partner is Pikachu"] },
       { name: "Charizard", universe: "Pokémon", pack: "CARTOONS", archetype: "STRONG_BULLY_PAL", clues: ["Orange fire-breathing dragon-like Pokémon", "Ignored Ash's commands until earning his respect", "Tail flame never goes out"] },
 
-      // 5. Chhota Bheem
       { name: "Chhota Bheem", universe: "Chhota Bheem", pack: "CARTOONS", archetype: "SHONEN_HERO", clues: ["Strong boy from Dholakpur who wears an orange dhoti", "Gains unstoppable strength after eating Tuntun Mausi's ladoos", "Protects King Indraverma's kingdom"] },
       { name: "Chutki", universe: "Chhota Bheem", pack: "CARTOONS", archetype: "HEROINE_FIGHTER", clues: ["Bheem's smart best friend with two braids", "Daughter of Tuntun Mausi", "Always carries extra ladoos for Bheem"] },
       { name: "Kalia", universe: "Chhota Bheem", pack: "CARTOONS", archetype: "STRONG_BULLY_PAL", clues: ["Jealous rival of Bheem in Dholakpur", "Always accompanied by twins Dholu and Bholu", "Tries to outshine Bheem but ends up needing rescue"] },
 
-      // 6. Motu Patlu
       { name: "Motu", universe: "Motu Patlu", pack: "CARTOONS", archetype: "LAZY_KID_HERO", clues: ["Chubby resident of Furfuri Nagar in a red tunic", "Loves samosas which suddenly give him superhero strength", "Best friend of Patlu"] },
       { name: "Patlu", universe: "Motu Patlu", pack: "CARTOONS", archetype: "GENIUS_STRATEGIST", clues: ["Thin, glasses-wearing smart friend in Furfuri Nagar", "Always rescues Motu from trouble", "Famous for 'Khaali pet mere dimaag ki batti nahi jalti'"] },
       { name: "Inspector Chingum", universe: "Motu Patlu", pack: "CARTOONS", archetype: "CAPTAIN_LEADER", clues: ["Mustachioed police inspector of Furfuri Nagar", "Says 'Chingum ke changul se bachna namumkin'", "Rides a bike and fires coconuts"] },
 
-      // 7. Zig & Sharko
       { name: "Zig", universe: "Zig & Sharko", pack: "CARTOONS", archetype: "LAZY_KID_HERO", clues: ["Skinny brown hyena stranded on an island", "Plots endlessly to eat Marina the mermaid", "Always gets flattened by Sharko"] },
       { name: "Sharko", universe: "Zig & Sharko", pack: "CARTOONS", archetype: "STRONG_BULLY_PAL", clues: ["Muscular great white shark who walks on land", "Bodyguard and boyfriend of Marina", "Beats up Zig every time he gets near Marina"] },
       { name: "Marina", universe: "Zig & Sharko", pack: "CARTOONS", archetype: "HEROINE_FIGHTER", clues: ["Cheerful red-haired mermaid who loves singing", "Completely oblivious to Zig's traps", "Protected by Sharko"] },
 
-      // 8. Ninja Hattori
       { name: "Hattori Kanzo", universe: "Ninja Hattori", pack: "CARTOONS", archetype: "ICONIC_MASCOT", clues: ["Little Iga ninja in blue robes who lives with Kenichi", "Says 'Ding ding!' after every ninja trick", "Protects Kenichi from Kemumaki"] },
       { name: "Shishimaru", universe: "Ninja Hattori", pack: "CARTOONS", archetype: "ANIMAL_SIDEKICK", clues: ["Yellow ninja dog who can roll into a fireball", "Obsessed with eating chocolate rolls", "Companion of Hattori and Shinzo"] },
       { name: "Kemumaki", universe: "Ninja Hattori", pack: "CARTOONS", archetype: "RIVAL_ANTIHERO", clues: ["Koga ninja rival dressed in green", "Has a ninja cat named Kagechiyo", "Competes with Hattori for Yumeko's attention"] },
 
-      // 9. Tom & Jerry
       { name: "Tom Cat", universe: "Tom & Jerry", pack: "CARTOONS", archetype: "LAZY_KID_HERO", clues: ["Grey-and-white house cat who chases Jerry nonstop", "Sets elaborate traps that always backfire on him", "Iconic classic cartoon cat"] },
       { name: "Jerry Mouse", universe: "Tom & Jerry", pack: "CARTOONS", archetype: "ICONIC_MASCOT", clues: ["Clever little brown mouse living in a baseboard hole", "Outsmarts Tom every single episode", "Loves yellow Swiss cheese"] },
       { name: "Spike Bulldog", universe: "Tom & Jerry", pack: "CARTOONS", archetype: "STRONG_BULLY_PAL", clues: ["Tough grey bulldog with a spiked collar", "Protective father of his pup Tyke", "Clobbers Tom whenever his nap is disturbed"] },
 
-      // 10. Oggy and the Cockroaches
       { name: "Oggy", universe: "Oggy and the Cockroaches", pack: "CARTOONS", archetype: "LAZY_KID_HERO", clues: ["Lazy blue cat with a red nose who just wants to watch TV", "Tormented daily by three cockroaches in his house", "Swats cockroaches with a flyswatter"] },
       { name: "Jack", universe: "Oggy and the Cockroaches", pack: "CARTOONS", archetype: "STRONG_BULLY_PAL", clues: ["Green-furred hot-tempered cousin of Oggy", "Builds wild contraptions to catch the cockroaches", "Drives a monster truck"] },
       { name: "Joey (Cockroach)", universe: "Oggy and the Cockroaches", pack: "CARTOONS", archetype: "GENIUS_STRATEGIST", clues: ["Short purple-headed leader of the three cockroaches", "Has one pink eye and one yellow eye", "Masterminds raids on Oggy's fridge"] },
 
-      // 11. Roll No. 21
       { name: "Kris (Roll No. 21)", universe: "Roll No. 21", pack: "CARTOONS", archetype: "SHONEN_HERO", clues: ["Blue-skinned boy at Mathura Anath Ashram", "Modern incarnation of Lord Krishna", "Plays his flute to defeat Kanishk's monsters"] },
       { name: "Kanishk", universe: "Roll No. 21", pack: "CARTOONS", archetype: "ICONIC_VILLAIN", clues: ["Evil principal of Mathura Anath Ashram", "Modern incarnation of Kansa", "Summons demons to defeat Kris"] },
 
       // ==================== 12 EVERYDAY & POP CULTURE CATEGORIES ====================
-      // 1. Indian Celebrities
       { name: "Shah Rukh Khan", universe: "Indian Celebrities", pack: "EVERYDAY", archetype: "BOLLYWOOD_STAR", clues: ["King of Bollywood known for his signature open-arms pose", "Starred in DDLJ, Pathaan, and Jawan", "Owner of Kolkata Knight Riders"] },
       { name: "Salman Khan", universe: "Indian Celebrities", pack: "EVERYDAY", archetype: "BOLLYWOOD_STAR", clues: ["Bollywood Bhaijaan famous for his turquoise bracelet", "Starred in Bajrangi Bhaijaan, Sultan, and Tiger", "Host of Bigg Boss"] },
       { name: "Ranbir Kapoor", universe: "Indian Celebrities", pack: "EVERYDAY", archetype: "BOLLYWOOD_STAR", clues: ["Starred in Rockstar, Yeh Jawaani Hai Deewani, and Animal", "Son of Rishi and Neetu Kapoor", "Married to Alia Bhatt"] },
@@ -944,7 +1265,6 @@
       { name: "Virat Kohli", universe: "Indian Celebrities", pack: "EVERYDAY", archetype: "CRICKET_LEGEND", clues: ["King Kohli — Indian batting superstar with jersey #18", "Famous for aggressive chase masterclasses", "Married to Anushka Sharma"] },
       { name: "MS Dhoni", universe: "Indian Celebrities", pack: "EVERYDAY", archetype: "CRICKET_LEGEND", clues: ["Captain Cool with jersey #7 and the helicopter shot", "Won all three ICC trophies for India", "Beloved CSK legend"] },
 
-      // 2. Indian YouTubers
       { name: "CarryMinati", universe: "Indian YouTubers", pack: "EVERYDAY", archetype: "COMEDY_YOUTUBER", clues: ["Ajey Nagar — India's biggest roasting YouTuber", "Famous for 'Toh kaise hain aap log'", "Released Yalgaar"] },
       { name: "BB Ki Vines", universe: "Indian YouTubers", pack: "EVERYDAY", archetype: "COMEDY_YOUTUBER", clues: ["Bhuvan Bam — plays Titu Mama, Sameer Fuddi, and Bablu Ji", "First Indian individual creator to cross 10M subscribers", "Starred in Taaza Khabar"] },
       { name: "Ashish Chanchlani", universe: "Indian YouTubers", pack: "EVERYDAY", archetype: "COMEDY_YOUTUBER", clues: ["Ulhasnagar comedy sketch creator famous for 'Bijli ka bill tera baap bharega'", "Makes hilarious family & exam skits", "Huge Marvel fan"] },
@@ -952,61 +1272,51 @@
       { name: "Triggered Insaan", universe: "Indian YouTubers", pack: "EVERYDAY", archetype: "GAMING_YOUTUBER", clues: ["Nischay Malhan — family-friendly roast & commentary creator", "Brother of Fukra Insaan", "Streams games on Live Insaan"] },
       { name: "Sourav Joshi", universe: "Indian YouTubers", pack: "EVERYDAY", archetype: "VLOG_YOUTUBER", clues: ["India's #1 daily family vlogger from Uttarakhand", "Features his cousin Piyush and dog Oreo", "Started with sketching videos"] },
 
-      // 3. Fruits
       { name: "Mango", universe: "Fruits", pack: "EVERYDAY", archetype: "FRUIT_ITEM", clues: ["King of Fruits in India during summer", "Sweet yellow-orange pulp with a single large seed", "Used to make Aamras and Alphonso shakes"] },
       { name: "Watermelon", universe: "Fruits", pack: "EVERYDAY", archetype: "FRUIT_ITEM", clues: ["Giant green-striped fruit with juicy red flesh inside", "Over 90% water — best eaten chilled in summer", "Filled with tiny black seeds"] },
       { name: "Banana", universe: "Fruits", pack: "EVERYDAY", archetype: "FRUIT_ITEM", clues: ["Curved yellow fruit you peel from the top", "Rich in potassium and instant energy", "Favorite snack of monkeys"] },
       { name: "Pineapple", universe: "Fruits", pack: "EVERYDAY", archetype: "FRUIT_ITEM", clues: ["Spiky tropical fruit with a leafy green crown", "Sweet and tangy yellow rings inside", "Debated pizza topping"] },
 
-      // 4. Snacks
       { name: "Samosa", universe: "Snacks", pack: "EVERYDAY", archetype: "SNACK_ITEM", clues: ["Crispy golden triangular pastry stuffed with spiced potatoes", "Served hot with green mint and tamarind chutney", "India's #1 evening tea-time snack"] },
       { name: "Pani Puri", universe: "Snacks", pack: "EVERYDAY", archetype: "SNACK_ITEM", clues: ["Hollow crispy puri filled with potato, chickpeas, and spicy tangy water", "Also called Golgappa or Puchka", "Eaten in one whole bite at street stalls"] },
       { name: "Vada Pav", universe: "Snacks", pack: "EVERYDAY", archetype: "SNACK_ITEM", clues: ["Mumbai's iconic spicy potato fritter sandwiched inside a pav bun", "Served with dry garlic chutney and fried green chili", "Known as the Indian burger"] },
       { name: "Momos", universe: "Snacks", pack: "EVERYDAY", archetype: "SNACK_ITEM", clues: ["Steamed or fried dumplings stuffed with veggies or chicken", "Served with fiery red chili garlic chutney", "Popular street snack across North India"] },
 
-      // 5. Sweets
       { name: "Gulab Jamun", universe: "Sweets", pack: "EVERYDAY", archetype: "SWEET_ITEM", clues: ["Soft fried khoya balls soaked in warm rose-cardamom sugar syrup", "Dark golden-brown Indian wedding dessert", "Tastes amazing warm with vanilla ice cream"] },
       { name: "Jalebi", universe: "Sweets", pack: "EVERYDAY", archetype: "SWEET_ITEM", clues: ["Crispy orange spiral coils dipped in saffron sugar syrup", "Often paired with fafda or rabri", "Juicy crunch in every swirl"] },
       { name: "Kaju Katli", universe: "Sweets", pack: "EVERYDAY", archetype: "SWEET_ITEM", clues: ["Diamond-shaped cashew fudge topped with edible silver varq", "Most gifted mithai during Diwali", "Smooth melt-in-the-mouth texture"] },
       { name: "Rasmalai", universe: "Sweets", pack: "EVERYDAY", archetype: "SWEET_ITEM", clues: ["Soft flattened paneer discs soaked in chilled saffron-pistachio milk", "Served cold in bowls", "Rich Bengali milk dessert"] },
 
-      // 6. Dairy
       { name: "Paneer", universe: "Dairy", pack: "EVERYDAY", archetype: "DAIRY_ITEM", clues: ["Soft white cottage cheese cubes used in Tikka and Shahi gravies", "Main protein source in Indian vegetarian feasts", "Does not melt when grilled"] },
       { name: "Butter", universe: "Dairy", pack: "EVERYDAY", archetype: "DAIRY_ITEM", clues: ["Creamy yellow dairy spread melted on pav bhaji and parathas", "Famous Amul mascot girl advertises it", "Churned from cream"] },
       { name: "Cheese", universe: "Dairy", pack: "EVERYDAY", archetype: "DAIRY_ITEM", clues: ["Stretchy mozzarella or cheddar grated over pizzas and sandwiches", "Comes in slices, cubes, and blocks", "Melts into gooey goodness"] },
       { name: "Curd (Dahi)", universe: "Dairy", pack: "EVERYDAY", archetype: "DAIRY_ITEM", clues: ["Thick fermented yogurt eaten with rice, parathas, or raita", "Considered lucky with sugar before exams", "Cooling probiotic dairy staple"] },
 
-      // 7. Drinks
       { name: "Masala Chai", universe: "Drinks", pack: "EVERYDAY", archetype: "DRINK_ITEM", clues: ["Hot Indian milk tea brewed with ginger, cardamom, and tea leaves", "Served in small cutting glasses or kulhads", "Morning fuel for millions"] },
       { name: "Cold Coffee", universe: "Drinks", pack: "EVERYDAY", archetype: "DRINK_ITEM", clues: ["Chilled frothy coffee blended with milk, ice, and chocolate syrup", "Topped with cocoa powder or vanilla scoop", "Cafe favorite"] },
       { name: "Mango Lassi", universe: "Drinks", pack: "EVERYDAY", archetype: "DRINK_ITEM", clues: ["Thick creamy yogurt smoothie blended with sweet mango pulp", "Served chilled in tall glasses", "Refreshing summer Punjabi drink"] },
       { name: "Nimbu Pani", universe: "Drinks", pack: "EVERYDAY", archetype: "DRINK_ITEM", clues: ["Freshly squeezed lemon water with black salt, sugar, and mint", "Instant summer hydration drink", "Also called Shikanji"] },
 
-      // 8. Stationery
       { name: "Ballpoint Pen", universe: "Stationery", pack: "EVERYDAY", archetype: "STATIONERY_ITEM", clues: ["Everyday blue or black ink writing tool with a cap", "Used in school exams and offices", "Often borrowed and never returned"] },
       { name: "Pencil", universe: "Stationery", pack: "EVERYDAY", archetype: "STATIONERY_ITEM", clues: ["Wooden graphite writing stick that needs sharpening", "Marks can be rubbed out with an eraser", "Apsara or Nataraj classic"] },
       { name: "Eraser", universe: "Stationery", pack: "EVERYDAY", archetype: "STATIONERY_ITEM", clues: ["Soft white rubber block used to wipe away pencil mistakes", "Leaves little rubber crumbs on the notebook", "Gets poked with pencils by bored students"] },
       { name: "Highlighter", universe: "Stationery", pack: "EVERYDAY", archetype: "STATIONERY_ITEM", clues: ["Fluorescent neon yellow or pink chisel-tip marker", "Used to mark important lines in textbooks", "Bright glowing ink"] },
 
-      // 9. Transport
       { name: "Auto Rickshaw", universe: "Transport", pack: "EVERYDAY", archetype: "TRANSPORT_ITEM", clues: ["Three-wheeled black-and-yellow or green-and-yellow city vehicle", "Weaves through Indian traffic with a meter", "Open sides with a black canopy roof"] },
       { name: "Metro Rail", universe: "Transport", pack: "EVERYDAY", archetype: "TRANSPORT_ITEM", clues: ["Air-conditioned urban rapid transit train running above or underground", "Uses smart cards or QR tokens at gates", "Beats city road traffic"] },
       { name: "Aeroplane", universe: "Transport", pack: "EVERYDAY", archetype: "TRANSPORT_ITEM", clues: ["Jet-powered aircraft flying high above the clouds", "Requires boarding passes and airport security", "Fastest way across countries"] },
       { name: "Bicycle", universe: "Transport", pack: "EVERYDAY", archetype: "TRANSPORT_ITEM", clues: ["Two-wheeled pedal-powered vehicle with handlebars and a bell", "Zero fuel needed, pure leg power", "First ride kids learn to balance"] },
 
-      // 10. Gadgets
+      { name: "Computer", universe: "Gadgets", pack: "EVERYDAY", archetype: "GADGET_ITEM", clues: ["Desktop or laptop machine with a monitor, keyboard, and mouse", "Used for coding, browsing, and gaming", "Runs Windows, macOS, or Linux"] },
       { name: "Smartphone", universe: "Gadgets", pack: "EVERYDAY", archetype: "GADGET_ITEM", clues: ["Pocket touchscreen device used for WhatsApp, games, and reels", "Charged daily with a USB-C or Lightning cable", "Everyone checks it first thing in the morning"] },
       { name: "Wireless Earbuds", universe: "Gadgets", pack: "EVERYDAY", archetype: "GADGET_ITEM", clues: ["Tiny Bluetooth earphones stored inside a pocket charging case", "Used for music, calls, and noise cancellation", "Easy to misplace one bud"] },
       { name: "Smartwatch", universe: "Gadgets", pack: "EVERYDAY", archetype: "GADGET_ITEM", clues: ["Digital wrist gadget that counts steps, heart rate, and notifications", "Touchscreen watch face with replaceable straps", "Syncs to your phone"] },
-      { name: "Gaming Laptop", universe: "Gadgets", pack: "EVERYDAY", archetype: "GADGET_ITEM", clues: ["Portable computer with RGB backlit keyboard and loud cooling fans", "Built with a dedicated graphics card for high-FPS games", "Heavy to carry in a backpack"] },
 
-      // 11. Footwear
       { name: "Sneakers", universe: "Footwear", pack: "EVERYDAY", archetype: "FOOTWEAR_ITEM", clues: ["Lace-up casual sports shoes with cushioned rubber soles", "Worn daily with jeans or joggers", "Collected by sneakerheads"] },
       { name: "Crocs", universe: "Footwear", pack: "EVERYDAY", archetype: "FOOTWEAR_ITEM", clues: ["Lightweight foam clogs full of ventilation holes", "Has a heel strap you can flip into 'sports mode'", "Waterproof and super comfy"] },
       { name: "Flip-Flops", universe: "Footwear", pack: "EVERYDAY", archetype: "FOOTWEAR_ITEM", clues: ["Flat rubber chappals with a Y-shaped strap between the toes", "Worn at home, beaches, and quick errands", "Makes a slapping sound when walking"] },
       { name: "Formal Loafers", universe: "Footwear", pack: "EVERYDAY", archetype: "FOOTWEAR_ITEM", clues: ["Slip-on leather shoes with no laces", "Worn to weddings, parties, and office meetings", "Polished sleek look"] },
 
-      // 12. Weather
       { name: "Monsoon Rain", universe: "Weather", pack: "EVERYDAY", archetype: "WEATHER_ITEM", clues: ["Heavy seasonal downpour accompanied by petrichor smell", "Requires umbrellas, raincoats, and chai-pakora", "Brings relief after scorching summer heat"] },
       { name: "Thunderstorm", universe: "Weather", pack: "EVERYDAY", archetype: "WEATHER_ITEM", clues: ["Dark storm clouds with bright lightning flashes and loud thunder", "Gusty winds and heavy rain", "Makes windows rattle"] },
       { name: "Snowfall", universe: "Weather", pack: "EVERYDAY", archetype: "WEATHER_ITEM", clues: ["Soft white ice flakes drifting down in freezing winter", "Blankets mountains like Manali and Kashmir", "Perfect for snowballs and snowmen"] },
@@ -1022,10 +1332,20 @@
       "from-fuchsia-500 to-purple-600"
     ];
 
+    // Distinct Pen Colors for Draw To Find (Player 1 = Blue, Player 2 = Red, Player 3 = Green, Player 4 = Yellow, etc.)
+    const DRAW_PEN_PALETTE = [
+      { name: "Blue", hex: "#2563eb", badgeBg: "bg-blue-500/20 border-blue-400/50 text-blue-300" },
+      { name: "Red", hex: "#dc2626", badgeBg: "bg-rose-500/20 border-rose-400/50 text-rose-300" },
+      { name: "Green", hex: "#16a34a", badgeBg: "bg-emerald-500/20 border-emerald-400/50 text-emerald-300" },
+      { name: "Yellow", hex: "#eab308", badgeBg: "bg-amber-500/20 border-amber-400/50 text-amber-300" },
+      { name: "Purple", hex: "#9333ea", badgeBg: "bg-purple-500/20 border-purple-400/50 text-purple-300" },
+      { name: "Cyan", hex: "#0891b2", badgeBg: "bg-cyan-500/20 border-cyan-400/50 text-cyan-300" }
+    ];
+
     const BOT_NAMES = ["Bot Zuko", "Bot Levi", "Bot Nova", "Bot Kira", "Bot Ren"];
 
     // =========================================================================
-    // 3. FIREBASE REAL-TIME MULTIPLAYER STATE
+    // 3. FIREBASE REAL-TIME MULTIPLAYER & PERMANENT PROFILE STATE
     // =========================================================================
     let auth = null;
     let db = null;
@@ -1033,6 +1353,12 @@
     let isLocalFallback = false;
 
     let currentUser = { uid: 'player_' + Math.random().toString(36).slice(2, 10) };
+    let userProfile = null; // { username, pin, displayName, friends: [], friendRequests: [], invites: [] }
+    let profileUnsubscribe = null;
+    let heartbeatInterval = null;
+    let authModalMode = 'register';
+    let activeRoomInvite = null;
+
     let landingGameType = 'ODD_ONE_OUT';
     let landingMaxPlayers = 4;
 
@@ -1043,11 +1369,24 @@
     let chatUnsubscribe = null;
     let botActionTimeout = null;
 
-    // Local 2-Click Confirmation State (Never auto-votes on 1st click)
+    // 2-Click Confirmation States
     let pendingVoteTargetUid = null;
     let pendingGuessWinnerUid = null;
 
-    // Pre-fill room code from ?room=XXXXX invite URL
+    // Draw To Find Canvas State
+    let isDrawingStroke = false;
+    let currentStrokePoints = [];
+    let hasDrawnThisTurn = false;
+
+    // 10-Second Hold-to-Record Voice Message State
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let isRecordingVoice = false;
+    let voiceRecordStartTime = 0;
+    let voiceTimerInterval = null;
+    let voiceAutoStopTimeout = null;
+
+    // Check URL invite parameter (?room=XXXXX)
     const urlParams = new URLSearchParams(window.location.search);
     const invitedRoomParam = (urlParams.get('room') || '').toUpperCase().trim();
     if (invitedRoomParam && invitedRoomParam.length === 5) {
@@ -1061,13 +1400,14 @@
         auth = getAuth(app);
         db = getFirestore(app);
 
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
           if (user) {
             currentUser = user;
             firebaseReady = true;
             isLocalFallback = false;
-            statusPill.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Online Sync Ready (odd-one-mafia)`;
+            statusPill.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Online Sync Ready`;
             statusPill.className = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-950/80 border border-emerald-500/30 text-[10px] font-semibold text-emerald-300';
+            await restoreSavedProfileSession();
           }
         });
 
@@ -1075,17 +1415,448 @@
       } catch (err) {
         console.warn('Firebase connection notice:', err);
         isLocalFallback = true;
-        statusPill.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Local Bot Mode (Check Firebase Internet/Rules)`;
+        statusPill.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Offline Bot Mode`;
         statusPill.className = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-950/80 border border-amber-500/30 text-[10px] font-semibold text-amber-300';
+        await restoreSavedProfileSession();
       }
     }
 
     // =========================================================================
-    // 4. LANDING SCREEN CONTROLS
+    // 4. PERMANENT @USERNAME + 4-DIGIT PIN PROFILE SYSTEM
+    // =========================================================================
+    function sanitizeUsername(raw) {
+      return String(raw || '').toLowerCase().replace(/^@+/, '').replace(/[^a-z0-9_]/g, '').slice(0, 16);
+    }
+
+    async function restoreSavedProfileSession() {
+      const savedRaw = localStorage.getItem('odd_one_mafia_profile_v1');
+      if (savedRaw) {
+        try {
+          const parsed = JSON.parse(savedRaw);
+          if (parsed && parsed.username && parsed.pin) {
+            if (firebaseReady && !isLocalFallback && db) {
+              const userSnap = await getDoc(doc(db, 'users', parsed.username));
+              if (userSnap.exists() && userSnap.data().pin === parsed.pin) {
+                applyLoggedInProfile(userSnap.data());
+                return;
+              }
+            } else {
+              applyLoggedInProfile(parsed);
+              return;
+            }
+          }
+        } catch (e) {
+          console.warn('Session restore error:', e);
+        }
+      }
+      // First-time visitor: show permanent profile setup modal
+      document.getElementById('auth-modal').classList.remove('hidden');
+    }
+
+    window.switchAuthTab = function (tab) {
+      authModalMode = tab;
+      const regTab = document.getElementById('auth-tab-register');
+      const logTab = document.getElementById('auth-tab-login');
+      const dispGroup = document.getElementById('auth-displayname-group');
+      const submitBtn = document.getElementById('auth-submit-btn');
+
+      if (tab === 'register') {
+        regTab.className = 'py-2 rounded-xl bg-violet-600 text-white text-xs font-extrabold transition';
+        logTab.className = 'py-2 rounded-xl text-slate-400 text-xs font-extrabold transition';
+        dispGroup.classList.remove('hidden');
+        submitBtn.textContent = '🚀 Save Permanent Profile & Enter';
+      } else {
+        logTab.className = 'py-2 rounded-xl bg-violet-600 text-white text-xs font-extrabold transition';
+        regTab.className = 'py-2 rounded-xl text-slate-400 text-xs font-extrabold transition';
+        dispGroup.classList.add('hidden');
+        submitBtn.textContent = '🔑 Log In to My @Username';
+      }
+    };
+
+    window.openProfileSwitchModal = function () {
+      document.getElementById('auth-switch-cancel-wrap').classList.remove('hidden');
+      window.switchAuthTab('login');
+      document.getElementById('auth-modal').classList.remove('hidden');
+    };
+
+    window.submitProfileAuth = async function (event) {
+      event.preventDefault();
+      const username = sanitizeUsername(document.getElementById('auth-username-input').value);
+      const pin = String(document.getElementById('auth-pin-input').value || '').replace(/\D/g, '').slice(0, 4);
+      const rawDisplay = (document.getElementById('auth-displayname-input').value || '').trim();
+
+      if (username.length < 3) {
+        showToast('Username must be at least 3 letters/numbers!', 'warning');
+        return;
+      }
+      if (pin.length !== 4) {
+        showToast('Enter a 4-digit numeric PIN!', 'warning');
+        return;
+      }
+
+      const submitBtn = document.getElementById('auth-submit-btn');
+      submitBtn.disabled = true;
+
+      try {
+        if (firebaseReady && !isLocalFallback && db) {
+          const userRef = doc(db, 'users', username);
+          const snap = await getDoc(userRef);
+
+          if (authModalMode === 'register') {
+            if (snap.exists()) {
+              showToast(`@${username} is already taken! Try another or log in.`, 'error');
+              return;
+            }
+            const newProfile = {
+              username,
+              pin,
+              displayName: rawDisplay || username,
+              friends: [],
+              friendRequests: [],
+              invites: [],
+              lastSeen: Date.now(),
+              createdAt: Date.now()
+            };
+            await setDoc(userRef, newProfile);
+            applyLoggedInProfile(newProfile);
+            showToast(`Created permanent profile @${username}!`, 'success');
+          } else {
+            if (!snap.exists()) {
+              showToast(`Account @${username} not found!`, 'error');
+              return;
+            }
+            const existing = snap.data();
+            if (existing.pin !== pin) {
+              showToast('Incorrect 4-digit PIN!', 'error');
+              return;
+            }
+            await updateDoc(userRef, { lastSeen: Date.now() });
+            applyLoggedInProfile(existing);
+            showToast(`Welcome back, @${username}!`, 'success');
+          }
+        } else {
+          // Local fallback profile
+          const localProf = {
+            username,
+            pin,
+            displayName: rawDisplay || username,
+            friends: [],
+            friendRequests: [],
+            invites: [],
+            lastSeen: Date.now()
+          };
+          applyLoggedInProfile(localProf);
+          showToast(`Signed in as @${username}!`, 'success');
+        }
+      } catch (err) {
+        console.error('Profile auth error:', err);
+        showToast('Could not save profile. Check connection!', 'error');
+      } finally {
+        submitBtn.disabled = false;
+      }
+    };
+
+    function applyLoggedInProfile(profile) {
+      userProfile = profile;
+      localStorage.setItem('odd_one_mafia_profile_v1', JSON.stringify({
+        username: profile.username,
+        pin: profile.pin,
+        displayName: profile.displayName
+      }));
+
+      document.getElementById('auth-modal').classList.add('hidden');
+      document.getElementById('header-profile-controls').classList.remove('hidden');
+      document.getElementById('header-username-label').textContent = `@${profile.username}`;
+      document.getElementById('landing-profile-tag').textContent = `@${profile.username}`;
+      document.getElementById('friends-modal-my-tag').textContent = `@${profile.username}`;
+
+      const nameInput = document.getElementById('player-name-input');
+      if (!nameInput.value.trim()) {
+        nameInput.value = profile.displayName || profile.username;
+      }
+
+      subscribeToUserProfile(profile.username);
+    }
+
+    function subscribeToUserProfile(username) {
+      if (profileUnsubscribe) profileUnsubscribe();
+      if (heartbeatInterval) clearInterval(heartbeatInterval);
+
+      if (!firebaseReady || isLocalFallback || !db) {
+        updateFriendsUI();
+        return;
+      }
+
+      const userRef = doc(db, 'users', username);
+      profileUnsubscribe = onSnapshot(userRef, (snap) => {
+        if (!snap.exists()) return;
+        userProfile = snap.data();
+        updateFriendsUI();
+
+        // Check for incoming room invites (within last 2 minutes)
+        const invites = Array.isArray(userProfile.invites) ? userProfile.invites : [];
+        const freshInvites = invites.filter(inv => Date.now() - (inv.createdAt || 0) < 120000);
+        if (freshInvites.length > 0 && !currentRoomCode) {
+          const latest = freshInvites[freshInvites.length - 1];
+          if (!activeRoomInvite || activeRoomInvite.roomCode !== latest.roomCode || activeRoomInvite.createdAt !== latest.createdAt) {
+            activeRoomInvite = latest;
+            const gameLabel = latest.gameType === 'MAFIA'
+              ? 'Mafia'
+              : latest.gameType === 'DRAW_TO_FIND'
+                ? 'Draw To Find'
+                : latest.gameType === 'GUESS_THE_NAME'
+                  ? 'Guess The Name'
+                  : 'Odd One Out';
+            document.getElementById('live-invite-text').textContent = `@${latest.fromUsername} invited you to ${gameLabel} (${latest.roomCode})!`;
+            document.getElementById('live-invite-banner').classList.remove('hidden');
+          }
+        }
+      });
+
+      // Keep online status fresh every 25 seconds
+      heartbeatInterval = setInterval(() => {
+        if (firebaseReady && !isLocalFallback && db && userProfile) {
+          updateDoc(userRef, { lastSeen: Date.now() }).catch(() => {});
+        }
+      }, 25000);
+    }
+
+    // =========================================================================
+    // 5. PERMANENT FRIENDS LIST & 1-TAP DIRECT ROOM INVITES
+    // =========================================================================
+    window.toggleFriendsModal = function (show) {
+      const modal = document.getElementById('friends-modal');
+      if (show) {
+        modal.classList.remove('hidden');
+        updateFriendsUI();
+      } else {
+        modal.classList.add('hidden');
+      }
+    };
+
+    window.sendFriendRequest = async function (event) {
+      event.preventDefault();
+      if (!userProfile) return;
+      const input = document.getElementById('add-friend-username-input');
+      const targetUsername = sanitizeUsername(input.value);
+
+      if (!targetUsername || targetUsername.length < 3) {
+        showToast('Enter a valid @username!', 'warning');
+        return;
+      }
+      if (targetUsername === userProfile.username) {
+        showToast("You can't add yourself!", 'warning');
+        return;
+      }
+      if ((userProfile.friends || []).includes(targetUsername)) {
+        showToast(`@${targetUsername} is already on your Friends List!`, 'info');
+        input.value = '';
+        return;
+      }
+
+      if (!firebaseReady || isLocalFallback || !db) {
+        showToast('Connect to internet to add friends!', 'warning');
+        return;
+      }
+
+      try {
+        const targetRef = doc(db, 'users', targetUsername);
+        const targetSnap = await getDoc(targetRef);
+        if (!targetSnap.exists()) {
+          showToast(`Player @${targetUsername} does not exist!`, 'error');
+          return;
+        }
+
+        await updateDoc(targetRef, {
+          friendRequests: arrayUnion(userProfile.username)
+        });
+        input.value = '';
+        showToast(`Friend request sent to @${targetUsername}!`, 'success');
+      } catch (err) {
+        console.error('Send friend request error:', err);
+        showToast('Could not send friend request.', 'error');
+      }
+    };
+
+    window.respondFriendRequest = async function (requesterUsername, accept) {
+      if (!userProfile || !firebaseReady || isLocalFallback || !db) return;
+      try {
+        const myRef = doc(db, 'users', userProfile.username);
+        const theirRef = doc(db, 'users', requesterUsername);
+
+        await updateDoc(myRef, {
+          friendRequests: arrayRemove(requesterUsername),
+          ...(accept ? { friends: arrayUnion(requesterUsername) } : {})
+        });
+
+        if (accept) {
+          await updateDoc(theirRef, {
+            friends: arrayUnion(userProfile.username)
+          });
+          showToast(`@${requesterUsername} added to your permanent Friends List!`, 'success');
+        } else {
+          showToast(`Declined request from @${requesterUsername}`, 'info');
+        }
+      } catch (err) {
+        console.error('Respond friend request error:', err);
+      }
+    };
+
+    window.sendDirectRoomInvite = async function (friendUsername) {
+      if (!userProfile || !currentRoomCode || !currentRoomData) return;
+      if (!firebaseReady || isLocalFallback || !db) {
+        showToast('Online sync needed for direct invites!', 'warning');
+        return;
+      }
+
+      try {
+        const friendRef = doc(db, 'users', friendUsername);
+        await updateDoc(friendRef, {
+          invites: arrayUnion({
+            roomCode: currentRoomCode,
+            fromUsername: userProfile.username,
+            fromName: userProfile.displayName || userProfile.username,
+            gameType: currentRoomData.gameType || 'ODD_ONE_OUT',
+            createdAt: Date.now()
+          })
+        });
+        showToast(`📨 Sent direct room invite to @${friendUsername}!`, 'success');
+      } catch (err) {
+        console.error('Send invite error:', err);
+        showToast(`Could not invite @${friendUsername}.`, 'error');
+      }
+    };
+
+    window.acceptRoomInvite = async function () {
+      if (!activeRoomInvite) return;
+      const code = activeRoomInvite.roomCode;
+      window.dismissRoomInvite();
+      document.getElementById('join-code-input').value = code;
+      await window.joinRoom();
+    };
+
+    window.dismissRoomInvite = function () {
+      document.getElementById('live-invite-banner').classList.add('hidden');
+      if (userProfile && activeRoomInvite && firebaseReady && !isLocalFallback && db) {
+        updateDoc(doc(db, 'users', userProfile.username), {
+          invites: arrayRemove(activeRoomInvite)
+        }).catch(() => {});
+      }
+      activeRoomInvite = null;
+    };
+
+    async function updateFriendsUI() {
+      if (!userProfile) return;
+      const friends = Array.isArray(userProfile.friends) ? userProfile.friends : [];
+      const requests = Array.isArray(userProfile.friendRequests) ? userProfile.friendRequests : [];
+
+      document.getElementById('landing-friends-count').textContent = friends.length;
+      document.getElementById('friends-count-label').textContent = friends.length;
+
+      const reqBadge = document.getElementById('header-friend-req-badge');
+      if (requests.length > 0) {
+        reqBadge.textContent = requests.length;
+        reqBadge.classList.remove('hidden');
+      } else {
+        reqBadge.classList.add('hidden');
+      }
+
+      // Render Incoming Friend Requests
+      const reqSection = document.getElementById('friend-requests-section');
+      const reqList = document.getElementById('friend-requests-list');
+      if (requests.length > 0) {
+        reqSection.classList.remove('hidden');
+        reqList.innerHTML = '';
+        requests.forEach(reqUser => {
+          reqList.innerHTML += `
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30">
+              <span class="text-xs font-extrabold text-white">@${escapeHtml(reqUser)}</span>
+              <div class="flex items-center gap-1.5">
+                <button type="button" onclick="window.respondFriendRequest('${reqUser}', true)"
+                  class="px-2.5 py-1 rounded-lg bg-emerald-500 text-slate-950 font-extrabold text-[11px]">
+                  Accept
+                </button>
+                <button type="button" onclick="window.respondFriendRequest('${reqUser}', false)"
+                  class="px-2 py-1 rounded-lg bg-slate-800 text-slate-300 font-bold text-[11px]">
+                  ✕
+                </button>
+              </div>
+            </div>
+          `;
+        });
+      } else {
+        reqSection.classList.add('hidden');
+      }
+
+      // Render Saved Friends in Modal & Lobby Invite Bar
+      const listContainer = document.getElementById('friends-list-container');
+      const lobbyInviteRow = document.getElementById('lobby-friends-invite-row');
+      listContainer.innerHTML = '';
+      lobbyInviteRow.innerHTML = '';
+
+      if (friends.length === 0) {
+        listContainer.innerHTML = `
+          <div class="p-4 rounded-2xl bg-slate-950/60 border border-dashed border-slate-800 text-center text-xs text-slate-500">
+            No friends saved yet. Enter your friend's @username above to add them forever!
+          </div>
+        `;
+        lobbyInviteRow.innerHTML = `
+          <span class="text-[11px] text-slate-400">No saved friends yet — tap "+ Add Friend" to add by @username!</span>
+        `;
+        return;
+      }
+
+      for (const fUsername of friends) {
+        let isOnline = false;
+        if (firebaseReady && !isLocalFallback && db) {
+          try {
+            const fSnap = await getDoc(doc(db, 'users', fUsername));
+            if (fSnap.exists()) {
+              isOnline = (Date.now() - (fSnap.data().lastSeen || 0)) < 65000;
+            }
+          } catch (e) {}
+        }
+
+        listContainer.innerHTML += `
+          <div class="flex items-center justify-between p-2.5 rounded-2xl bg-slate-950/80 border border-slate-800">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full ${isOnline ? 'bg-emerald-400' : 'bg-slate-600'}"></span>
+              <div>
+                <div class="text-xs font-extrabold text-white">@${escapeHtml(fUsername)}</div>
+                <div class="text-[10px] ${isOnline ? 'text-emerald-400' : 'text-slate-500'}">
+                  ${isOnline ? 'Online now' : 'Offline'}
+                </div>
+              </div>
+            </div>
+            ${currentRoomCode ? `
+              <button type="button" onclick="window.sendDirectRoomInvite('${fUsername}')"
+                class="px-3 py-1.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-extrabold text-[11px] transition active:scale-95">
+                📨 Invite
+              </button>
+            ` : `
+              <span class="text-[10px] font-bold text-slate-500">Saved ✓</span>
+            `}
+          </div>
+        `;
+
+        lobbyInviteRow.innerHTML += `
+          <button type="button" onclick="window.sendDirectRoomInvite('${fUsername}')"
+            class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-violet-600/30 border border-slate-700 hover:border-violet-400 flex items-center gap-1.5 shrink-0 transition active:scale-95">
+            <span class="w-2 h-2 rounded-full ${isOnline ? 'bg-emerald-400' : 'bg-slate-500'}"></span>
+            <span class="text-xs font-extrabold text-white">@${escapeHtml(fUsername)}</span>
+            <span class="text-[10px] font-bold text-violet-300">Invite</span>
+          </button>
+        `;
+      }
+    }
+
+    // =========================================================================
+    // 6. LANDING SCREEN CONTROLS
     // =========================================================================
     window.selectLandingGameType = function (type) {
-      landingGameType = ['ODD_ONE_OUT', 'MAFIA', 'GUESS_THE_NAME'].includes(type) ? type : 'ODD_ONE_OUT';
+      landingGameType = ['ODD_ONE_OUT', 'DRAW_TO_FIND', 'MAFIA', 'GUESS_THE_NAME'].includes(type) ? type : 'ODD_ONE_OUT';
       const oddBtn = document.getElementById('landing-game-odd');
+      const drawBtn = document.getElementById('landing-game-draw');
       const mafiaBtn = document.getElementById('landing-game-mafia');
       const guessBtn = document.getElementById('landing-game-guess');
       const createBtn = document.getElementById('btn-create-room');
@@ -1093,6 +1864,7 @@
 
       const inactiveCls = 'p-3 rounded-2xl border-2 border-slate-800 bg-slate-950/70 text-left transition active:scale-[0.98]';
       oddBtn.className = inactiveCls;
+      drawBtn.className = inactiveCls;
       mafiaBtn.className = inactiveCls;
       guessBtn.className = inactiveCls;
 
@@ -1102,6 +1874,11 @@
         createBtn.className = 'w-full py-3.5 px-5 rounded-2xl bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-500 hover:to-orange-500 text-white font-extrabold text-sm sm:text-base shadow-lg shadow-rose-600/25 transition active:scale-[0.98]';
         createBtn.textContent = '🔫 Create Mafia Room';
         rangeHint.textContent = 'Min 4 • Max 6';
+      } else if (landingGameType === 'DRAW_TO_FIND') {
+        drawBtn.className = 'p-3 rounded-2xl border-2 border-cyan-400 bg-cyan-500/15 text-left transition active:scale-[0.98] shadow-lg shadow-cyan-950/30';
+        createBtn.className = 'w-full py-3.5 px-5 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-extrabold text-sm sm:text-base shadow-lg shadow-cyan-600/25 transition active:scale-[0.98]';
+        createBtn.textContent = '🎨 Create Draw To Find Room';
+        rangeHint.textContent = 'Min 3 • Max 6';
       } else if (landingGameType === 'GUESS_THE_NAME') {
         guessBtn.className = 'p-3 rounded-2xl border-2 border-amber-500 bg-amber-500/15 text-left transition active:scale-[0.98] shadow-lg shadow-amber-950/30';
         createBtn.className = 'w-full py-3.5 px-5 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-extrabold text-sm sm:text-base shadow-lg shadow-amber-600/25 transition active:scale-[0.98]';
@@ -1133,9 +1910,11 @@
         const active = sz === landingMaxPlayers;
         const activeStyle = landingGameType === 'MAFIA'
           ? 'border-rose-500 bg-rose-500/20 text-white shadow'
-          : landingGameType === 'GUESS_THE_NAME'
-            ? 'border-amber-500 bg-amber-500/20 text-white shadow'
-            : 'border-violet-500 bg-violet-500/20 text-white shadow';
+          : landingGameType === 'DRAW_TO_FIND'
+            ? 'border-cyan-400 bg-cyan-500/20 text-white shadow'
+            : landingGameType === 'GUESS_THE_NAME'
+              ? 'border-amber-500 bg-amber-500/20 text-white shadow'
+              : 'border-violet-500 bg-violet-500/20 text-white shadow';
 
         container.innerHTML += `
           <button type="button" onclick="window.selectLandingSize(${sz})"
@@ -1152,7 +1931,7 @@
     initFirebaseConnection();
 
     // =========================================================================
-    // 5. UI & FIRESTORE STORAGE HELPERS
+    // 7. UI & FIRESTORE HELPERS
     // =========================================================================
     function showToast(message, type = 'info') {
       const container = document.getElementById('toast-container');
@@ -1174,7 +1953,7 @@
     }
 
     function switchView(viewId) {
-      ['view-landing', 'view-lobby', 'view-game-odd', 'view-game-mafia', 'view-game-guess', 'view-results'].forEach(id => {
+      ['view-landing', 'view-lobby', 'view-game-odd', 'view-game-mafia', 'view-game-guess', 'view-game-draw', 'view-results'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.add('hidden');
       });
@@ -1182,13 +1961,16 @@
       if (target) target.classList.remove('hidden');
 
       const headerControls = document.getElementById('header-room-controls');
+      const profileControls = document.getElementById('header-profile-controls');
       if (viewId === 'view-landing') {
         headerControls.classList.add('hidden');
+        if (userProfile) profileControls.classList.remove('hidden');
         document.getElementById('header-title').textContent = 'ODD ONE MAFIA';
-        document.getElementById('header-subtitle').textContent = 'Odd One Out • Mafia • Guess The Name';
+        document.getElementById('header-subtitle').textContent = '4 Party Games • Friends & Voice';
         document.getElementById('header-logo-badge').textContent = '?';
       } else {
         headerControls.classList.remove('hidden');
+        profileControls.classList.add('hidden');
       }
     }
 
@@ -1233,7 +2015,8 @@
       const input = document.getElementById('player-name-input');
       const clean = (input.value || '').trim().replace(/\s+/g, ' ');
       if (!clean) {
-        showToast('Enter your nickname first!', 'warning');
+        if (userProfile && userProfile.displayName) return userProfile.displayName;
+        showToast('Enter your display name first!', 'warning');
         input.focus();
         return null;
       }
@@ -1269,7 +2052,127 @@
     }
 
     // =========================================================================
-    // 6. CREATE & JOIN ROOMS
+    // 8. HOLD-TO-RECORD VOICE NOTES (MAX 10 SECONDS)
+    // =========================================================================
+    window.startVoiceRecording = async function (event) {
+      if (event) event.preventDefault();
+      if (isRecordingVoice || !currentRoomCode || !currentRoomData) return;
+
+      if (currentRoomData.gameType === 'MAFIA') {
+        const aliveIds = currentRoomData.alivePlayerIds || [];
+        if (!aliveIds.includes(currentUser.uid)) {
+          showToast('Eliminated players cannot send voice notes.', 'warning');
+          return;
+        }
+      }
+
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        showToast('Microphone is not supported on this browser.', 'error');
+        return;
+      }
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+          ? 'audio/webm;codecs=opus'
+          : MediaRecorder.isTypeSupported('audio/mp4')
+            ? 'audio/mp4'
+            : '';
+
+        mediaRecorder = mimeType
+          ? new MediaRecorder(stream, { mimeType, audioBitsPerSecond: 16000 })
+          : new MediaRecorder(stream);
+
+        audioChunks = [];
+        isRecordingVoice = true;
+        voiceRecordStartTime = Date.now();
+
+        const overlay = document.getElementById('voice-recording-overlay');
+        const timerText = document.getElementById('voice-recording-timer');
+        overlay.classList.remove('hidden');
+
+        voiceTimerInterval = setInterval(() => {
+          const elapsed = Math.min(10.0, (Date.now() - voiceRecordStartTime) / 1000);
+          timerText.textContent = `Recording Voice Note... ${elapsed.toFixed(1)}s / 10.0s`;
+        }, 100);
+
+        mediaRecorder.ondataavailable = (e) => {
+          if (e.data && e.data.size > 0) audioChunks.push(e.data);
+        };
+
+        mediaRecorder.onstop = async () => {
+          stream.getTracks().forEach(t => t.stop());
+          clearInterval(voiceTimerInterval);
+          clearTimeout(voiceAutoStopTimeout);
+          overlay.classList.add('hidden');
+
+          const durationSec = Math.max(1, Math.min(10, Math.round((Date.now() - voiceRecordStartTime) / 1000)));
+          if (audioChunks.length === 0) return;
+
+          const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+          if (blob.size > 350000) {
+            showToast('Voice note too large—keep it under 10 seconds!', 'warning');
+            return;
+          }
+
+          const reader = new FileReader();
+          reader.onloadend = async () => {
+            const base64Audio = reader.result;
+            const me = (currentRoomData.players || []).find(p => p.uid === currentUser.uid);
+            if (!me || !base64Audio) return;
+
+            await appendChatMessage({
+              round: currentRoomData.round,
+              senderId: currentUser.uid,
+              senderName: me.name,
+              colorIdx: me.colorIdx,
+              text: `🎙️ Voice Note (${durationSec}s)`,
+              audioData: base64Audio,
+              audioDuration: durationSec,
+              createdAt: Date.now()
+            });
+          };
+          reader.readAsDataURL(blob);
+        };
+
+        mediaRecorder.start();
+
+        // Automatically stop & send at 10.0 seconds max
+        voiceAutoStopTimeout = setTimeout(() => {
+          if (isRecordingVoice) {
+            window.stopVoiceRecording();
+          }
+        }, 10000);
+      } catch (err) {
+        console.warn('Mic permission error:', err);
+        isRecordingVoice = false;
+        showToast('Please allow microphone permission to send voice notes!', 'warning');
+      }
+    };
+
+    window.stopVoiceRecording = function (event) {
+      if (event) event.preventDefault();
+      if (!isRecordingVoice) return;
+      isRecordingVoice = false;
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+      }
+    };
+
+    window.cancelVoiceRecording = function (event) {
+      if (!isRecordingVoice) return;
+      isRecordingVoice = false;
+      audioChunks = [];
+      clearInterval(voiceTimerInterval);
+      clearTimeout(voiceAutoStopTimeout);
+      document.getElementById('voice-recording-overlay').classList.add('hidden');
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+      }
+    };
+
+    // =========================================================================
+    // 9. CREATE & JOIN ROOMS
     // =========================================================================
     window.createRoom = async function () {
       const nickname = getPlayerNickname();
@@ -1295,6 +2198,7 @@
         const code = generateRoomCode();
         const initialPlayer = {
           uid: currentUser.uid,
+          username: userProfile ? userProfile.username : '',
           name: nickname,
           colorIdx: 0,
           score: 0,
@@ -1321,9 +2225,15 @@
           oddUniverse: '',
           activeClues: [],
           imposterId: '',
-          // Anti-repeat history: stores "MajorityName|OddName" strings and recent majority names
           usedPairsHistory: [],
           recentMajorityHistory: [],
+          // Draw To Find state
+          drawWord: '',
+          drawUniverse: '',
+          blenderId: '',
+          drawPhase: 'drawing', // 'drawing' or 'voting'
+          drawTurnIndex: 0,     // 0 to (maxPlayers * 2 - 1) across 2 cycles
+          drawStrokes: [],      // [{ playerId, color, points: [{x, y}] }]
           // Mafia state
           mafiaPhase: 'night',
           mafiaTurnNumber: 1,
@@ -1356,9 +2266,11 @@
 
         const label = landingGameType === 'MAFIA'
           ? 'Mafia'
-          : landingGameType === 'GUESS_THE_NAME'
-            ? 'Guess The Name'
-            : 'Odd One Out';
+          : landingGameType === 'DRAW_TO_FIND'
+            ? 'Draw To Find'
+            : landingGameType === 'GUESS_THE_NAME'
+              ? 'Guess The Name'
+              : 'Odd One Out';
         showToast(`Created ${landingMaxPlayers}-player ${label} room ${code}!`, 'success');
       } catch (err) {
         console.error('Create room error:', err);
@@ -1418,6 +2330,7 @@
           if (data.status === 'lobby' && botIdx !== -1) {
             players[botIdx] = {
               uid: currentUser.uid,
+              username: userProfile ? userProfile.username : '',
               name: nickname,
               colorIdx: players[botIdx].colorIdx,
               score: 0,
@@ -1449,6 +2362,7 @@
 
         players.push({
           uid: currentUser.uid,
+          username: userProfile ? userProfile.username : '',
           name: nickname,
           colorIdx: assignedColor,
           score: 0,
@@ -1485,6 +2399,7 @@
       localChatMessages = [];
       pendingVoteTargetUid = null;
       pendingGuessWinnerUid = null;
+      hasDrawnThisTurn = false;
 
       if (firebaseReady && !isLocalFallback && db && leavingCode && leavingData && currentUser) {
         try {
@@ -1497,12 +2412,11 @@
               hostId: nextHostId
             });
           }
-        } catch (e) {
-          // Ignore cleanup errors
-        }
+        } catch (e) {}
       }
 
       switchView('view-landing');
+      updateFriendsUI();
     };
 
     window.switchLobbyGameType = async function (newGameType) {
@@ -1510,7 +2424,7 @@
         showToast('Only the room host can switch game mode.', 'warning');
         return;
       }
-      const targetType = ['ODD_ONE_OUT', 'MAFIA', 'GUESS_THE_NAME'].includes(newGameType) ? newGameType : 'ODD_ONE_OUT';
+      const targetType = ['ODD_ONE_OUT', 'DRAW_TO_FIND', 'MAFIA', 'GUESS_THE_NAME'].includes(newGameType) ? newGameType : 'ODD_ONE_OUT';
       let maxPlayers = Number(currentRoomData.maxPlayers) || 4;
       if (targetType === 'MAFIA' && maxPlayers < 4) {
         maxPlayers = 4;
@@ -1568,6 +2482,7 @@
         }
         players.push({
           uid: `bot_${Date.now()}_${botCounter}`,
+          username: '',
           name: BOT_NAMES[botCounter % BOT_NAMES.length],
           colorIdx,
           score: 0,
@@ -1582,7 +2497,7 @@
     };
 
     // =========================================================================
-    // 7. REAL-TIME SUBSCRIPTIONS & STATE ROUTING
+    // 10. REAL-TIME SUBSCRIPTIONS & STATE ROUTING
     // =========================================================================
     function subscribeToRoom(code) {
       currentRoomCode = code;
@@ -1600,13 +2515,16 @@
             return;
           }
           const prevRound = currentRoomData ? currentRoomData.round : -1;
-          const prevPhase = currentRoomData ? currentRoomData.mafiaPhase : '';
+          const prevPhase = currentRoomData ? (currentRoomData.mafiaPhase || currentRoomData.drawPhase) : '';
+          const prevTurn = currentRoomData ? currentRoomData.drawTurnIndex : -1;
           currentRoomData = snapshot.data();
 
-          // Reset pending 2-click selections whenever round or phase transitions
-          if (currentRoomData.round !== prevRound || currentRoomData.mafiaPhase !== prevPhase) {
+          if (currentRoomData.round !== prevRound || (currentRoomData.mafiaPhase || currentRoomData.drawPhase) !== prevPhase) {
             pendingVoteTargetUid = null;
             pendingGuessWinnerUid = null;
+          }
+          if (currentRoomData.drawTurnIndex !== prevTurn) {
+            hasDrawnThisTurn = false;
           }
 
           renderRoomState(currentRoomData);
@@ -1636,6 +2554,10 @@
         document.getElementById('header-title').textContent = 'MAFIA';
         document.getElementById('header-subtitle').textContent = `${maxPlayers}-Player Social Deduction`;
         document.getElementById('header-logo-badge').textContent = '🔫';
+      } else if (gType === 'DRAW_TO_FIND') {
+        document.getElementById('header-title').textContent = 'DRAW TO FIND';
+        document.getElementById('header-subtitle').textContent = `${maxPlayers}-Player Sketch Deduction`;
+        document.getElementById('header-logo-badge').textContent = '🎨';
       } else if (gType === 'GUESS_THE_NAME') {
         document.getElementById('header-title').textContent = 'GUESS THE NAME';
         document.getElementById('header-subtitle').textContent = `${maxPlayers}-Player Chat Charades`;
@@ -1654,6 +2576,9 @@
         if (gType === 'MAFIA') {
           switchView('view-game-mafia');
           renderMafiaGame(data, isHost);
+        } else if (gType === 'DRAW_TO_FIND') {
+          switchView('view-game-draw');
+          renderDrawToFindGame(data, isHost);
         } else if (gType === 'GUESS_THE_NAME') {
           switchView('view-game-guess');
           renderGuessTheNameGame(data, isHost);
@@ -1669,21 +2594,26 @@
     }
 
     // =========================================================================
-    // 8. LOBBY RENDERER
+    // 11. LOBBY RENDERER
     // =========================================================================
     function renderLobby(data, isHost, maxPlayers) {
       const gType = data.gameType || 'ODD_ONE_OUT';
       const isMafia = gType === 'MAFIA';
+      const isDraw = gType === 'DRAW_TO_FIND';
       const isGuess = gType === 'GUESS_THE_NAME';
       const isOdd = gType === 'ODD_ONE_OUT';
 
       document.getElementById('lobby-room-code').textContent = data.roomCode;
       document.getElementById('lobby-player-count').textContent = `${data.players.length} / ${maxPlayers}`;
+      updateFriendsUI();
 
       const gameBadge = document.getElementById('lobby-game-badge');
       if (isMafia) {
         gameBadge.textContent = '🔫 MAFIA';
         gameBadge.className = 'px-2 py-0.5 rounded-full bg-rose-500/20 border border-rose-500/30 text-[10px] font-extrabold text-rose-300';
+      } else if (isDraw) {
+        gameBadge.textContent = '🎨 DRAW TO FIND';
+        gameBadge.className = 'px-2 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-500/30 text-[10px] font-extrabold text-cyan-300';
       } else if (isGuess) {
         gameBadge.textContent = '🎭 GUESS THE NAME';
         gameBadge.className = 'px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/30 text-[10px] font-extrabold text-amber-300';
@@ -1726,7 +2656,7 @@
                     ${isMe ? '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-violet-500/20 text-violet-300">YOU</span>' : ''}
                   </div>
                   <span class="text-[10px] text-slate-400">
-                    ${isRoomHost ? '👑 Host' : (player.isBot ? '🤖 Demo Bot' : '✅ Ready')}
+                    ${isRoomHost ? '👑 Host' : (player.isBot ? '🤖 Demo Bot' : (player.username ? '@' + escapeHtml(player.username) : '✅ Ready'))}
                   </span>
                 </div>
               </div>
@@ -1751,21 +2681,23 @@
         }
       }
 
-      // Game Mode Switch Buttons
+      // Game Mode Switch Buttons (All 4 Games)
       const switchOdd = document.getElementById('lobby-switch-odd');
+      const switchDraw = document.getElementById('lobby-switch-draw');
       const switchMafia = document.getElementById('lobby-switch-mafia');
       const switchGuess = document.getElementById('lobby-switch-guess');
-      switchOdd.disabled = !isHost;
-      switchMafia.disabled = !isHost;
-      switchGuess.disabled = !isHost;
+      [switchOdd, switchDraw, switchMafia, switchGuess].forEach(b => { b.disabled = !isHost; });
 
-      switchOdd.className = `py-2 px-2 rounded-xl border text-[11px] sm:text-xs font-extrabold transition ${
+      switchOdd.className = `py-2 px-2 rounded-xl border text-[11px] font-extrabold transition ${
         isOdd ? 'border-violet-500 bg-violet-500/20 text-white' : 'border-slate-800 bg-slate-950/60 text-slate-400'
       }`;
-      switchMafia.className = `py-2 px-2 rounded-xl border text-[11px] sm:text-xs font-extrabold transition ${
+      switchDraw.className = `py-2 px-2 rounded-xl border text-[11px] font-extrabold transition ${
+        isDraw ? 'border-cyan-400 bg-cyan-500/20 text-white' : 'border-slate-800 bg-slate-950/60 text-slate-400'
+      }`;
+      switchMafia.className = `py-2 px-2 rounded-xl border text-[11px] font-extrabold transition ${
         isMafia ? 'border-rose-500 bg-rose-500/20 text-white' : 'border-slate-800 bg-slate-950/60 text-slate-400'
       }`;
-      switchGuess.className = `py-2 px-2 rounded-xl border text-[11px] sm:text-xs font-extrabold transition ${
+      switchGuess.className = `py-2 px-2 rounded-xl border text-[11px] font-extrabold transition ${
         isGuess ? 'border-amber-500 bg-amber-500/20 text-white' : 'border-slate-800 bg-slate-950/60 text-slate-400'
       }`;
 
@@ -1781,9 +2713,11 @@
         const active = sz === maxPlayers;
         const activeClass = isMafia
           ? 'border-rose-500 bg-rose-500/20 text-white shadow-sm'
-          : isGuess
-            ? 'border-amber-500 bg-amber-500/20 text-white shadow-sm'
-            : 'border-violet-500 bg-violet-500/20 text-white shadow-sm';
+          : isDraw
+            ? 'border-cyan-400 bg-cyan-500/20 text-white shadow-sm'
+            : isGuess
+              ? 'border-amber-500 bg-amber-500/20 text-white shadow-sm'
+              : 'border-violet-500 bg-violet-500/20 text-white shadow-sm';
         capContainer.innerHTML += `
           <button type="button" onclick="window.setMaxPlayers(${sz})" ${!isHost ? 'disabled' : ''}
             class="py-2 rounded-xl border text-xs font-extrabold transition ${
@@ -1795,11 +2729,13 @@
       });
 
       const oddSettingsEl = document.getElementById('lobby-odd-settings');
+      const drawSettingsEl = document.getElementById('lobby-draw-settings');
       const mafiaSettingsEl = document.getElementById('lobby-mafia-settings');
       const guessSettingsEl = document.getElementById('lobby-guess-settings');
       const packWrapperEl = document.getElementById('lobby-pack-selector-wrapper');
 
       oddSettingsEl.classList.add('hidden');
+      drawSettingsEl.classList.add('hidden');
       mafiaSettingsEl.classList.add('hidden');
       guessSettingsEl.classList.add('hidden');
 
@@ -1811,12 +2747,13 @@
         document.getElementById('mafia-villager-count-text').textContent = `${villagersCount} Villager${villagersCount === 1 ? '' : 's'}`;
       } else {
         packWrapperEl.classList.remove('hidden');
-        if (isGuess) {
+        if (isDraw) {
+          drawSettingsEl.classList.remove('hidden');
+        } else if (isGuess) {
           guessSettingsEl.classList.remove('hidden');
         } else {
           oddSettingsEl.classList.remove('hidden');
 
-          // Same-Universe vs Cross-Universe Toggle
           const isCross = Boolean(data.crossServerMode);
           const btnSame = document.getElementById('btn-universe-same');
           const btnCross = document.getElementById('btn-universe-cross');
@@ -1841,7 +2778,6 @@
             checkSame.className = 'text-xs text-slate-600 font-bold';
           }
 
-          // Classic vs Undercover Toggle
           const imposterKnows = data.imposterKnows !== false;
           const btnClassic = document.getElementById('btn-mode-classic');
           const btnUndercover = document.getElementById('btn-mode-undercover');
@@ -1868,7 +2804,6 @@
           }
         }
 
-        // Pack Selector Buttons
         const selectedPack = data.selectedPack || 'ALL';
         document.querySelectorAll('.pack-btn').forEach(btn => {
           btn.disabled = !isHost;
@@ -1891,9 +2826,11 @@
           startBtn.disabled = false;
           startBtn.textContent = isMafia
             ? `🔫 Start ${maxPlayers}-Player Mafia Match`
-            : isGuess
-              ? `🎭 Start ${maxPlayers}-Player Guess The Name`
-              : `🚀 Start ${maxPlayers}-Player Odd One Out`;
+            : isDraw
+              ? `🎨 Start ${maxPlayers}-Player Draw To Find`
+              : isGuess
+                ? `🎭 Start ${maxPlayers}-Player Guess The Name`
+                : `🚀 Start ${maxPlayers}-Player Odd One Out`;
         } else {
           startBtn.disabled = true;
           startBtn.textContent = `Waiting for ${maxPlayers} Players (${data.players.length}/${maxPlayers})...`;
@@ -1905,28 +2842,23 @@
     }
 
     // =========================================================================
-    // 9. DYNAMIC ANTI-REPEAT PAIRING ENGINE (SAME-UNIVERSE & CROSS-UNIVERSE)
+    // 12. ANTI-REPEAT CROSS-UNIVERSE PAIRING ENGINE
     // =========================================================================
     function generateDynamicOddOneOutPair(selectedPack, isCrossServer, usedPairsHistory, recentMajorityHistory) {
       const pool = CHARACTER_DATABASE.filter(c => selectedPack === 'ALL' || c.pack === selectedPack);
       const activePool = pool.length >= 2 ? pool : CHARACTER_DATABASE;
 
-      // Build all valid (majority, odd) pairs based on Same-Universe vs Cross-Universe
       let validPairs = [];
 
       if (isCrossServer) {
-        // Cross-Universe: different universes, preferably matching archetype (e.g., Sasuke [Naruto] vs Vegeta [DBZ] or Megumi [JJK])
         for (const maj of activePool) {
           for (const odd of activePool) {
-            if (maj.name === odd.name) continue;
-            if (maj.universe === odd.universe) continue;
-            if (maj.pack !== odd.pack) continue; // Keep Anime vs Anime, Cartoon vs Cartoon, Everyday vs Everyday
+            if (maj.name === odd.name || maj.universe === odd.universe || maj.pack !== odd.pack) continue;
             if (maj.archetype === odd.archetype) {
               validPairs.push({ maj, odd, priority: 1 });
             }
           }
         }
-        // Fallback if a pack has fewer matching archetypes across universes
         if (validPairs.length === 0) {
           for (const maj of activePool) {
             for (const odd of activePool) {
@@ -1937,7 +2869,6 @@
           }
         }
       } else {
-        // Same-Universe: two distinct characters from the exact same anime/cartoon/everyday category
         for (const maj of activePool) {
           for (const odd of activePool) {
             if (maj.name !== odd.name && maj.universe === odd.universe) {
@@ -1948,26 +2879,20 @@
       }
 
       if (validPairs.length === 0) {
-        // Ultimate safety fallback
         validPairs.push({ maj: CHARACTER_DATABASE[0], odd: CHARACTER_DATABASE[1], priority: 1 });
       }
 
       const usedPairSet = new Set(Array.isArray(usedPairsHistory) ? usedPairsHistory : []);
       const recentMajList = Array.isArray(recentMajorityHistory) ? recentMajorityHistory : [];
 
-      // Filter out any (majority|odd) pair that has ALREADY been used in previous rounds!
-      // Example: If Round 1 was Naruto -> Luffy, and Round 4 picks Naruto again, "Naruto Uzumaki|Monkey D. Luffy" is excluded!
       let unusedPairs = validPairs.filter(p => !usedPairSet.has(`${p.maj.name}|${p.odd.name}`) && !usedPairSet.has(`${p.odd.name}|${p.maj.name}`));
 
-      // If every single combination in the pack has been exhausted, reset pair history
       let resetHistory = false;
       if (unusedPairs.length === 0) {
         unusedPairs = validPairs;
         resetHistory = true;
       }
 
-      // Strongly prefer majority characters NOT used in the last 2 rounds so consecutive rounds feel super fresh,
-      // while still allowing a majority character to return on Round 4+ with a brand new Odd character!
       const lastTwoMajorities = new Set(recentMajList.slice(-2));
       const freshMajorityPairs = unusedPairs.filter(p => !lastTwoMajorities.has(p.maj.name));
       const candidatePool = freshMajorityPairs.length > 0 ? freshMajorityPairs : unusedPairs;
@@ -1984,7 +2909,7 @@
     }
 
     // =========================================================================
-    // 10. START NEW ROUND (ALL 3 GAMES)
+    // 13. START NEW ROUND (ALL 4 GAMES)
     // =========================================================================
     window.startNewRound = async function () {
       if (!currentRoomData || currentRoomData.hostId !== currentUser.uid) return;
@@ -1999,6 +2924,7 @@
 
       pendingVoteTargetUid = null;
       pendingGuessWinnerUid = null;
+      hasDrawnThisTurn = false;
       const nextRound = (currentRoomData.round || 0) + 1;
 
       if (gType === 'MAFIA') {
@@ -2032,6 +2958,32 @@
           text: `Match ${nextRound} started! 1 Mafia, 1 Doctor, and ${maxPlayers - 2} Innocent Villagers. Night 1 begins...`,
           createdAt: Date.now()
         });
+      } else if (gType === 'DRAW_TO_FIND') {
+        const activePack = currentRoomData.selectedPack || 'ALL';
+        const pool = CHARACTER_DATABASE.filter(c => activePack === 'ALL' || c.pack === activePack);
+        const activePool = pool.length > 0 ? pool : CHARACTER_DATABASE;
+        const chosenChar = activePool[Math.floor(Math.random() * activePool.length)];
+        const blenderPlayer = currentRoomData.players[Math.floor(Math.random() * currentRoomData.players.length)];
+
+        await saveRoomPatch({
+          status: 'discussion',
+          round: nextRound,
+          drawWord: chosenChar.name,
+          drawUniverse: chosenChar.universe,
+          blenderId: blenderPlayer.uid,
+          drawPhase: 'drawing',
+          drawTurnIndex: 0,
+          drawStrokes: [],
+          votes: {}
+        });
+
+        await appendChatMessage({
+          round: nextRound,
+          senderId: 'SYSTEM',
+          senderName: 'Art Master',
+          text: `Round ${nextRound} (${chosenChar.universe})! Everyone draws 2 turns on the shared canvas. Watch closely for The Blender!`,
+          createdAt: Date.now()
+        });
       } else if (gType === 'GUESS_THE_NAME') {
         const activePack = currentRoomData.selectedPack || 'ALL';
         const pool = CHARACTER_DATABASE.filter(c => activePack === 'ALL' || c.pack === activePack);
@@ -2046,7 +2998,6 @@
         }
 
         const chosenChar = available[Math.floor(Math.random() * available.length)];
-        // Rotate Clue Giver cleanly across rounds
         const clueGiverIdx = (nextRound - 1) % currentRoomData.players.length;
         const clueGiver = currentRoomData.players[clueGiverIdx];
 
@@ -2066,11 +3017,10 @@
           round: nextRound,
           senderId: 'SYSTEM',
           senderName: 'Charades Host',
-          text: `Round ${nextRound} (${chosenChar.universe})! ${clueGiver.name} is the Clue Giver. Type your guesses in chat — first one right wins!`,
+          text: `Round ${nextRound} (${chosenChar.universe})! ${clueGiver.name} is the Clue Giver. Guess in chat or voice — first right answer wins!`,
           createdAt: Date.now()
         });
       } else {
-        // ODD ONE OUT (Same-Universe OR Cross-Universe with Anti-Repeat Pairing)
         const activePack = currentRoomData.selectedPack || 'ALL';
         const isCrossServer = Boolean(currentRoomData.crossServerMode);
         const imposterKnows = currentRoomData.imposterKnows !== false;
@@ -2106,7 +3056,7 @@
           round: nextRound,
           senderId: 'SYSTEM',
           senderName: 'Game Master',
-          text: `Round ${nextRound} • ${isCrossServer ? 'Cross-Universe' : 'Same-Universe'} • ${imposterKnows ? 'Classic Mode' : 'Undercover Mode'}. Chat freely and use 2-click voting below!`,
+          text: `Round ${nextRound} • ${isCrossServer ? 'Cross-Universe' : 'Same-Universe'} • ${imposterKnows ? 'Classic Mode' : 'Undercover Mode'}. Chat or hold 🎙️ for voice notes!`,
           createdAt: Date.now()
         });
       }
@@ -2120,12 +3070,12 @@
     };
 
     // =========================================================================
-    // 11. TWO-CLICK VOTING CONFIRMATION HELPERS (ODD ONE OUT & MAFIA)
+    // 14. TWO-CLICK VOTING CONFIRMATION (ODD ONE OUT, MAFIA & DRAW TO FIND)
     // =========================================================================
     window.selectPendingVote = function (targetUid) {
       if (!currentRoomData) return;
       const votes = currentRoomData.votes || {};
-      if (votes[currentUser.uid]) return; // Already locked in
+      if (votes[currentUser.uid]) return;
       pendingVoteTargetUid = targetUid;
       renderRoomState(currentRoomData);
     };
@@ -2142,6 +3092,10 @@
       if (currentRoomData.gameType === 'MAFIA') {
         const aliveIds = currentRoomData.alivePlayerIds || [];
         if (!aliveIds.includes(currentUser.uid) || currentRoomData.mafiaPhase !== 'day') return;
+      }
+
+      if (currentRoomData.gameType === 'DRAW_TO_FIND' && currentRoomData.drawPhase !== 'voting') {
+        return;
       }
 
       const votes = { ...(currentRoomData.votes || {}) };
@@ -2162,17 +3116,15 @@
       if (isPending) {
         return `
           <div class="col-span-1 sm:col-span-2 p-3 rounded-2xl bg-amber-500/15 border-2 border-amber-400 shadow-lg space-y-2 animate-pop-in">
-            <div class="flex items-center justify-between gap-2">
-              <div class="flex items-center gap-2 min-w-0">
-                <div class="w-8 h-8 rounded-xl bg-gradient-to-br ${grad} flex items-center justify-center font-display font-extrabold text-white text-xs shrink-0">
-                  ${initials}
+            <div class="flex items-center gap-2 min-w-0">
+              <div class="w-8 h-8 rounded-xl bg-gradient-to-br ${grad} flex items-center justify-center font-display font-extrabold text-white text-xs shrink-0">
+                ${initials}
+              </div>
+              <div class="truncate">
+                <div class="font-extrabold text-xs sm:text-sm text-amber-200">
+                  Are you sure you want to vote for ${escapeHtml(player.name)}?
                 </div>
-                <div class="truncate">
-                  <div class="font-extrabold text-xs sm:text-sm text-amber-200">
-                    Are you sure you want to vote for ${escapeHtml(player.name)}?
-                  </div>
-                  <div class="text-[10px] text-amber-100/80">Tap Yes to lock in your vote, or No to pick someone else.</div>
-                </div>
+                <div class="text-[10px] text-amber-100/80">Tap Yes to lock in your vote, or No to pick someone else.</div>
               </div>
             </div>
             <div class="grid grid-cols-2 gap-2 pt-0.5">
@@ -2215,7 +3167,335 @@
     }
 
     // =========================================================================
-    // 12. ODD ONE OUT GAMEPLAY RENDERER
+    // 15. DRAW TO FIND (4TH GAME — SHARED CANVAS + 2-CYCLE TURN SYSTEM)
+    // =========================================================================
+    const drawCanvas = document.getElementById('draw-canvas');
+    const drawCtx = drawCanvas.getContext('2d');
+
+    function getCanvasCoords(e) {
+      const rect = drawCanvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      return {
+        x: Math.round(((clientX - rect.left) / rect.width) * 600),
+        y: Math.round(((clientY - rect.top) / rect.height) * 450)
+      };
+    }
+
+    function redrawAllStrokes(strokes, previewPoints = null, previewColor = '#2563eb') {
+      drawCtx.fillStyle = '#ffffff';
+      drawCtx.fillRect(0, 0, 600, 450);
+
+      // Subtle ruled notebook grid lines
+      drawCtx.strokeStyle = '#f1f5f9';
+      drawCtx.lineWidth = 1;
+      for (let x = 50; x < 600; x += 50) {
+        drawCtx.beginPath();
+        drawCtx.moveTo(x, 0);
+        drawCtx.lineTo(x, 450);
+        drawCtx.stroke();
+      }
+      for (let y = 50; y < 450; y += 50) {
+        drawCtx.beginPath();
+        drawCtx.moveTo(0, y);
+        drawCtx.lineTo(600, y);
+        drawCtx.stroke();
+      }
+
+      const allToRender = [...(Array.isArray(strokes) ? strokes : [])];
+      if (previewPoints && previewPoints.length > 0) {
+        allToRender.push({ color: previewColor, points: previewPoints });
+      }
+
+      allToRender.forEach(stroke => {
+        const pts = stroke.points || [];
+        if (pts.length === 0) return;
+        drawCtx.strokeStyle = stroke.color || '#2563eb';
+        drawCtx.lineWidth = 5;
+        drawCtx.lineCap = 'round';
+        drawCtx.lineJoin = 'round';
+
+        drawCtx.beginPath();
+        drawCtx.moveTo(pts[0].x, pts[0].y);
+        for (let i = 1; i < pts.length; i++) {
+          drawCtx.lineTo(pts[i].x, pts[i].y);
+        }
+        if (pts.length === 1) {
+          drawCtx.lineTo(pts[0].x + 1, pts[0].y + 1);
+        }
+        drawCtx.stroke();
+      });
+    }
+
+    function isMyDrawTurn() {
+      if (!currentRoomData || currentRoomData.gameType !== 'DRAW_TO_FIND') return false;
+      if (currentRoomData.drawPhase !== 'drawing') return false;
+      const players = currentRoomData.players || [];
+      const turnIdx = Number(currentRoomData.drawTurnIndex) || 0;
+      const activePlayer = players[turnIdx % players.length];
+      return Boolean(activePlayer && activePlayer.uid === currentUser.uid);
+    }
+
+    drawCanvas.addEventListener('pointerdown', (e) => {
+      if (!isMyDrawTurn() || hasDrawnThisTurn) return;
+      e.preventDefault();
+      isDrawingStroke = true;
+      currentStrokePoints = [getCanvasCoords(e)];
+      const myIdx = currentRoomData.players.findIndex(p => p.uid === currentUser.uid);
+      const myPen = DRAW_PEN_PALETTE[Math.max(0, myIdx) % DRAW_PEN_PALETTE.length];
+      redrawAllStrokes(currentRoomData.drawStrokes, currentStrokePoints, myPen.hex);
+    });
+
+    drawCanvas.addEventListener('pointermove', (e) => {
+      if (!isDrawingStroke) return;
+      e.preventDefault();
+      const pt = getCanvasCoords(e);
+      const last = currentStrokePoints[currentStrokePoints.length - 1];
+      if (!last || Math.hypot(pt.x - last.x, pt.y - last.y) >= 3) {
+        currentStrokePoints.push(pt);
+        const myIdx = currentRoomData.players.findIndex(p => p.uid === currentUser.uid);
+        const myPen = DRAW_PEN_PALETTE[Math.max(0, myIdx) % DRAW_PEN_PALETTE.length];
+        redrawAllStrokes(currentRoomData.drawStrokes, currentStrokePoints, myPen.hex);
+      }
+    });
+
+    async function commitCurrentStrokeAndAdvance() {
+      if (!isDrawingStroke) return;
+      isDrawingStroke = false;
+      if (currentStrokePoints.length === 0 || !currentRoomData) return;
+
+      hasDrawnThisTurn = true;
+      const players = currentRoomData.players || [];
+      const myIdx = players.findIndex(p => p.uid === currentUser.uid);
+      const myPen = DRAW_PEN_PALETTE[Math.max(0, myIdx) % DRAW_PEN_PALETTE.length];
+
+      // Downsample points slightly if stroke is super long so Firestore doc stays lightweight
+      let savedPoints = currentStrokePoints;
+      if (savedPoints.length > 140) {
+        const step = Math.ceil(savedPoints.length / 140);
+        savedPoints = savedPoints.filter((_, idx) => idx % step === 0 || idx === currentStrokePoints.length - 1);
+      }
+
+      const updatedStrokes = [
+        ...(currentRoomData.drawStrokes || []),
+        {
+          playerId: currentUser.uid,
+          color: myPen.hex,
+          points: savedPoints
+        }
+      ];
+
+      currentStrokePoints = [];
+      const nextTurnIndex = (Number(currentRoomData.drawTurnIndex) || 0) + 1;
+      const totalTurnsNeeded = players.length * 2; // 2 full drawing cycles!
+
+      if (nextTurnIndex >= totalTurnsNeeded) {
+        await saveRoomPatch({
+          drawStrokes: updatedStrokes,
+          drawTurnIndex: nextTurnIndex,
+          drawPhase: 'voting',
+          votes: {}
+        });
+        await appendChatMessage({
+          round: currentRoomData.round,
+          senderId: 'SYSTEM',
+          senderName: 'Art Master',
+          text: '🎨 Both drawing cycles are complete! Discuss the drawing and vote out The Blender!',
+          createdAt: Date.now()
+        });
+      } else {
+        await saveRoomPatch({
+          drawStrokes: updatedStrokes,
+          drawTurnIndex: nextTurnIndex
+        });
+      }
+    }
+
+    drawCanvas.addEventListener('pointerup', commitCurrentStrokeAndAdvance);
+    drawCanvas.addEventListener('pointercancel', commitCurrentStrokeAndAdvance);
+
+    window.finishCurrentDrawTurn = async function () {
+      if (!isMyDrawTurn() || !currentRoomData) return;
+      const players = currentRoomData.players || [];
+      const nextTurnIndex = (Number(currentRoomData.drawTurnIndex) || 0) + 1;
+      const totalTurnsNeeded = players.length * 2;
+
+      if (nextTurnIndex >= totalTurnsNeeded) {
+        await saveRoomPatch({
+          drawTurnIndex: nextTurnIndex,
+          drawPhase: 'voting',
+          votes: {}
+        });
+      } else {
+        await saveRoomPatch({ drawTurnIndex: nextTurnIndex });
+      }
+    };
+
+    function renderDrawToFindGame(data, isHost) {
+      const players = data.players || [];
+      const totalPlayers = players.length;
+      const totalTurnsNeeded = totalPlayers * 2;
+      const turnIndex = Math.min(totalTurnsNeeded, Number(data.drawTurnIndex) || 0);
+      const isVotingPhase = data.drawPhase === 'voting' || turnIndex >= totalTurnsNeeded;
+      const cycleNumber = turnIndex < totalPlayers ? 1 : 2;
+
+      document.getElementById('draw-round-badge').textContent = `ROUND ${data.round}`;
+      document.getElementById('draw-cycle-pill').textContent = isVotingPhase
+        ? '✅ 2 / 2 Cycles Done'
+        : `✏️ Drawing Cycle ${cycleNumber} / 2`;
+      document.getElementById('draw-phase-badge').innerHTML = isVotingPhase
+        ? `<span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> Voting Phase`
+        : `<span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span> Turn ${turnIndex + 1} of ${totalTurnsNeeded}`;
+
+      // Secret Word vs The Blender
+      const amIBlender = data.blenderId === currentUser.uid;
+      const banner = document.getElementById('draw-secret-banner');
+      const blenderBadge = document.getElementById('draw-blender-badge');
+      const secretText = document.getElementById('draw-secret-word-text');
+      const roleInst = document.getElementById('draw-role-instruction');
+      document.getElementById('draw-category-tag').textContent = data.drawUniverse || 'Mixed';
+
+      if (amIBlender) {
+        banner.className = 'w-full rounded-3xl bg-gradient-to-br from-rose-700 via-red-900 to-slate-950 border border-rose-400/50 p-3.5 flex flex-col items-center justify-center text-center shadow-2xl shadow-rose-900/40';
+        blenderBadge.classList.remove('hidden');
+        secretText.textContent = '??? (NO WORD)';
+        roleInst.textContent = 'Watch what the others draw, guess the secret object/character, and draw a convincing line on your 2 turns!';
+      } else {
+        banner.className = 'w-full rounded-3xl bg-gradient-to-br from-cyan-700 via-blue-800 to-slate-950 border border-cyan-400/40 p-3.5 flex flex-col items-center justify-center text-center shadow-2xl';
+        blenderBadge.classList.add('hidden');
+        secretText.textContent = data.drawWord || '---';
+        roleInst.textContent = 'Draw 1 stroke per turn (2 turns total on the same page) to prove you know the word without making it obvious to The Blender!';
+      }
+
+      // Render Pen Color Legend
+      const legend = document.getElementById('draw-pen-legend');
+      legend.innerHTML = '';
+      const activePlayer = !isVotingPhase ? players[turnIndex % totalPlayers] : null;
+
+      players.forEach((p, idx) => {
+        const pen = DRAW_PEN_PALETTE[idx % DRAW_PEN_PALETTE.length];
+        const isCurrentArtist = activePlayer && activePlayer.uid === p.uid;
+        legend.innerHTML += `
+          <div class="flex items-center justify-between px-2.5 py-1.5 rounded-xl border ${isCurrentArtist ? 'border-white bg-slate-800 shadow' : 'border-slate-800 bg-slate-950/70'}">
+            <div class="flex items-center gap-1.5 min-w-0">
+              <span class="w-3 h-3 rounded-full shrink-0 border border-white/40" style="background-color: ${pen.hex}"></span>
+              <span class="text-[11px] font-bold text-white truncate">${escapeHtml(p.name)}</span>
+            </div>
+            <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded border ${pen.badgeBg} shrink-0">
+              ${isCurrentArtist ? '✏️ Drawing' : pen.name}
+            </span>
+          </div>
+        `;
+      });
+
+      // Redraw Shared Canvas
+      if (!isDrawingStroke) {
+        redrawAllStrokes(data.drawStrokes || []);
+      }
+
+      // Turn Status & Lock Overlay
+      const turnStatusText = document.getElementById('draw-turn-status-text');
+      const lockOverlay = document.getElementById('draw-canvas-lock-overlay');
+      const doneBtn = document.getElementById('btn-finish-draw-turn');
+
+      if (isVotingPhase) {
+        turnStatusText.textContent = '🎨 Final Drawing Complete — Vote Out The Blender Below!';
+        lockOverlay.classList.add('hidden');
+        doneBtn.classList.add('hidden');
+      } else if (activePlayer && activePlayer.uid === currentUser.uid) {
+        const myIdx = players.findIndex(p => p.uid === currentUser.uid);
+        const myPen = DRAW_PEN_PALETTE[Math.max(0, myIdx) % DRAW_PEN_PALETTE.length];
+        turnStatusText.innerHTML = `<span class="text-emerald-300">✏️ YOUR TURN (Cycle ${cycleNumber}/2)!</span> Draw 1 line with your <span style="color:${myPen.hex}">${myPen.name}</span> pen`;
+        lockOverlay.classList.add('hidden');
+        doneBtn.classList.remove('hidden');
+      } else if (activePlayer) {
+        turnStatusText.textContent = `⏳ ${activePlayer.name} is drawing (Cycle ${cycleNumber}/2)...`;
+        lockOverlay.classList.remove('hidden');
+        doneBtn.classList.add('hidden');
+      }
+
+      // Voting Panel
+      const votes = data.votes || {};
+      const totalVotes = Object.keys(votes).length;
+      const myVote = votes[currentUser.uid];
+      const votingPanel = document.getElementById('draw-voting-panel');
+      const votingPill = document.getElementById('draw-voting-progress-pill');
+
+      if (isVotingPhase) {
+        votingPanel.classList.remove('hidden');
+        votingPill.className = 'px-2.5 py-1 rounded-xl bg-amber-500/20 border border-amber-500/40 text-xs font-extrabold text-amber-300 shrink-0';
+        votingPill.textContent = `🗳️ ${totalVotes} / ${totalPlayers} Voted`;
+
+        document.getElementById('draw-voting-subtitle').textContent = myVote
+          ? `Vote locked (${totalVotes}/${totalPlayers})`
+          : pendingVoteTargetUid
+            ? 'Confirm Yes or No below'
+            : `Tap a suspect (${totalVotes}/${totalPlayers} voted)`;
+
+        const grid = document.getElementById('draw-voting-grid');
+        grid.innerHTML = '';
+        players
+          .filter(p => p.uid !== currentUser.uid)
+          .forEach(player => {
+            grid.innerHTML += buildTwoClickVoteCardHtml(player, myVote, false, Boolean(votes[player.uid]));
+          });
+
+        if (isHost && totalVotes >= totalPlayers) {
+          finalizeDrawToFindResults(data);
+        } else if (isHost) {
+          scheduleDrawVotingBots(data);
+        }
+      } else {
+        votingPanel.classList.add('hidden');
+        votingPill.className = 'px-2.5 py-1 rounded-xl bg-cyan-500/15 border border-cyan-500/30 text-xs font-extrabold text-cyan-300 shrink-0';
+        votingPill.textContent = `✏️ Cycle ${cycleNumber}/2`;
+
+        if (isHost && activePlayer && activePlayer.isBot) {
+          scheduleDrawArtistBot(data, activePlayer, turnIndex, totalTurnsNeeded);
+        }
+      }
+    }
+
+    async function finalizeDrawToFindResults(data) {
+      if (data.status === 'results') return;
+      const votes = data.votes || {};
+      const tally = {};
+      data.players.forEach(p => { tally[p.uid] = 0; });
+
+      Object.values(votes).forEach(targetId => {
+        if (tally[targetId] !== undefined) tally[targetId]++;
+      });
+
+      let maxVotes = 0;
+      Object.values(tally).forEach(count => { if (count > maxVotes) maxVotes = count; });
+
+      const topSuspects = Object.keys(tally).filter(uid => tally[uid] === maxVotes && maxVotes > 0);
+      const isTie = topSuspects.length !== 1;
+      const eliminatedId = isTie ? null : topSuspects[0];
+      const innocentsWon = !isTie && eliminatedId === data.blenderId;
+
+      const updatedPlayers = data.players.map(p => {
+        let bonus = 0;
+        if (innocentsWon && p.uid !== data.blenderId) bonus = 100;
+        else if (!innocentsWon && p.uid === data.blenderId) bonus = 150;
+        return { ...p, score: (p.score || 0) + bonus };
+      });
+
+      await saveRoomPatch({
+        status: 'results',
+        players: updatedPlayers,
+        lastRoundOutcome: {
+          mode: 'DRAW_TO_FIND',
+          innocentsWon,
+          isTie,
+          eliminatedId,
+          tally
+        }
+      });
+    }
+
+    // =========================================================================
+    // 16. ODD ONE OUT GAMEPLAY RENDERER
     // =========================================================================
     function renderOddOneOutGame(data, isHost) {
       document.getElementById('odd-round-badge').textContent = `ROUND ${data.round}`;
@@ -2252,7 +3532,7 @@
         cardBox.className = 'w-full rounded-3xl bg-gradient-to-br from-violet-600 via-indigo-700 to-slate-900 border border-violet-400/40 p-4 flex flex-col items-center justify-center text-center shadow-2xl shadow-violet-900/40 transition-all';
         imposterBadge.classList.add('hidden');
         roleHint.textContent = imposterKnows
-          ? `${innocentCount} Innocents share this exact name. Chat freely and use 2-click voting below!`
+          ? `${innocentCount} Innocents share this exact name. Chat or hold 🎙️ for voice notes, then vote below!`
           : "Undercover Mode: You don't know if you're the Odd One Out! Chat freely and vote below when ready.";
       }
 
@@ -2322,7 +3602,7 @@
     }
 
     // =========================================================================
-    // 13. MAFIA GAMEPLAY RENDERER (WITH 2-CLICK DAYTIME VOTING)
+    // 17. MAFIA GAMEPLAY RENDERER
     // =========================================================================
     function renderMafiaGame(data, isHost) {
       const roles = data.mafiaRoles || {};
@@ -2542,8 +3822,10 @@
 
       const chatInput = document.getElementById('mafia-chat-input');
       const chatSendBtn = document.getElementById('mafia-chat-send-btn');
+      const micBtn = document.getElementById('mafia-mic-btn');
       chatInput.disabled = !amIAlive;
       chatSendBtn.disabled = !amIAlive;
+      if (micBtn) micBtn.disabled = !amIAlive;
       chatInput.placeholder = amIAlive
         ? 'Discuss who the Mafia is...'
         : 'You were eliminated (spectating)...';
@@ -2673,7 +3955,7 @@
     }
 
     // =========================================================================
-    // 14. GUESS THE NAME (CHAT DUMB CHARADES) GAMEPLAY
+    // 18. GUESS THE NAME GAMEPLAY RENDERER
     // =========================================================================
     function renderGuessTheNameGame(data, isHost) {
       const amIClueGiver = data.clueGiverId === currentUser.uid;
@@ -2695,13 +3977,12 @@
         banner.className = 'w-full rounded-3xl bg-gradient-to-br from-amber-600 via-orange-700 to-slate-900 border border-amber-400/50 p-4 flex flex-col items-center justify-center text-center shadow-2xl shadow-amber-900/40';
         tag.textContent = '🎭 YOU ARE THE CLUE GIVER (SECRET CHARACTER)';
         secretDisplay.textContent = data.guessSecretWord || '---';
-        bannerDesc.textContent = `Describe "${data.guessSecretWord}" in chat without typing the name! Tap the first person who guesses it right below.`;
+        bannerDesc.textContent = `Describe "${data.guessSecretWord}" in chat or voice notes without saying the name!`;
         skipBtn.classList.remove('hidden');
         declareBox.classList.remove('hidden');
-        chatInput.placeholder = 'Type hints in chat (do NOT say the secret name)...';
+        chatInput.placeholder = 'Type hints or hold 🎙️ for voice clue...';
         document.getElementById('guess-chat-sub').textContent = 'Give hints in chat, then declare the first correct guesser below!';
 
-        // Render 2-click Declare Winner buttons for the Clue Giver
         const grid = document.getElementById('guess-players-grid');
         grid.innerHTML = '';
 
@@ -2724,7 +4005,7 @@
                         Declare ${escapeHtml(player.name)} as the Winner?
                       </div>
                       <div class="text-[10px] text-emerald-100/80">
-                        ${escapeHtml(player.name)} gets +100 pts, you get +50 pts, and everyone else gets 0 pts.
+                        ${escapeHtml(player.name)} gets +100 pts, you get +50 pts, and others get 0 pts.
                       </div>
                     </div>
                   </div>
@@ -2762,14 +4043,13 @@
         banner.className = 'w-full rounded-3xl bg-gradient-to-br from-cyan-700 via-indigo-800 to-slate-950 border border-cyan-400/40 p-4 flex flex-col items-center justify-center text-center shadow-2xl';
         tag.textContent = '🔎 GUESS THE SECRET CHARACTER';
         secretDisplay.textContent = `${clueGiverName} is giving hints!`;
-        bannerDesc.textContent = `Read ${clueGiverName}'s clues in chat and type your guesses fast — the first player to guess right wins +100 pts!`;
+        bannerDesc.textContent = `Read or listen to ${clueGiverName}'s clues and type your guesses fast — first right answer wins +100 pts!`;
         skipBtn.classList.add('hidden');
         declareBox.classList.add('hidden');
-        chatInput.placeholder = 'Type your guess here (e.g. Naruto, Iron Man, Samosa)...';
+        chatInput.placeholder = 'Type your guess here...';
         document.getElementById('guess-chat-sub').textContent = 'Type your guesses fast — first right answer wins!';
       }
 
-      // If Clue Giver is a Demo Bot, have it automatically drop hints in chat!
       if (isHost && clueGiverPlayer && clueGiverPlayer.isBot) {
         scheduleGuessClueGiverBot(data, clueGiverPlayer);
       }
@@ -2792,9 +4072,8 @@
 
       const updatedPlayers = currentRoomData.players.map(p => {
         let bonus = 0;
-        if (p.uid === winnerUid) bonus = 100; // First correct guesser wins!
-        else if (p.uid === currentRoomData.clueGiverId) bonus = 50; // Clue giver gets 50 pts
-        // All other players get 0 pts!
+        if (p.uid === winnerUid) bonus = 100;
+        else if (p.uid === currentRoomData.clueGiverId) bonus = 50;
         return { ...p, score: (p.score || 0) + bonus };
       });
 
@@ -2856,7 +4135,6 @@
       const me = (currentRoomData.players || []).find(p => p.uid === currentUser.uid);
       if (!me) return;
 
-      // Prevent the Clue Giver from accidentally typing the exact secret character name!
       if (currentRoomData.clueGiverId === currentUser.uid && currentRoomData.guessSecretWord) {
         const secretLower = currentRoomData.guessSecretWord.toLowerCase().trim();
         const firstWord = secretLower.split(' ')[0];
@@ -2877,7 +4155,6 @@
         createdAt: Date.now()
       });
 
-      // If Clue Giver is a Demo Bot and a human typed the right answer, auto-award the human!
       const clueGiver = currentRoomData.players.find(p => p.uid === currentRoomData.clueGiverId);
       if (clueGiver && clueGiver.isBot && currentRoomData.hostId === currentUser.uid && currentRoomData.guessSecretWord) {
         const secretLower = currentRoomData.guessSecretWord.toLowerCase().trim();
@@ -2907,7 +4184,7 @@
     };
 
     // =========================================================================
-    // 15. SHARED CHAT RENDERER
+    // 19. SHARED CHAT & VOICE NOTE BUBBLE RENDERER
     // =========================================================================
     window.sendChatMessage = async function (event, inputId) {
       event.preventDefault();
@@ -2940,9 +4217,11 @@
       const gType = currentRoomData.gameType || 'ODD_ONE_OUT';
       const listId = gType === 'MAFIA'
         ? 'mafia-chat-list'
-        : gType === 'GUESS_THE_NAME'
-          ? 'guess-chat-list'
-          : 'odd-chat-list';
+        : gType === 'DRAW_TO_FIND'
+          ? 'draw-chat-list'
+          : gType === 'GUESS_THE_NAME'
+            ? 'guess-chat-list'
+            : 'odd-chat-list';
       const list = document.getElementById(listId);
       if (!list) return;
 
@@ -2965,17 +4244,26 @@
         const isClueGiverMsg = gType === 'GUESS_THE_NAME' && msg.senderId === currentRoomData.clueGiverId;
         const grad = AVATAR_COLORS[(msg.colorIdx || 0) % AVATAR_COLORS.length];
 
+        const contentHtml = msg.audioData
+          ? `<div class="space-y-1">
+               <div class="text-[11px] font-extrabold opacity-90">${escapeHtml(msg.text || '🎙️ Voice Note')}</div>
+               <audio controls preload="metadata" src="${msg.audioData}" class="h-8 max-w-[200px] sm:max-w-[230px] rounded-lg"></audio>
+             </div>`
+          : escapeHtml(msg.text);
+
         if (isMe) {
           const bubbleBg = gType === 'MAFIA'
-            ? 'bg-rose-600'
-            : gType === 'GUESS_THE_NAME'
-              ? 'bg-amber-500 text-slate-950 font-semibold'
-              : 'bg-violet-600 text-white';
+            ? 'bg-rose-600 text-white'
+            : gType === 'DRAW_TO_FIND'
+              ? 'bg-cyan-500 text-slate-950 font-semibold'
+              : gType === 'GUESS_THE_NAME'
+                ? 'bg-amber-500 text-slate-950 font-semibold'
+                : 'bg-violet-600 text-white';
           list.innerHTML += `
             <div class="flex flex-col items-end">
               <span class="text-[10px] font-bold text-slate-500 mb-0.5 mr-1">You</span>
-              <div class="max-w-[82%] px-3.5 py-2 rounded-2xl rounded-tr-sm ${bubbleBg} text-xs sm:text-sm font-medium shadow">
-                ${escapeHtml(msg.text)}
+              <div class="max-w-[85%] px-3.5 py-2 rounded-2xl rounded-tr-sm ${bubbleBg} text-xs sm:text-sm font-medium shadow">
+                ${contentHtml}
               </div>
             </div>
           `;
@@ -2985,12 +4273,12 @@
               <div class="w-7 h-7 rounded-lg bg-gradient-to-br ${grad} flex items-center justify-center font-display font-extrabold text-[11px] text-white shrink-0 mt-3.5">
                 ${escapeHtml((msg.senderName || '?').slice(0, 2).toUpperCase())}
               </div>
-              <div class="flex flex-col items-start max-w-[80%]">
+              <div class="flex flex-col items-start max-w-[85%]">
                 <span class="text-[10px] font-bold ${isClueGiverMsg ? 'text-amber-300' : 'text-slate-400'} mb-0.5 ml-1">
                   ${escapeHtml(msg.senderName)} ${isClueGiverMsg ? '🎭 (Clue Giver)' : ''}
                 </span>
                 <div class="px-3.5 py-2 rounded-2xl rounded-tl-sm ${isClueGiverMsg ? 'bg-amber-500/15 border border-amber-500/40 text-amber-100' : 'bg-slate-800/95 border border-slate-700/70 text-slate-100'} text-xs sm:text-sm font-medium">
-                  ${escapeHtml(msg.text)}
+                  ${contentHtml}
                 </div>
               </div>
             </div>
@@ -3002,7 +4290,7 @@
     }
 
     // =========================================================================
-    // 16. RESULTS & SCOREBOARD RENDERER
+    // 20. RESULTS & SCOREBOARD RENDERER
     // =========================================================================
     function renderResults(data, isHost) {
       const outcome = data.lastRoundOutcome || {};
@@ -3015,14 +4303,63 @@
       const subtitle = document.getElementById('results-winner-subtitle');
 
       const oddCard = document.getElementById('results-odd-card');
+      const drawCard = document.getElementById('results-draw-card');
       const mafiaCard = document.getElementById('results-mafia-card');
       const guessCard = document.getElementById('results-guess-card');
 
       oddCard.classList.add('hidden');
+      drawCard.classList.add('hidden');
       mafiaCard.classList.add('hidden');
       guessCard.classList.add('hidden');
 
-      if (gType === 'GUESS_THE_NAME') {
+      if (gType === 'DRAW_TO_FIND') {
+        drawCard.classList.remove('hidden');
+        const innocentsWon = Boolean(outcome.innocentsWon);
+        const isTie = Boolean(outcome.isTie);
+        const tally = outcome.tally || {};
+        const blenderPlayer = data.players.find(p => p.uid === data.blenderId);
+        const blenderName = blenderPlayer ? blenderPlayer.name : 'Unknown';
+
+        if (innocentsWon) {
+          banner.className = 'rounded-3xl p-5 text-center border shadow-2xl space-y-1.5 bg-gradient-to-br from-emerald-900/70 via-slate-900 to-slate-950 border-emerald-500/40';
+          emoji.textContent = '🎨';
+          title.textContent = 'ARTISTS CATCH THE BLENDER!';
+          subtitle.textContent = `The group spotted ${blenderName} (+100 pts each)!`;
+        } else {
+          banner.className = 'rounded-3xl p-5 text-center border shadow-2xl space-y-1.5 bg-gradient-to-br from-rose-900/75 via-slate-900 to-slate-950 border-rose-500/40';
+          emoji.textContent = '🎭';
+          title.textContent = 'THE BLENDER ESCAPED!';
+          subtitle.textContent = isTie
+            ? `Vote tied! ${blenderName} blended in seamlessly (+150 pts)!`
+            : `Wrong artist voted out! ${blenderName} fooled everyone (+150 pts)!`;
+        }
+
+        document.getElementById('reveal-draw-word').textContent = data.drawWord || '---';
+        document.getElementById('reveal-draw-universe').textContent = data.drawUniverse || '';
+        document.getElementById('reveal-draw-blender-name').textContent = blenderName;
+
+        const votesList = document.getElementById('reveal-draw-votes-list');
+        votesList.innerHTML = '';
+        data.players.forEach(player => {
+          const count = tally[player.uid] || 0;
+          const pct = Math.round((count / totalPlayers) * 100);
+          const isBl = player.uid === data.blenderId;
+          votesList.innerHTML += `
+            <div class="p-2.5 rounded-xl bg-slate-950/70 border ${isBl ? 'border-rose-500/40' : 'border-slate-800'}">
+              <div class="flex items-center justify-between text-xs font-bold mb-1">
+                <span class="text-white">
+                  ${escapeHtml(player.name)}
+                  ${isBl ? '<span class="ml-1.5 px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 text-[10px]">THE BLENDER</span>' : ''}
+                </span>
+                <span class="text-slate-300">${count} vote${count === 1 ? '' : 's'}</span>
+              </div>
+              <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                <div class="h-full rounded-full ${isBl ? 'bg-rose-500' : 'bg-cyan-400'}" style="width: ${pct}%"></div>
+              </div>
+            </div>
+          `;
+        });
+      } else if (gType === 'GUESS_THE_NAME') {
         guessCard.classList.remove('hidden');
         const winnerPlayer = data.players.find(p => p.uid === outcome.winnerUid);
         const clueGiverPlayer = data.players.find(p => p.uid === outcome.clueGiverId);
@@ -3168,8 +4505,75 @@
     }
 
     // =========================================================================
-    // 17. DEMO BOT AI FOR ALL 3 GAMES
+    // 21. DEMO BOT AI FOR ALL 4 GAMES
     // =========================================================================
+    function scheduleDrawArtistBot(data, botPlayer, turnIndex, totalTurnsNeeded) {
+      if (botActionTimeout) clearTimeout(botActionTimeout);
+      botActionTimeout = setTimeout(async () => {
+        if (!currentRoomData || currentRoomData.gameType !== 'DRAW_TO_FIND' || currentRoomData.drawPhase !== 'drawing') return;
+        if (currentRoomData.drawTurnIndex !== turnIndex) return;
+
+        const players = currentRoomData.players || [];
+        const botIdx = players.findIndex(p => p.uid === botPlayer.uid);
+        const pen = DRAW_PEN_PALETTE[Math.max(0, botIdx) % DRAW_PEN_PALETTE.length];
+
+        // Generate a neat geometric sketch stroke in the bot's pen color
+        const cx = 180 + Math.floor(Math.random() * 240);
+        const cy = 140 + Math.floor(Math.random() * 170);
+        const r = 35 + Math.floor(Math.random() * 35);
+        const points = [];
+        for (let a = 0; a <= Math.PI * 1.5; a += 0.35) {
+          points.push({
+            x: Math.max(20, Math.min(580, Math.round(cx + Math.cos(a) * r))),
+            y: Math.max(20, Math.min(430, Math.round(cy + Math.sin(a) * r)))
+          });
+        }
+
+        const updatedStrokes = [
+          ...(currentRoomData.drawStrokes || []),
+          { playerId: botPlayer.uid, color: pen.hex, points }
+        ];
+        const nextTurnIndex = turnIndex + 1;
+
+        if (nextTurnIndex >= totalTurnsNeeded) {
+          await saveRoomPatch({
+            drawStrokes: updatedStrokes,
+            drawTurnIndex: nextTurnIndex,
+            drawPhase: 'voting',
+            votes: {}
+          });
+        } else {
+          await saveRoomPatch({
+            drawStrokes: updatedStrokes,
+            drawTurnIndex: nextTurnIndex
+          });
+        }
+      }, 1600);
+    }
+
+    function scheduleDrawVotingBots(data) {
+      const bots = data.players.filter(p => p.isBot);
+      if (bots.length === 0) return;
+      const votes = data.votes || {};
+      const unvotedBots = bots.filter(b => !votes[b.uid]);
+      if (unvotedBots.length === 0) return;
+
+      if (botActionTimeout) clearTimeout(botActionTimeout);
+      botActionTimeout = setTimeout(async () => {
+        if (!currentRoomData || currentRoomData.gameType !== 'DRAW_TO_FIND' || currentRoomData.drawPhase !== 'voting') return;
+        const bot = unvotedBots[0];
+        const candidates = data.players.filter(p => p.uid !== bot.uid);
+        const blenderCand = candidates.find(c => c.uid === data.blenderId);
+        const target = (blenderCand && Math.random() < 0.5)
+          ? blenderCand.uid
+          : candidates[Math.floor(Math.random() * candidates.length)].uid;
+
+        await saveRoomPatch({
+          votes: { ...(currentRoomData.votes || {}), [bot.uid]: target }
+        });
+      }, 1800);
+    }
+
     function scheduleOddOneOutBots(data) {
       const bots = data.players.filter(p => p.isBot);
       if (bots.length === 0) return;
