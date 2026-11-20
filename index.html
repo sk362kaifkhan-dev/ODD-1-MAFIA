@@ -243,6 +243,27 @@
   </style>
 </head>
 <body data-theme="midnight" class="min-h-screen flex flex-col">
+<!-- Custom Splash Screen Overlay -->
+<div id="sus-splash" style="position:fixed;inset:0;z-index:99999;background:#07070c;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.4s ease;">
+  <img src="icon.png" alt="Sus Mates" style="width:132px;height:132px;border-radius:50%;box-shadow:0 0 35px rgba(255,42,95,0.35);margin-bottom:20px;" />
+  <div style="font-family:'Inter',sans-serif;font-size:28px;font-weight:900;letter-spacing:3px;color:#ffffff;text-transform:uppercase;">
+    SUS MATES
+  </div>
+  <div style="font-family:'Inter',sans-serif;font-size:12px;font-weight:600;letter-spacing:2px;color:#94a3b8;margin-top:6px;text-transform:uppercase;">
+    Party Games
+  </div>
+</div>
+<script>
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      const splash = document.getElementById('sus-splash');
+      if (splash) {
+        splash.style.opacity = '0';
+        setTimeout(() => splash.remove(), 400);
+      }
+    }, 1100);
+  });
+</script>
 
   <!-- Non-blocking Toast Banner Container -->
   <div id="toast-container" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 w-[92%] max-w-md pointer-events-none"></div>
